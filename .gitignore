@@ -2,3 +2,6 @@
 .DS_Store
 #忽略子目录的.DS_Store
 */.DS_Store
+# 忽略子目录的文件
+*/.idea
+*/__pycache__
