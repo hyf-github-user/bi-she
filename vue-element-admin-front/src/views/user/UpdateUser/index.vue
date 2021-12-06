@@ -25,19 +25,27 @@
     </el-form-item>
 
     <el-form-item label="级别" prop="auth">
-      <el-input v-model="ruleForm.auth" />
+      <el-radio-group v-model="ruleForm.auth">
+        <el-radio :label="1">锁定用户</el-radio>
+        <el-radio :label="2">普通用户</el-radio>
+        <el-radio :label="3">协管员</el-radio>
+        <el-radio :label="4">管理员</el-radio>
+      </el-radio-group>
     </el-form-item>
 
     <el-form-item label="激活状态" prop="active">
-      <el-input v-model="ruleForm.active" />
+      <el-radio v-model="ruleForm.active" :label="true">已激活</el-radio>
+      <el-radio v-model="ruleForm.active" :label="false">未激活</el-radio>
     </el-form-item>
 
     <el-form-item label="确认状态" prop="confirmed">
-      <el-input v-model="ruleForm.confirmed" />
+      <el-radio v-model="ruleForm.confirmed" :label="true">已确认</el-radio>
+      <el-radio v-model="ruleForm.confirmed" :label="false">未确认</el-radio>
     </el-form-item>
 
     <el-form-item label="锁定状态" prop="locked">
-      <el-input v-model="ruleForm.locked" />
+      <el-radio v-model="ruleForm.locked" :label="true">已锁定</el-radio>
+      <el-radio v-model="ruleForm.locked" :label="false">未锁定</el-radio>
     </el-form-item>
 
     <el-form-item label="身份信息" prop="role_id">
@@ -71,6 +79,7 @@ export default {
       if (response.code === 200) {
         console.log('response=====', response)
         this.ruleForm = response.data
+        console.log(this.ruleForm.active)
       }
     })
   },
