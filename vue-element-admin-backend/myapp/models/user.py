@@ -44,6 +44,26 @@ class User(db.Model, UserMixin):
         self.set_role()  # 调用生成角色方法
         self.set_private_key()  # 生成私钥与保存公钥
 
+    # 更新用户信息
+    def update(self, username, name, email, active, locked, confirmed, role_id):
+        self.username = username
+        self.name = name
+        self.email = email
+        self.active = active
+        self.confirmed = confirmed
+        self.role_id = role_id
+        # role_id与locked的关系
+        if self.role_id == 1:
+            self.locked = 1
+        else:
+            self.locked = locked
+        if self.locked == 1:
+            self.role_id = 1
+            self.auth = 1
+        else:
+            # 保证auth与role_id一样
+            self.auth = self.role_id
+
     # 转换为json数据
     def to_json(self):
         return {

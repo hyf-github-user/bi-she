@@ -24,8 +24,8 @@
       <el-input v-model="ruleForm.email" />
     </el-form-item>
 
-    <el-form-item label="级别" prop="auth">
-      <el-radio-group v-model="ruleForm.auth">
+    <el-form-item label="身份信息" prop="role_id">
+      <el-radio-group v-model="ruleForm.role_id">
         <el-radio :label="1">锁定用户</el-radio>
         <el-radio :label="2">普通用户</el-radio>
         <el-radio :label="3">协管员</el-radio>
@@ -45,11 +45,7 @@
 
     <el-form-item label="锁定状态" prop="locked">
       <el-radio v-model="ruleForm.locked" :label="true">已锁定</el-radio>
-      <el-radio v-model="ruleForm.locked" :label="false">未锁定</el-radio>
-    </el-form-item>
-
-    <el-form-item label="身份信息" prop="role_id">
-      <el-input v-model="ruleForm.role_id" />
+      <el-radio v-model="ruleForm.locked" :label="false" :disabled="ruleForm.role_id==1">未锁定</el-radio>
     </el-form-item>
 
     <el-form-item>
@@ -69,7 +65,7 @@ export default {
       rules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { min: 1, max: 5, message: '长度在 1 到 5 个字符', trigger: 'blur' }
         ]
       }
     }
@@ -93,7 +89,7 @@ export default {
           console.log(this.ruleForm.name)
           updateUser(this.ruleForm).then((response) => {
             if (response.code === 200) {
-              this.$alert(this.ruleForm.username + '用户信息已更新!!', 'OK', {
+              this.$alert('用户' + this.ruleForm.username + '信息已更新!!', 'OK', {
                 confirmButtonText: '确定',
                 callback: action => {
                   this.$router.push('/user/ManageUser')

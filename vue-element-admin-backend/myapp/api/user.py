@@ -45,21 +45,16 @@ def updateUser():
     id = data.get('id')
     username = data.get('username')
     name = data.get('name')
-    auth = data.get('auth')
     email = data.get('email')
     active = data.get('active')
     confirmed = data.get('confirmed')
-    locked = data.get('locked')
     role_id = data.get('role_id')
+    locked = data.get('locked')
     user = User.query.get(id)
-    user.username = username
-    user.name = name
-    user.auth = auth
-    user.email = email
-    user.active = active
-    user.confirmed = confirmed
-    user.locked = locked
-    user.role_id = role_id
+    user.update(username=username, name=name,
+                email=email, active=active,
+                locked=locked,
+                confirmed=confirmed, role_id=role_id)
     db.session.commit()
     return Result.success()
 

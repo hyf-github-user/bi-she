@@ -91,7 +91,7 @@ def register_commands(app):
         db.create_all()  # 根据模型生成相应的表
         click.echo('初始化权限与角色的数据库...')
         Role.init_role()
-        admin = User.query.filter_by(auth=3).first()  # 首先查询是否存在超级管理员
+        admin = User.query.filter_by(auth=4).first()  # 首先查询是否存在超级管理员
         if admin is not None:
             click.echo('超级管理员账户已存在,正在更新管理员信息....')
             admin.username = username
@@ -102,7 +102,7 @@ def register_commands(app):
             click.echo('创建超级管理员账户中......')
             admin = User(
                 username=username,
-                auth=3,
+                auth=4,
                 name=name,
                 email=app.config['ADMIN_EMAIL'],
                 confirmed=True,
@@ -142,7 +142,7 @@ def register_commands(app):
             click.echo('创建测试员账户中......')
             test_user = User(
                 username=test_username,
-                auth=1,
+                auth=2,
                 name=test_name,
                 email=test_email,
                 confirmed=True,
