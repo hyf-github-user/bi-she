@@ -10,6 +10,7 @@ class BaseConfig(object):
     # session加密
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev key')
     TOKEN_EXPIRATION = 30 * 24 * 3600  # 令牌过期时间
+    JWT_SECRET = "safasfasfas"
     # 配置数据库连接
     # mysql + pymysql://user:password@hostip:port/数据名称
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:hu15879093053@localhost:3306/grad_pro'

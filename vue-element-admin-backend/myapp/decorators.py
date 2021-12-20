@@ -2,12 +2,14 @@
 # coding:utf-8
 # 实现禁止未登录的用户访问关键的视图
 from functools import wraps
-
-from flask import flash, url_for, redirect, abort, Markup
+from flask import flash, url_for, redirect, abort, Markup, request
 from flask_login import current_user
-
+from myapp.utils import identify
+from myapp.utils.network import Result
 
 # 过滤未确认的用户
+
+
 def confirm_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -39,3 +41,21 @@ def permission_required(permission_name):
 # 需要管理员身份的装饰器
 def admin_required(func):
     return permission_required('ADMINISTER')(func)
+
+
+def jwt_validate(f):
+    """
+    jwt验证的装饰器
+    """
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        # 获取前端发来的hear中的Authorization
+        token = request.headers.get("Authorization", default=None)
+        print("token:=====>", token)
+        if not token:
+            return Result.error(message="invalid_authorization_code")
+        username = identify(token)
+        if not username:
+            return Result.error(message="invalid_authorization_code")
+        return f(*args, **kwargs)
+    return wrapper

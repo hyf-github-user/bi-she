@@ -1,22 +1,24 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
-from flask import Blueprint, request
-
-from exts import db
-from myapp.models.user import User
-from myapp.utils import users_to_json
-from myapp.utils.network import Result
 import json
+from myapp.utils.network import Result
+from myapp.utils import users_to_json
+from myapp.models.user import User
+from exts import db
+from flask import Blueprint, request
+from myapp.utils.token import auth
 
 api_user = Blueprint("api_user", __name__)
 
 
 # 获取用户列表
 @api_user.route('/user/UserList', methods=['GET'])
+@auth.login_required  # 验证X-Token
 def UserList():
     page = request.args.get('page', 1, type=int)
     size = request.args.get('size', 2, type=int)
-    pagination = User.query.order_by(User.register_time.asc()).paginate(page, size, error_out=False)
+    pagination = User.query.order_by(
+        User.register_time.asc()).paginate(page, size, error_out=False)
     users = pagination.items
     users = users_to_json(users)
     total = User.query.all()
@@ -28,6 +30,7 @@ def UserList():
 
 # 根据id获取用户
 @api_user.route('/user/getById', methods=['GET'])
+@auth.login_required  # 验证X-Token
 def getById():
     id = request.args.get('id', type=int)
     user = User.query.get(id)
@@ -39,6 +42,7 @@ def getById():
 
 # 更新用户信息
 @api_user.route('/user/updateUser', methods=['PUT'])
+@auth.login_required  # 验证X-Token
 def updateUser():
     data = request.get_data()
     data = json.loads(data)
@@ -61,6 +65,7 @@ def updateUser():
 
 # 删除用户
 @api_user.route('/user/deleteUser', methods=['DELETE'])
+@auth.login_required  # 验证X-Token
 def deleteUser():
     id = request.args.get('id', type=int)
     user = User.query.get(id)
@@ -74,6 +79,7 @@ def deleteUser():
 
 # 添加用户
 @api_user.route('/user/addUser', methods=['POST'])
+@auth.login_required  # 验证X-Token
 def addUser():
     data = request.get_data()
     data = json.loads(data)

@@ -8,6 +8,8 @@ from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_wtf import CSRFProtect
+from flask_jwt_extended import JWTManager
+
 
 # 结合bootstrap
 bootstrap = Bootstrap()
@@ -25,9 +27,11 @@ mail = Mail()
 avatars = Avatars()
 # 进行CSRF保护
 # csrf = CSRFProtect()
-
+jwt = JWTManager()
 
 # 把user存入Session中
+
+
 @login_manager.user_loader
 def load_user(user_id):
     from myapp.models.user import User

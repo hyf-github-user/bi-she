@@ -28,6 +28,7 @@ def create_app():
     register_commands(app=app)
     # # 定义错误页面
     # register_errors(myapp=myapp)
+
     return app
 
 
@@ -131,7 +132,8 @@ def register_commands(app):
         """
         test_password = "12345678"
         click.echo("开始创建测试员......")
-        test_user = User.query.filter_by(username=test_username).first()  # 首先查询是否存在测试用户
+        test_user = User.query.filter_by(
+            username=test_username).first()  # 首先查询是否存在测试用户
         if test_user is not None:
             click.echo('测试账户已存在,正在更新测试员信息....')
             test_user.username = test_username

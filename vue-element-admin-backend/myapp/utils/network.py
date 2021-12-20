@@ -25,7 +25,8 @@ class Result:
     def success(**kwargs):
         data = {
             "code": 200,
-            "data": 'success'
+            "data": 'success',
+            "jwt": ''
         }
         data.update(kwargs)
         return Response(json.dumps(data, cls=DateEncoder))
