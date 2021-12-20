@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import { asyncRoutes, constantRoutes } from '@/router'
 
 /**
@@ -51,6 +52,18 @@ const actions = {
     return new Promise(resolve => {
       let accessedRoutes
       if (roles.includes('admin')) {
+        // var role_route = []
+        // // 进行异步数组的过滤
+        // asyncRoutes.forEach((item) => {
+        //   // 对路由进行权限筛选
+        //   if (item.hasOwnProperty('meta')) {
+        //     if (item.meta.hasOwnProperty('roles')) {
+        //       if (item.meta.roles.includes('admin')) {
+        //         role_route.push(item)
+        //       }
+        //     }
+        //   }
+        // })
         accessedRoutes = asyncRoutes || []
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)

@@ -10,7 +10,7 @@ const service = axios.create({
   timeout: 5000 // request timeout
 })
 
-// request interceptor
+// request interceptor,拦截器
 service.interceptors.request.use(
   config => {
     // do something before request is sent
@@ -20,6 +20,9 @@ service.interceptors.request.use(
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
       config.headers['X-Token'] = getToken()
+      const token_type = 'Bearer'
+      // console.log('get_Jwt_Token:=====', get_Jwt_Token())
+      config.headers.Authorization = token_type + ' ' + getToken()
     }
     return config
   },
@@ -44,8 +47,10 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
+    console.log('res', res)
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 200) {
+      console.log('res', res)
       Message({
         message: res.message,
         type: 'error',

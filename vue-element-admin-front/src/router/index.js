@@ -6,10 +6,14 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 
-/* Router Modules */
+/* 侧边栏的路由 */
+// 组件侧边栏
 import componentsRouter from './modules/components'
+// 图标侧边栏
 import chartsRouter from './modules/charts'
+// table侧边栏
 import tableRouter from './modules/table'
+// 用户管理侧边栏
 import userRouter from './modules/user'
 // 固定的路由
 export const constantRoutes = [
@@ -54,7 +58,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', affix: true }
+        meta: { title: '博客管理系统', icon: 'dashboard', affix: true }
       }
     ]
   },
