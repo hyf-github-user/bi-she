@@ -122,12 +122,11 @@ def register_commands(app):
     @click.option('--test_email', prompt=True, help='QQ邮箱')
     @click.option('--test_password', prompt=False, hide_input=True,
                   confirmation_prompt=True, help='密码用来登录')
-    def test(test_username, test_name, test_password, test_email):
+    def test(test_username, test_name, test_email):
         """
         测试
         :param test_username:
         :param test_name:
-        :param test_password:
         :return:
         """
         test_password = "12345678"

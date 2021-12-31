@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from exts import db
 from myapp.utils.network import Result
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
 
 class User(db.Model, UserMixin):
@@ -119,7 +120,6 @@ class User(db.Model, UserMixin):
     @staticmethod
     def verify(username, password):
         user = User.query.filter_by(username=username).first()
-        print("user.auth:", user.auth)
         if not user:  # 无用户
             # 返回认证失败的错误
             return Result.error(message="无此用户!"), False
@@ -130,6 +130,20 @@ class User(db.Model, UserMixin):
             'editor' if user.auth == 3 \
                 else 'user'
         return {'uid': user.id, 'scope': scope}, True
+
+    # 产生token
+    @staticmethod
+    def create_token(uid, scope):
+        s = Serializer(current_app.config['JWT_SECRET'], expires_in=current_app.config['TOKEN_EXPIRATION'])
+        t = s.dumps({
+            'uid': uid,
+            'scope': scope
+        })
+        # 进行ASCII编码
+        token = {
+            'token': t.decode('ascii')
+        }
+        return token
 
     # 一个方法变成属性调用
     @property

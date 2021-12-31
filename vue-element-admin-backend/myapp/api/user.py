@@ -13,7 +13,7 @@ api_user = Blueprint("api_user", __name__)
 
 # 获取用户列表
 @api_user.route('/user/UserList', methods=['GET'])
-@auth.login_required  # 验证X-Token
+@auth.login_required  # 验证jwt
 def UserList():
     page = request.args.get('page', 1, type=int)
     size = request.args.get('size', 2, type=int)
@@ -30,7 +30,7 @@ def UserList():
 
 # 根据id获取用户
 @api_user.route('/user/getById', methods=['GET'])
-@auth.login_required  # 验证X-Token
+@auth.login_required  # 验证jwt
 def getById():
     id = request.args.get('id', type=int)
     user = User.query.get(id)
@@ -42,7 +42,7 @@ def getById():
 
 # 更新用户信息
 @api_user.route('/user/updateUser', methods=['PUT'])
-@auth.login_required  # 验证X-Token
+@auth.login_required  # 验证jwt
 def updateUser():
     data = request.get_data()
     data = json.loads(data)
@@ -65,7 +65,7 @@ def updateUser():
 
 # 删除用户
 @api_user.route('/user/deleteUser', methods=['DELETE'])
-@auth.login_required  # 验证X-Token
+@auth.login_required  # 验证jwt
 def deleteUser():
     id = request.args.get('id', type=int)
     user = User.query.get(id)
@@ -79,7 +79,7 @@ def deleteUser():
 
 # 添加用户
 @api_user.route('/user/addUser', methods=['POST'])
-@auth.login_required  # 验证X-Token
+@auth.login_required  # 验证jwt
 def addUser():
     data = request.get_data()
     data = json.loads(data)

@@ -1,9 +1,8 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
 from flask import Blueprint, request, g
-from myapp.utils.token import generate_access_token
 from myapp.utils.network import Result
-from myapp.utils.token import get_token, auth, verify_auth_token
+from myapp.utils.token import auth, verify_auth_token
 from myapp.models.user import User
 
 login_bp = Blueprint("login_bp", __name__)
@@ -16,16 +15,15 @@ def login():
         data['username'], data['password'])  # 会获得user.id,与身份信息scope
     if status:
         # 获取token
-        token = get_token(current_user['uid'], current_user['scope'])
-        jwt_token = generate_access_token(current_user['uid'])
-        return Result.success(data=token, jwt=jwt_token)
-    print("current_user:", current_user)
+        token = User.create_token(current_user['uid'], current_user['scope'])
+        print("登录的token: ", token)
+        return Result.success(data=token)
     return current_user
 
 
 # 获取用户信息,需认证token
 @login_bp.route('/user/info', methods=['GET'])
-@auth.login_required  # 验证X-Token
+@auth.login_required
 def get_info():
     token = request.args.get('token')  # 获取token
     user, status = verify_auth_token(token)  # 验证token
@@ -38,7 +36,6 @@ def get_info():
             "avatar": "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif",
             "name": info.name
         }
-        # print("user_info:====", user_info)
         return Result.success(data=user_info)
     else:
         return user
