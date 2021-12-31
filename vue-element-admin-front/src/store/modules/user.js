@@ -35,13 +35,8 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        console.log(response)
-        console.log('jwt:======', response.jwt)
-        // var Jwt_Token = response.jwt
         commit('SET_TOKEN', data.token)
         setToken(data.token)
-        // commit('SET_JWT_TOKEN', Jwt_Token)
-        // set_Jwt_Token(Jwt_Token)
         resolve()
       }).catch(error => {
         reject(error)

@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function searchUser(name) {
   return request({
-    url: '/vue-element-admin/search/user',
+    url: '/data/search/user',
     method: 'get',
     params: { name }
   })
@@ -10,7 +10,7 @@ export function searchUser(name) {
 
 export function transactionList(query) {
   return request({
-    url: '/vue-element-admin/transaction/list',
+    url: '/data/transaction/list',
     method: 'get',
     params: query
   })

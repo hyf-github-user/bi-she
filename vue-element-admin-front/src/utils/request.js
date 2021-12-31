@@ -19,10 +19,8 @@ service.interceptors.request.use(
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['X-Token'] = getToken()
-      const token_type = 'Bearer'
-      // console.log('get_Jwt_Token:=====', get_Jwt_Token())
-      config.headers.Authorization = token_type + ' ' + getToken()
+      // jwt验证
+      config.headers.Authorization = 'jwt' + ' ' + getToken()
     }
     return config
   },
@@ -47,10 +45,9 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-    console.log('res', res)
+    console.log('res:===', res)
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 200) {
-      console.log('res', res)
       Message({
         message: res.message,
         type: 'error',
