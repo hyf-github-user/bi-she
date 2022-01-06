@@ -2,4 +2,4 @@
 # coding:utf-8
 from flask import Blueprint
 
-article_bp = Blueprint("article_bp", __name__)
+article_bp = Blueprint("article", __name__)

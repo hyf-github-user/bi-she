@@ -8,6 +8,7 @@ from myapp.api.comment import api_comment
 from myapp.api.login import login_bp
 from myapp.api.user import api_user
 from myapp.blueprints.auth.views import auth_bp
+from myapp.blueprints.main.views import main_bp
 from myapp.blueprints.user.views import user_bp
 from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager
 from myapp.models.user import Role, User
@@ -52,6 +53,7 @@ def register_blueprints(app):
     app.register_blueprint(api_article, url_prefix='/api')
     app.register_blueprint(login_bp, url_prefix='/api')
     # 前台蓝图注册
+    app.register_blueprint(main_bp)
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(auth_bp, url_prefix='/auth')
 

@@ -1,15 +1,31 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
-from flask import Blueprint
-from flask_login import login_required
+from flask import Blueprint, flash, redirect, url_for, render_template
+from flask_login import current_user, login_required, login_user, logout_user
+from myapp.models.user import User
+from myapp.blueprints.auth.forms import LoginForm
 
-auth_bp = Blueprint("auth_bp", __name__)
+auth_bp = Blueprint("auth", __name__)
 
 
 # 用户登录视图函数
 @auth_bp.route('/login', methods=['POST', 'GET'])
 def login():
-    pass
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    # 登录表单
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data.lower()).first()
+        if user and user.check_password(form.password.data):
+            if login_user(user, form.remember_me.data):  # 记住我登录选项
+                flash('登录成功!', 'info')
+                return redirect_back()  # 回到首页
+            else:
+                flash('你的账号已被封禁!', 'warning')
+                return redirect(url_for('main.index'))
+        flash('邮箱或密码错误!', 'warning')
+    return render_template('main/login.html', form=form)
 
 
 # 用户注册视图函数
@@ -52,4 +68,6 @@ def reset_password(token):
 @auth_bp.route('/logout')
 @login_required
 def logout():
-    pass
+    logout_user()
+    flash('登出成功!', 'info')
+    return redirect(url_for('main.index'))

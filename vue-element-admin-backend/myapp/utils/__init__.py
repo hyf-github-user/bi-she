@@ -2,12 +2,7 @@
 # coding:utf-8
 from myapp.utils import Coding
 from myapp.utils.rsa_message import RSAUtil
-from PIL import Image, ImageFont, ImageFilter, ImageDraw
-from datetime import datetime, timedelta
-import random
-import jwt
 from myapp.utils.network import Result
-from flask import current_app
 
 
 def users_to_json(users):
@@ -57,6 +52,7 @@ def validate_picture(length):
         :return:
         """
         return (random.randint(0, 255), random.randint(10, 255), random.randint(64, 255))
+
     # 验证码随机数
     msg = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     width = 150
@@ -95,7 +91,7 @@ def validate_picture(length):
     # 干扰圆
     for i in range(10):
         draw.point([random.randint(0, width),
-                   random.randint(0, height)], fill=rndColor())
+                    random.randint(0, height)], fill=rndColor())
         x = random.randint(0, width)
         y = random.randint(0, height)
         draw.arc((x, y, x + 4, y + 4), 0, 90, fill=rndColor())

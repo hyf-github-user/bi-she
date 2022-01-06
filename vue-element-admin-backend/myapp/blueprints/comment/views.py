@@ -2,4 +2,4 @@
 # coding:utf-8
 from flask import Blueprint
 
-comment_bp = Blueprint("comment_bp", __name__)
+comment_bp = Blueprint("comment", __name__)

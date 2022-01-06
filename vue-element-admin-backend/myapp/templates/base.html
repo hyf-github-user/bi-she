@@ -1,0 +1,153 @@
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>{% block title %}{% endblock %}-博客</title>
+        {# 网页图标 #}
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        {% block styles %}
+            {# 导入css文件 #}
+            <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}"/>
+        {% endblock %} {% endblock %}
+</head>
+
+<body>
+{# 设置导航栏 #}
+{% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
+        <div class="container">
+            {# 图像按钮#}
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='favicon.ico') }}"
+                     class="d-inline-block align-top" alt="Bluelog">
+            </a>
+            <a class="navbar-brand" href="https://www.baidu.com">蓝客</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {# 导航栏的菜单 #}
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    {{ render_nav_item('main.index', 'Home') }}
+                    {{ render_nav_item('main.explore', '个人中心') }}
+                    {# 下拉菜单 #}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-toggle="dropdown" aria-expanded="false">
+                            菜单
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">菜单一</a>
+                            <a class="dropdown-item" href="#">菜单二</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">菜单三</a>
+                        </div>
+                    </li>
+                    {# 搜索栏 #}
+                    <form class="form-inline my-2 my-lg-0">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+                    {# 隐藏的菜单 #}
+                    <li class="nav-item">
+                        <a class="nav-link disabled">后台管理</a>
+                    </li>
+                </ul>
+                {#右上角的登录与注册按钮#}
+                <div class="navbar-nav ml-auto">
+                    {#判断用户是否登录#}
+                    {% if current_user.is_authenticated %}
+                        {# 用户登录后,展示通知#}
+                        <a class="nav-item nav-link" href="#">
+                            <span class="oi oi-bell"></span>
+                            {# notification_count推荐提醒数量是由模板上下文处理函数传入的#}
+                            {# 使用ajax的方法请求后端数据 #}
+                            <span id="notification-badge"
+                                  class="{% if notification_count == 0 %}hide{% endif %} badge badge-danger badge-notification"
+                                  data-href="#">{{ notification_count }}</span>
+                        </a>
+                        {# 上传文件按钮#}
+                        <a class="nav-item nav-link" href="#" title="上传">
+                            <span class="oi oi-cloud-upload"></span>&nbsp;&nbsp;
+                        </a>
+                        {# 展示个人用户的功能#}
+                        <div class="dropdown nav-item">
+                            {# 获取头像 #}
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                <img class="avatar-xs"
+                                     src="#">
+                                <span class="caret"></span>
+                            </a>
+                            {# 用户下拉菜单 #}
+                            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                <h6 class="dropdown-header">{{ current_user.username }} 已登录</h6>
+                                <a class="dropdown-item"
+                                   href="#">
+                                    <span class="oi oi-person"></span> 个人中心
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">
+                                    <span class="oi oi-cog"></span> 用户设置
+                                </a>
+                                {% if current_user.can('MODERATE') %}
+                                    <a class="dropdown-item" href="#">
+                                        <span class="oi oi-dashboard"></span> 展示面板
+                                    </a>
+                                {% endif %}
+                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                    <span class="oi oi-power-standby"></span> 注销
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a class="btn btn-outline-primary" href="{{ url_for('auth.login') }}">登录</a>&nbsp;&nbsp;
+                        <a class="btn btn-primary" href="{{ url_for('auth.register') }}">注册</a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+
+<main>
+    <div class="container">
+        {% for message in get_flashed_messages(with_categories=True) %}
+            <div class="alert alert-{{ message[0] }}">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message[1] }}
+            </div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+        {% block footer %}
+            <footer>
+                <p class="float-left">
+                    <small> &copy; 2022 <a href="http://huyinfu.top/user" title="Written by HYF">HYF</a> -
+                        <a href="https://gitee.com/hyf-github-user" title="Fork me on Gitee">Gitee</a> -
+                        <a href="http://gitee.com/hyf-github-user/flask-bluelog" title="A Bluelog project">Bluelog</a>
+                    </small>
+                </p>
+                <p class="float-right">
+                    <small>Capture and share every wonderful moment.</small>
+                </p>
+            </footer>
+        {% endblock %}
+    </div>
+</main>
+
+{% block scripts %}
+    {# 导入js文件 #}
+    <script src="{{ url_for('static', filename='bootstrap/js/jquery.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+{% endblock %}
+</body>
+</html>

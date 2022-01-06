@@ -3,4 +3,4 @@
 from flask import Blueprint
 
 # 管理员处理视图
-admin_bp = Blueprint("admin_bp", __name__)
+admin_bp = Blueprint("admin", __name__)
