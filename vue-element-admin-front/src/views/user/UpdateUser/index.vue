@@ -1,58 +1,61 @@
 <template>
-  <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
-    <el-form-item label="注册时间">
-      <el-input v-model="ruleForm.register_time" readonly />
-    </el-form-item>
+  <div style="margin:30px 40px 5px 10px">
+    <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
+      <el-form-item label="注册时间">
+        <el-input v-model="ruleForm.register_time" readonly />
+      </el-form-item>
 
-    <el-form-item label="用户ID">
-      <el-input v-model="ruleForm.id" readonly />
-    </el-form-item>
+      <el-form-item label="用户ID">
+        <el-input v-model="ruleForm.id" readonly />
+      </el-form-item>
 
-    <el-form-item label="登录名" prop="username">
-      <el-input v-model="ruleForm.username" />
-    </el-form-item>
+      <el-form-item label="登录名" prop="username">
+        <el-input v-model="ruleForm.username" />
+      </el-form-item>
 
-    <el-form-item label="用户名" prop="name">
-      <el-input v-model="ruleForm.name" />
-    </el-form-item>
+      <el-form-item label="用户名" prop="name">
+        <el-input v-model="ruleForm.name" />
+      </el-form-item>
 
-    <el-form-item label="登录密码" prop="rsa_password_hash">
-      <el-input v-model="ruleForm.rsa_password_hash" readonly />
-    </el-form-item>
+      <el-form-item label="登录密码" prop="rsa_password_hash">
+        <el-input v-model="ruleForm.rsa_password_hash" readonly />
+      </el-form-item>
 
-    <el-form-item label="邮箱" prop="auth">
-      <el-input v-model="ruleForm.email" />
-    </el-form-item>
+      <el-form-item label="邮箱" prop="auth">
+        <el-input v-model="ruleForm.email" />
+      </el-form-item>
 
-    <el-form-item label="身份信息" prop="role_id">
-      <el-radio-group v-model="ruleForm.role_id">
-        <el-radio :label="1">锁定用户</el-radio>
-        <el-radio :label="2">普通用户</el-radio>
-        <el-radio :label="3">协管员</el-radio>
-        <el-radio :label="4">管理员</el-radio>
-      </el-radio-group>
-    </el-form-item>
+      <el-form-item label="身份信息" prop="role_id">
+        <el-radio-group v-model="ruleForm.role_id">
+          <el-radio :label="1">锁定用户</el-radio>
+          <el-radio :label="2">普通用户</el-radio>
+          <el-radio :label="3">协管员</el-radio>
+          <el-radio :label="4">管理员</el-radio>
+        </el-radio-group>
+      </el-form-item>
 
-    <el-form-item label="激活状态" prop="active">
-      <el-radio v-model="ruleForm.active" :label="true">已激活</el-radio>
-      <el-radio v-model="ruleForm.active" :label="false">未激活</el-radio>
-    </el-form-item>
+      <el-form-item label="激活状态" prop="active">
+        <el-radio v-model="ruleForm.active" :label="true">已激活</el-radio>
+        <el-radio v-model="ruleForm.active" :label="false">未激活</el-radio>
+      </el-form-item>
 
-    <el-form-item label="确认状态" prop="confirmed">
-      <el-radio v-model="ruleForm.confirmed" :label="true">已确认</el-radio>
-      <el-radio v-model="ruleForm.confirmed" :label="false">未确认</el-radio>
-    </el-form-item>
+      <el-form-item label="确认状态" prop="confirmed">
+        <el-radio v-model="ruleForm.confirmed" :label="true">已确认</el-radio>
+        <el-radio v-model="ruleForm.confirmed" :label="false">未确认</el-radio>
+      </el-form-item>
 
-    <el-form-item label="锁定状态" prop="locked">
-      <el-radio v-model="ruleForm.locked" :label="true">已锁定</el-radio>
-      <el-radio v-model="ruleForm.locked" :label="false" :disabled="ruleForm.role_id==1">未锁定</el-radio>
-    </el-form-item>
+      <el-form-item label="锁定状态" prop="locked">
+        <el-radio v-model="ruleForm.locked" :label="true">已锁定</el-radio>
+        <el-radio v-model="ruleForm.locked" :label="false" :disabled="ruleForm.role_id==1">未锁定</el-radio>
+      </el-form-item>
 
-    <el-form-item>
-      <el-button type="primary" @click="submitForm('ruleForm')">更新用户</el-button>
-      <el-button @click="resetForm('ruleForm')">重置</el-button>
-    </el-form-item>
-  </el-form>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm('ruleForm')">更新用户</el-button>
+        <el-button @click="resetForm('ruleForm')">重置</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+
 </template>
 
 <script>

@@ -1,51 +1,54 @@
 <template>
-  <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
+  <div style="margin:30px 40px 5px 10px">
+    <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
 
-    <el-form-item label="登录名" prop="username">
-      <el-input v-model="ruleForm.username" />
-    </el-form-item>
+      <el-form-item label="登录名" prop="username">
+        <el-input v-model="ruleForm.username" />
+      </el-form-item>
 
-    <el-form-item label="用户名" prop="name">
-      <el-input v-model="ruleForm.name" />
-    </el-form-item>
+      <el-form-item label="用户名" prop="name">
+        <el-input v-model="ruleForm.name" />
+      </el-form-item>
 
-    <el-form-item label="邮箱" prop="email">
-      <el-input v-model="ruleForm.email" />
-    </el-form-item>
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="ruleForm.email" />
+      </el-form-item>
 
-    <el-form-item label="级别" prop="auth">
-      <el-input v-model="ruleForm.auth" />
-    </el-form-item>
+      <el-form-item label="级别" prop="auth">
+        <el-input v-model="ruleForm.auth" />
+      </el-form-item>
 
-    <el-form-item label="激活状态" prop="active">
-      <el-input v-model="ruleForm.active" />
-    </el-form-item>
+      <el-form-item label="激活状态" prop="active">
+        <el-input v-model="ruleForm.active" />
+      </el-form-item>
 
-    <el-form-item label="确认状态" prop="confirmed">
-      <el-input v-model="ruleForm.confirmed" />
-    </el-form-item>
+      <el-form-item label="确认状态" prop="confirmed">
+        <el-input v-model="ruleForm.confirmed" />
+      </el-form-item>
 
-    <el-form-item label="锁定状态" prop="locked">
-      <el-input v-model="ruleForm.locked" />
-    </el-form-item>
+      <el-form-item label="锁定状态" prop="locked">
+        <el-input v-model="ruleForm.locked" />
+      </el-form-item>
 
-    <el-form-item label="身份信息" prop="role_id">
-      <el-input v-model="ruleForm.role_id" />
-    </el-form-item>
+      <el-form-item label="身份信息" prop="role_id">
+        <el-input v-model="ruleForm.role_id" />
+      </el-form-item>
 
-    <el-form-item label="密码" prop="password">
-      <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
-    </el-form-item>
+      <el-form-item label="密码" prop="password">
+        <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
+      </el-form-item>
 
-    <el-form-item label="确认密码" prop="checkPass">
-      <el-input v-model="ruleForm.checkPass" type="password" autocomplete="off" />
-    </el-form-item>
+      <el-form-item label="确认密码" prop="checkPass">
+        <el-input v-model="ruleForm.checkPass" type="password" autocomplete="off" />
+      </el-form-item>
 
-    <el-form-item>
-      <el-button type="primary" @click="submitForm('ruleForm')">添加用户</el-button>
-      <el-button @click="resetForm('ruleForm')">重置</el-button>
-    </el-form-item>
-  </el-form>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm('ruleForm')">添加用户</el-button>
+        <el-button @click="resetForm('ruleForm')">重置</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+
 </template>
 
 <script>

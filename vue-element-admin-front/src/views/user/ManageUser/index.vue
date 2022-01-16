@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="margin:20px 60px 5px 40px">
     <el-table
       :data="ruleForm"
       style="width: 100%"
