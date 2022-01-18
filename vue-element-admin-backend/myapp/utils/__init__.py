@@ -1,8 +1,13 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
-from myapp.utils import Coding
+from urllib.parse import urlparse, urljoin
+
+from flask import request, redirect, url_for
+
 from myapp.utils.rsa_message import RSAUtil
 from myapp.utils.network import Result
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
+import random
 
 
 def users_to_json(users):
@@ -16,35 +21,55 @@ def users_to_json(users):
     return result
 
 
-def ver_password(user, i_pwd):
-    u_pwd = Coding.HexStrToBytes(user.password)
-    private_key = Coding.HexStrToBytes(user.private_key)  # 私钥转换为字节流
-    # 校验
-    flag = RSAUtil.eq(privateKey=private_key, text1=u_pwd, text2=i_pwd)
-    return flag
+# 重定项到首页
+def redirect_back(default='main.index', **kwargs):
+    for target in request.args.get('next'), request.referrer:
+        if not target:
+            continue
+        if is_safe_url(target):
+            return redirect(target)
+    return redirect(url_for(default, **kwargs))
 
 
-def create(user, data):
-    # 生成私钥
-    user_item = user.copy()
-    private_key = RSAUtil.create_keys(user.uuid)
-    # 转字符串
-    user_item.private_key = Coding.BytesToHexStr(private_key)
-    # 加密密码
-    pwd = RSAUtil.encrypt(RSAUtil.getPublicKey(user.uuid), user.password)
+def is_safe_url(target):
+    """
+    判断是否是安全的链接
+    :param target:
+    :return:
+    """
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and \
+           ref_url.netloc == test_url.netloc
 
-    user_item.password = Coding.BytesToHexStr(pwd)
 
-    user.create(user_item)
-
-    return user
+#
+# def ver_password(user, i_pwd):
+#     u_pwd = Coding.HexStrToBytes(user.password)
+#     private_key = Coding.HexStrToBytes(user.private_key)  # 私钥转换为字节流
+#     # 校验
+#     flag = RSAUtil.eq(privateKey=private_key, text1=u_pwd, text2=i_pwd)
+#     return flag
+#
+#
+# def create(user, data):
+#     # 生成私钥
+#     user_item = user.copy()
+#     private_key = RSAUtil.create_keys(user.uuid)
+#     # 转字符串
+#     user_item.private_key = Coding.BytesToHexStr(private_key)
+#     # 加密密码
+#     pwd = RSAUtil.encrypt(RSAUtil.getPublicKey(user.uuid), user.password)
+#
+#     user_item.password = Coding.BytesToHexStr(pwd)
+#
+#     user.create(user_item)
+#
+#     return user
 
 
 # 生成随机图片
 def validate_picture(length):
-    from PIL import Image, ImageDraw, ImageFilter, ImageFont
-    import random
-
     # 随机颜色
     def rndColor():
         """

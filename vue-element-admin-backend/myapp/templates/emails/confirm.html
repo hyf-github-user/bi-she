@@ -1,0 +1,6 @@
+<p>Hello {{ user.username }},</p>
+<p>欢迎来到我的 <b>博客网站</b>!</p>
+<p>点击下面链接可以验证注册信息:<br>
+    <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">{{ url_for('auth.confirm', token=token, _external=True) }}</a>
+</p>
+<small>(不需要回复此邮件哦,这个是验证邮件!)</small>

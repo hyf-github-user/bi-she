@@ -1,0 +1,9 @@
+Hello {{ user.username }},
+
+欢迎来到我的博客网站
+
+点击下面链接可以验证注册信息:
+
+    {{ url_for('auth.confirm', token=token, _external=True) }}
+
+(不需要回复此邮件哦,这个是验证邮件!)

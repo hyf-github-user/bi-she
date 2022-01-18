@@ -10,6 +10,7 @@ class RSAUtil:
         :param name:
         :return:
         """
+
         (pubkey, privkey) = rsa.newkeys(1024)
         # 保存公钥
         pub = pubkey.save_pkcs1()
@@ -65,6 +66,19 @@ class RSAUtil:
         """
         result = RSAUtil.decrypt(text1, privateKey)
         return str(result) == str(text2)
+
+
+def HexStrToBytes(text):
+    return bytes.fromhex(text)
+
+
+def BytesToHexStr(text):
+    """
+    字节转hex字符串
+    :param text:
+    :return:
+    """
+    return text.hex()
 
 
 if __name__ == '__main__':

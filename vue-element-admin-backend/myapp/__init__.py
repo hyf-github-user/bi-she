@@ -1,7 +1,8 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
 import click
-from flask import Flask
+from flask import Flask, render_template
+from flask_wtf.csrf import CSRFError
 
 from myapp.api.article import api_article
 from myapp.api.comment import api_comment
@@ -10,8 +11,9 @@ from myapp.api.user import api_user
 from myapp.blueprints.auth.views import auth_bp
 from myapp.blueprints.main.views import main_bp
 from myapp.blueprints.user.views import user_bp
-from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager
+from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf
 from myapp.models.user import Role, User
+from myapp.utils import Result
 
 from settings import DevelopmentConfig
 
@@ -28,7 +30,7 @@ def create_app():
     # 注册命令
     register_commands(app=app)
     # # 定义错误页面
-    # register_errors(myapp=myapp)
+    register_errors(app=app)
 
     return app
 
@@ -36,12 +38,19 @@ def create_app():
 def register_extensions(app):
     # 注册所有的扩展
     bootstrap.init_app(app=app)
+    # 数据库注册
     db.init_app(app=app)
+    # 上传文件的注册
     dropzone.init_app(app=app)
+    # flask-login注册
     login_manager.init_app(app=app)
+    # 电子邮箱注册
     mail.init_app(app=app)
+    # 自定义头像注册
     avatars.init_app(app=app)
-    # csrf.init_app(app=app)
+    # csrf验证的注册
+    csrf.init_app(app=app)
+    # 跨域注册
     cors.init_app(app=app)
 
 
@@ -99,7 +108,6 @@ def register_commands(app):
             click.echo('超级管理员账户已存在,正在更新管理员信息....')
             admin.username = username
             admin.set_password(password)
-            admin.set_hash_password()  # 对哈希密码进行加密的密文
             admin.name = name
         else:
             click.echo('创建超级管理员账户中......')
@@ -112,7 +120,6 @@ def register_commands(app):
                 active=True
             )
             admin.set_password(password)
-            admin.set_hash_password()  # 对哈希密码进行加密的密文
             db.session.add(admin)
             db.session.commit()
             click.echo("创建管理员成功!")
@@ -139,7 +146,6 @@ def register_commands(app):
             click.echo('测试账户已存在,正在更新测试员信息....')
             test_user.username = test_username
             test_user.set_password(test_password)
-            test_user.set_hash_password()  # 对哈希密码进行加密的密文
             test_user.name = test_name
         else:
             click.echo('创建测试员账户中......')
@@ -152,7 +158,64 @@ def register_commands(app):
                 active=True
             )
             test_user.set_password(test_password)
-            test_user.set_hash_password()  # 对哈希密码进行加密的密文
             db.session.add(test_user)
             db.session.commit()
             click.echo("创建测试员成功!")
+
+
+def register_errors(app):
+    """
+    自定义错误页面
+    :param app:
+    :return:
+    """
+
+    @app.errorhandler(400)
+    def bad_request(e):
+        """
+        400错误
+        :param e:
+        :return:
+        """
+        return render_template('errors/400.html'), 400
+
+    @app.errorhandler(403)
+    def forbidden(e):
+        """
+        权限错误
+        :param e:
+        :return:
+        """
+        return render_template('errors/403.html'), 403
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        """
+        404错误
+        :param e:
+        :return:
+        """
+        return render_template('errors/404.html'), 404
+
+    @app.errorhandler(413)
+    def request_entity_too_large(e):
+        return render_template('errors/413.html'), 413
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        """
+        服务器错误
+        :param e:
+        :return:
+        """
+        return render_template('errors/500.html'), 500
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        """
+        csrf验证出错
+        :param e:
+        :return:
+        """
+        print("CSRF验证错误!")
+        return Result.error(message="CSRF验证失败!")

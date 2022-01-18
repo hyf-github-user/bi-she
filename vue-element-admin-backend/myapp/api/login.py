@@ -1,6 +1,8 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
 from flask import Blueprint, request, g
+
+from exts import csrf
 from myapp.utils.network import Result
 from myapp.utils.token import auth, verify_auth_token
 from myapp.models.user import User
@@ -9,6 +11,7 @@ login_bp = Blueprint("login_bp", __name__)
 
 
 @login_bp.route('/user/login', methods=['POST'])
+@csrf.exempt  # 禁止csrf验证
 def login():
     data = request.get_json()  # 输入的就是工号
     current_user, status = User.verify(
@@ -42,6 +45,7 @@ def get_info():
 
 
 # 退出路由
+@csrf.exempt  # 禁止csrf验证
 @login_bp.route('/user/logout', methods=['POST'])
 def logout():
     return Result.success()

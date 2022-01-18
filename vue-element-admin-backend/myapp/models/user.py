@@ -27,8 +27,8 @@ class User(db.Model, UserMixin):
     avatar_s = db.Column(db.String(64))
     avatar_m = db.Column(db.String(64))
     avatar_l = db.Column(db.String(64))
-    private_key = db.Column(db.Text(), comment="加密哈希密码的私钥")
-    rsa_password_hash = db.Column(db.Text(), comment="对哈希密码进行加密之后的密文")
+    private_key = db.Column(db.Text(), comment="加密密码的私钥")
+    rsa_password = db.Column(db.Text(), comment="对密码进行加密之后的密文")
     # 用户状态
     active = db.Column(db.Boolean, default=True)  # 是否激活用户
     confirmed = db.Column(db.Boolean, default=False)  # 确认注册
@@ -78,7 +78,7 @@ class User(db.Model, UserMixin):
             'confirmed': self.confirmed,
             'locked': self.locked,
             'register_time': self.register_time,
-            'rsa_password_hash': self.rsa_password_hash,
+            'rsa_password_hash': self.rsa_password,
             'role_id': self.role_id,
         }
 
@@ -94,27 +94,27 @@ class User(db.Model, UserMixin):
     # 设置密码
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)  # 生成哈希加密的密码
+        # 对真实密码进行rsa加密
+        from myapp.utils.rsa_message import RSAUtil, BytesToHexStr
+        # 对密码加密之后的密文
+        self.rsa_password = BytesToHexStr(RSAUtil.encrypt(
+            RSAUtil.getPublicKey(self.id), password))
 
     # 设置公钥与私钥
     def set_private_key(self):
-        from myapp.utils.rsa_message import RSAUtil
-        from myapp.utils.Coding import BytesToHexStr
+        from myapp.utils.rsa_message import RSAUtil, BytesToHexStr
         self.private_key = BytesToHexStr(
             RSAUtil.create_keys(self.id))  # 保存私钥,与公钥
-
-    # 对哈希密码进行加密
-    def set_hash_password(self):
-        from myapp.utils.rsa_message import RSAUtil
-        from myapp.utils.Coding import BytesToHexStr
-        # 对哈希密码加密之后的密文
-        self.rsa_password_hash = BytesToHexStr(RSAUtil.encrypt(
-            RSAUtil.getPublicKey(self.id), self.password_hash))
 
     # 验证密码
     def check_password(self, password):
         if not self.password_hash:
             return False
         return check_password_hash(self.password_hash, password)
+
+    # 验证rsa密码
+    def check_rsa(self, password):
+        pass
 
     # 验证密码
     @staticmethod

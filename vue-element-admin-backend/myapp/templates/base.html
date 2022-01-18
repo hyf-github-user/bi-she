@@ -13,13 +13,19 @@
         {% block styles %}
             {# 导入css文件 #}
             <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}"/>
-        {% endblock %} {% endblock %}
+            {# 导入图标的css样式 #}
+            <link rel="stylesheet"
+                  href="{{ url_for('static', filename='open-iconic/font/css/open-iconic-bootstrap.css') }}">
+            {# 自定义css样式 #}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        {% endblock %}
+    {% endblock %}
 </head>
 
 <body>
 {# 设置导航栏 #}
 {% block navbar %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             {# 图像按钮#}
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
@@ -71,10 +77,6 @@
                             <span id="notification-badge"
                                   class="{% if notification_count == 0 %}hide{% endif %} badge badge-danger badge-notification"
                                   data-href="#">{{ notification_count }}</span>
-                        </a>
-                        {# 上传文件按钮#}
-                        <a class="nav-item nav-link" href="#" title="上传">
-                            <span class="oi oi-cloud-upload"></span>&nbsp;&nbsp;
                         </a>
                         {# 展示个人用户的功能#}
                         <div class="dropdown nav-item">

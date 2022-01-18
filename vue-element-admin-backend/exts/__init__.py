@@ -24,9 +24,8 @@ mail = Mail()
 # 头像插件
 avatars = Avatars()
 
-
 # 进行CSRF保护
-# csrf = CSRFProtect()
+csrf = CSRFProtect()
 
 
 # 把user存入Session中
