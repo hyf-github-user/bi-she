@@ -1,13 +1,13 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
 from flask import Blueprint, flash, redirect, url_for, render_template
-from flask_login import current_user, login_required, login_user, logout_user
+from flask_login import current_user, login_required, login_user, logout_user, login_fresh, confirm_login
 
 from exts import db
 from myapp.models.user import User
-from myapp.blueprints.auth.forms import LoginForm, RegisterForm
+from myapp.blueprints.auth.forms import LoginForm, RegisterForm, ForgetPasswordForm, ResetPasswordForm
 from myapp.utils import redirect_back
-from myapp.utils.emails import send_confirm_email
+from myapp.utils.emails import send_confirm_email, send_reset_password_email
 from myapp.utils.token import generate_token, validate_token
 from settings import Operations
 
@@ -103,20 +103,76 @@ def resend_confirm_email():
 
 # 用户刷新重新认证
 @auth_bp.route('/re_authenticate', methods=['POST', 'GET'])
+@login_required
 def re_authenticate():
-    pass
+    """
+    刷新登录,防止超时
+    :return:
+    """
+    # 判断当前用户对话是否超时
+    if login_fresh():
+        return redirect(url_for('main.index'))
+
+    form = LoginForm()
+    if form.validate_on_submit() and current_user.validate_password(form.password.data):
+        # 重新登录
+        confirm_login()
+        return redirect_back()
+
+    return render_template('auth/login.html', form=form)
 
 
 # 忘记密码视图函数
 @auth_bp.route('/forget-password', methods=['POST', 'GET'])
 def forget_password():
-    pass
+    # 判断当前用户是否登录
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    # 创建忘记密码的表单
+    form = ForgetPasswordForm()
+    if form.validate_on_submit():
+        # 根据输入的邮箱查找用户
+        user = User.query.filter_by(form.email.data.lower()).first()
+        if user:
+            token = generate_token(user=user, operation=Operations.RESET_PASSWORD)
+            send_reset_password_email(user=user, token=token)
+            flash('密码重置消息已发送!请查看!', 'info')
+            return redirect(url_for('auth.login'))
+        flash('错误的邮箱!', 'warning')
+        return redirect(url_for('auth.forget_password'))
+    return render_template('auth/reset_password.html', form=form)
 
 
 # 重置密码(需携带QQ邮箱发送的token)
 @auth_bp.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
-    pass
+    """
+    验证重置密码的token
+    :param token:
+    :return:
+    """
+    # 判断当前用户是否登录
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    # 创建重置密码的表单
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        email = form.email.data.lower()
+        # 新密码
+        password = form.password.data
+        # 通过email查找用户
+        user = User.query.filter_by(email=email).first()
+        if user:
+            # 开始验证token
+            if validate_token(user=user, token=token, operation=Operations.RESET_PASSWORD, new_password=password):
+                flash("用户密码更新成功!", 'success')
+                return redirect(url_for('auth.login'))
+            else:
+                flash("更新密码的token验证失败!", 'danger')
+                return redirect(url_for('auth.forget_password'))
+        else:
+            return redirect(url_for('main.index'))
+    return render_template('auth/reset_password.html', form=form)
 
 
 # 用户登出视图函数

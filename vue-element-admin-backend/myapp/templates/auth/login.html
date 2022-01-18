@@ -16,7 +16,7 @@
                         {{ render_form(form) }}
                         <hr>
                         <p class="small"><a href="{{ url_for('auth.register') }}">注册新账号</a></p>
-                        <p class="small"><a href="#">忘记密码</a></p>
+                        <p class="small"><a href="{{ url_for('auth.forget_password') }}">忘记密码</a></p>
                     </div>
                 </div>
             </div>
