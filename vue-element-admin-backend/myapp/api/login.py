@@ -1,8 +1,12 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
-from flask import Blueprint, request, g
+from io import BytesIO
+
+from flask import Blueprint, request, g, make_response
 
 from exts import csrf
+from myapp.utils.RedisDb import RedisDb
+from myapp.utils.captcha import Captcha
 from myapp.utils.network import Result
 from myapp.utils.token import auth, verify_auth_token
 from myapp.models.user import User
@@ -49,3 +53,22 @@ def get_info():
 @login_bp.route('/user/logout', methods=['POST'])
 def logout():
     return Result.success()
+
+
+@login_bp.route('/captcha')
+def captcha():
+    c = Captcha()
+    image, code = c.generate_captcha()
+    # 创建一个缓冲区,用于保存二进制流
+    buffer = BytesIO()
+    image.save(buffer, 'jpeg')
+    # 获取图片的二进制流
+    image = buffer.getvalue()
+    # 把buf_str作为response返回前端，并设置首部字段
+    response = make_response(image)
+    response.headers['Content-Type'] = 'image/gif'
+    # 将验证码字符串储存在session中
+    redis_db = RedisDb()
+    redis_db.handle_captcha(code, code)
+    print("redis存入的code1是: ", redis_db.handle_captcha(code))
+    return response
