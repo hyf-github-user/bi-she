@@ -2,12 +2,12 @@
 # coding:utf-8
 from io import BytesIO
 
-from flask import Blueprint, flash, redirect, url_for, render_template, make_response, session
+from flask import Blueprint, flash, redirect, url_for, render_template, make_response
 from flask_login import current_user, login_required, login_user, logout_user, login_fresh, confirm_login
 
 from exts import db
-from myapp.models.user import User
 from myapp.blueprints.auth.forms import LoginForm, RegisterForm, ForgetPasswordForm, ResetPasswordForm
+from myapp.models.user import User
 from myapp.utils import redirect_back
 from myapp.utils.RedisDb import RedisDb
 from myapp.utils.captcha import Captcha
@@ -135,8 +135,10 @@ def forget_password():
     # 创建忘记密码的表单
     form = ForgetPasswordForm()
     if form.validate_on_submit():
+        # 获取表单的email
+        email = form.email.data.lower()
         # 根据输入的邮箱查找用户
-        user = User.query.filter_by(form.email.data.lower()).first()
+        user = User.query.filter_by(email=email).first()
         if user:
             token = generate_token(user=user, operation=Operations.RESET_PASSWORD)
             send_reset_password_email(user=user, token=token)
@@ -148,7 +150,7 @@ def forget_password():
 
 
 # 重置密码(需携带QQ邮箱发送的token)
-@auth_bp.route('/reset-password/<token>', methods=['POST'])
+@auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     """
     验证重置密码的token

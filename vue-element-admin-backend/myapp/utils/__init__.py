@@ -1,5 +1,6 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
+import os
 from urllib.parse import urlparse, urljoin
 
 from flask import request, redirect, url_for
@@ -128,3 +129,13 @@ def validate_picture(length):
         image.save(f, "png")
 
     return image, code
+
+
+def mkdir_path(path):
+    """
+    创建文件夹
+    :param path:
+    :return:
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)

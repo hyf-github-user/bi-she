@@ -84,7 +84,7 @@
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
                                 <img class="avatar-xs"
-                                     src="#">
+                                     src="{{ url_for('main.get_avatar', filename=current_user.avatar_s) }}">
                                 <span class="caret"></span>
                             </a>
                             {# 用户下拉菜单 #}

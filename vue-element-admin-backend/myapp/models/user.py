@@ -2,6 +2,7 @@
 # coding:utf-8
 from datetime import datetime
 from flask import current_app
+from flask_avatars import Identicon
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from exts import db
@@ -27,6 +28,7 @@ class User(db.Model, UserMixin):
     avatar_s = db.Column(db.String(64))
     avatar_m = db.Column(db.String(64))
     avatar_l = db.Column(db.String(64))
+    # 存放登录密码
     private_key = db.Column(db.Text(), comment="加密密码的私钥")
     rsa_password = db.Column(db.Text(), comment="对密码进行加密之后的密文")
     # 用户状态
@@ -45,6 +47,8 @@ class User(db.Model, UserMixin):
         super(User, self).__init__(**kwargs)
         self.set_role()  # 调用生成角色方法
         self.set_private_key()  # 生成私钥与保存公钥
+        # 自定义生成头像
+        self.generate_avatar()
 
     # 更新用户信息
     def update(self, username, name, email, active, locked, confirmed, role_id):
@@ -115,6 +119,15 @@ class User(db.Model, UserMixin):
     # 验证rsa密码
     def check_rsa(self, password):
         pass
+
+    # 自动生成头像
+    def generate_avatar(self):
+        avatar = Identicon()
+        filenames = avatar.generate(text=self.username)
+        self.avatar_s = filenames[0]
+        self.avatar_m = filenames[1]
+        self.avatar_l = filenames[2]
+        db.session.commit()
 
     # 验证密码
     @staticmethod

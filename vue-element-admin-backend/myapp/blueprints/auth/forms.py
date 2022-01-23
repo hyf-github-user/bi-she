@@ -1,9 +1,6 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
-
-
 from flask_wtf import FlaskForm
-
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import Email, Length, DataRequired, Regexp, EqualTo, ValidationError
 from myapp.models.user import User

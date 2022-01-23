@@ -5,7 +5,10 @@
 {% endblock %}
 
 {% block content %}
-    <div class="jumbotron">
+    {% if current_user.is_authenticated %}
+        个人中心
+    {% else %}
+        <div class="jumbotron">
         <div class="row">
             <div class="col-md-8">
                 <img src="{{ url_for('static', filename='images/index.jpeg') }}" class="rounded img-fluid">
@@ -17,4 +20,6 @@
             </div>
         </div>
     </div>
+    {% endif %}
+
 {% endblock %}

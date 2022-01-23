@@ -14,6 +14,10 @@ class Operations:
 
 
 class BaseConfig(object):
+    # 上传文件的保存路径
+    BLUELOG_UPLOAD_PATH = os.path.join(basedir, 'uploads')
+    if not os.path.exists(BLUELOG_UPLOAD_PATH):
+        os.makedirs(BLUELOG_UPLOAD_PATH)
     # session加密
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev key')
     TOKEN_EXPIRATION = 30 * 24 * 3600  # 令牌过期时间
@@ -34,6 +38,11 @@ class BaseConfig(object):
     MAIL_USERNAME = '1348977728@qq.com'  # 邮件账户用户名
     MAIL_PASSWORD = 'tqekpctqcoxkffeg'  # 邮件账户的密码
     MAIL_DEFAULT_SENDER = '1348977728@qq.com'  # 填邮箱，默认发送者
+    # 设置头像的配置
+    AVATARS_SAVE_PATH = os.path.join(BLUELOG_UPLOAD_PATH, 'avatars')
+    if not os.path.exists(AVATARS_SAVE_PATH):
+        os.makedirs(AVATARS_SAVE_PATH)
+    AVATARS_SIZE_TUPLE = (30, 100, 200)
 
 
 # 俩种配置
