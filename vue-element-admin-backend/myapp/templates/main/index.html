@@ -6,20 +6,34 @@
 
 {% block content %}
     {% if current_user.is_authenticated %}
-        个人中心
+        {% for post in posts %}
+            <h3 class='text-primary'><a href='{{ url_for('user.show_post', post_id=post.id) }}'>{{ post.title }}</a>
+            </h3>
+            <p>
+            <div class='post-body'>
+                {% if post.body_html %}
+                    {{ post.body_html |safe|striptags|truncate }}
+                {% else %}
+                    {{ post.body }}
+                {% endif %}
+            </div>
+            <small><a href='{{ url_for('user.show_post', post_id=post.id) }}'>加载更多</a></small>
+            </p>
+        {% endfor %}
+
     {% else %}
         <div class="jumbotron">
-        <div class="row">
-            <div class="col-md-8">
-                <img src="{{ url_for('static', filename='images/index.jpeg') }}" class="rounded img-fluid">
-            </div>
-            <div class="col-md-4 align-self-center">
-                <h1>蓝客</h1>
-                <p>专注于技术开发的小白,追求技术永不过时!</p>
-                <p><a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">注册</a></p>
+            <div class="row">
+                <div class="col-md-8">
+                    <img src="{{ url_for('static', filename='images/index.jpeg') }}" class="rounded img-fluid">
+                </div>
+                <div class="col-md-4 align-self-center">
+                    <h1>蓝客</h1>
+                    <p>专注于技术开发的小白,追求技术永不过时!</p>
+                    <p><a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">注册</a></p>
+                </div>
             </div>
         </div>
-    </div>
     {% endif %}
 
 {% endblock %}

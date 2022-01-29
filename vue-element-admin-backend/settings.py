@@ -43,6 +43,18 @@ class BaseConfig(object):
     if not os.path.exists(AVATARS_SAVE_PATH):
         os.makedirs(AVATARS_SAVE_PATH)
     AVATARS_SIZE_TUPLE = (30, 100, 200)
+    # 上传图片保存的位置
+    PHOTO_SAVE_PATH = os.path.join(BLUELOG_UPLOAD_PATH, 'photos')
+    if not os.path.exists(PHOTO_SAVE_PATH):
+        os.makedirs(PHOTO_SAVE_PATH)
+
+    # 青牛云存储的设置
+    QINIU_ACCESS_KEY = os.getenv('ACCESS_KEY')
+    QINIU_SECRET_KEY = os.getenv('QINIU_KEY')
+    QQINIU_BUCKET_NAME = '七牛空间名称'
+    QINIU_BUCKET_DOMAIN = '七牛空间对应域名'
+    # 文章的分页数
+    BLUELOG_POST_PER_PAGE = 3
 
 
 # 俩种配置

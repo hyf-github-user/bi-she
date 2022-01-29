@@ -5,6 +5,7 @@ from flask_bootstrap import Bootstrap
 from flask_dropzone import Dropzone
 from flask_login import LoginManager, AnonymousUserMixin
 from flask_mail import Mail
+from flask_qiniustorage import Qiniu
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_wtf import CSRFProtect
@@ -23,14 +24,13 @@ login_manager = LoginManager()
 mail = Mail()
 # 头像插件
 avatars = Avatars()
-
 # 进行CSRF保护
 csrf = CSRFProtect()
+# 青牛云存储
+qiniu_store = Qiniu()
 
 
 # 把user存入Session中
-
-
 @login_manager.user_loader
 def load_user(user_id):
     from myapp.models.user import User

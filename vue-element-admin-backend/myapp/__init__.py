@@ -11,7 +11,7 @@ from myapp.api.user import api_user
 from myapp.blueprints.auth.views import auth_bp
 from myapp.blueprints.main.views import main_bp
 from myapp.blueprints.user.views import user_bp
-from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf
+from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf, qiniu_store
 from myapp.models.user import Role, User
 from myapp.utils import Result
 
@@ -52,6 +52,8 @@ def register_extensions(app):
     csrf.init_app(app=app)
     # 跨域注册
     cors.init_app(app=app)
+    # 青牛云存储插件注册
+    qiniu_store.init_app(app=app)
 
 
 # 注册蓝图

@@ -18,6 +18,10 @@
                   href="{{ url_for('static', filename='open-iconic/font/css/open-iconic-bootstrap.css') }}">
             {# 自定义css样式 #}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+            {# 导入editor的css文件 #}
+            <link id="theme-style" rel="stylesheet"
+                  href="{{ url_for('static', filename='editormd/css/editormd.preview.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static',filename='editormd/css/editormd.css') }}"/>
         {% endblock %}
     {% endblock %}
 </head>
@@ -69,6 +73,7 @@
                 <div class="navbar-nav ml-auto">
                     {#判断用户是否登录#}
                     {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('user.new_post') }}" class="btn btn-outline-success my-2 my-sm-0">发表文章</a>
                         {# 用户登录后,展示通知#}
                         <a class="nav-item nav-link" href="#">
                             <span class="oi oi-bell"></span>
@@ -150,6 +155,47 @@
     <script src="{{ url_for('static', filename='bootstrap/js/jquery.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    {# 导入editor的js文件 #}
+    <script src="{{ url_for('static',filename='editormd/examples/js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='editormd/lib/marked.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='editormd/lib/prettify.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='editormd/lib/raphael.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='editormd/lib/underscore.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='editormd/lib/sequence-diagram.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='editormd/lib/flowchart.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='editormd/lib/jquery.flowchart.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='editormd/editormd.min.js') }}"></script>
+    <script type="text/javascript">
+        $(function () {
+            const editor = editormd("fancy-editormd", {
+                // width: "100%", 请不要添加
+                height: 640,
+                syncScrolling: "single",
+                path: "{{ url_for('static',filename='editormd/lib/') }}",
+                preview: true,
+                watch: true,
+                editor: false,
+                theme: "",
+                previewTheme: "",
+                editorTheme: "pastel-on-dark",
+                markdown: "",
+                codeFold: true,
+                saveHTMLToTextarea: true, // 保存 HTML 到 Textarea
+                searchReplace: true,
+                htmlDecode: "style,script,iframe|on*", // 开启 HTML 标签解析，为了安全性，默认不开启
+                emoji: true,
+                taskList: true,
+                tocm: true, // Using [TOCM]
+                tex: true,                   // 开启科学公式TeX语言支持，默认关闭
+                flowChart: true,             // 开启流程图支持，默认关闭
+                sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
+                // 开启图片上传功能
+                imageUpload: true,
+                imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                imageUploadURL: "{{ url_for('user.upload') }}",
+            });
+        });
+    </script>
 {% endblock %}
 </body>
 </html>

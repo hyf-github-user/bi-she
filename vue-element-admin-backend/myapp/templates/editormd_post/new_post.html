@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form name="mdEditorForm" action='{{ url_for('user.new_post') }}' method='post'>
+        <div style='height: 70px;padding: 5px; text-align: center;'>
+            <span class="bs-tooltip-right">标题: </span>
+            <input type="text" name="title" style='height:30px;width:390px;'>&nbsp;&nbsp;&nbsp;&nbsp;
+            <button id='confirmButton' class=" btn btn-primary btn-lg">发布</button>
+        </div>
+        <!-- 文章的主体内容 textarea -->
+        <div id="fancy-editormd">
+            <textarea name="content" id="content" style="display:none;"> </textarea>
+        </div>
+    </form>
+
+{% endblock %}

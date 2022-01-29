@@ -4,10 +4,10 @@ from datetime import datetime
 from flask import current_app
 from flask_avatars import Identicon
 from flask_login import UserMixin
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import check_password_hash, generate_password_hash
 from exts import db
 from myapp.utils.network import Result
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
 
 class User(db.Model, UserMixin):
@@ -40,6 +40,12 @@ class User(db.Model, UserMixin):
     # 用户与身份的关联(一对多)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
     role = db.relationship('Role', back_populates='users')
+
+    # 用户与评论是一对多的关系
+    comments = db.relationship('Comment', back_populates='author', cascade='all')
+
+    # 用户与文章是一对多的关系
+    posts = db.relationship('Post', back_populates='author', cascade='all')
 
     # 创建构造函数
     def __init__(self, **kwargs):
@@ -229,7 +235,84 @@ class Role(db.Model):
 
 # 权限功能表
 class Permission(db.Model):
+    __tablename__ = "permission"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30), unique=True)  # 存储权限功能说明
     roles = db.relationship(
         'Role', secondary=roles_permissions, back_populates='permissions')  # 多对多的模型联系
+
+
+# 文章与分类是多对多模型,采用了中间表的关系描述
+post_category = db.Table('post_category',
+                         db.Column('post_id', db.Integer, db.ForeignKey('post.id')),
+                         db.Column('category_id', db.ForeignKey('category.id')))
+
+
+class Post(db.Model):
+    """
+    文章模型
+    """
+    __tablename__ = "post"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="文章主键")
+    # 文章主题
+    title = db.Column(db.String(255))
+    # 文章内容,属于markdown的文件
+    body = db.Column(db.Text)
+    # markdown渲染之后的html文件
+    body_html = db.Column(db.Text)
+    # 文章创建时间
+    timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
+    # 文章是否能被评论
+    can_comment = db.Column(db.Boolean, default=True)  # 是否能评论
+    # 标记被举报的次数
+    flag = db.Column(db.Integer, default=0, comment="文章被举报次数")
+    # 文章与分类多对多的关系属性
+    categories = db.relationship('Category', secondary=post_category, back_populates='posts')
+    # 文章与评论是一对多的关系
+    comments = db.relationship('Comment', back_populates='post', cascade='all')
+    # 用户与文章是一对多的关系
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author = db.relationship('User', back_populates='posts')
+
+
+class Category(db.Model):
+    """
+    文章分类
+    """
+    __tablename__ = "category"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="分类主键")
+    # 分类名称,index是为了方便索引
+    name = db.Column(db.String(64), index=True, unique=True)
+    # 分类创建时间
+    timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
+
+    # 关系属性
+    posts = db.relationship('Post', secondary=post_category, back_populates='categories')
+
+
+class Comment(db.Model):
+    """
+    评论模型
+    """
+    __tablename__ = "comment"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="评论主键")
+    body = db.Column(db.Text)
+    # 评论创建时间
+    timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
+    # 标记被举报的次数
+    flag = db.Column(db.Integer, default=0, comment="评论被举报次数")
+    # 用户与评论是一对多的关系
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author = db.relationship('User', back_populates='comments')
+    # 文章与评论是一对多的关系
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    post = db.relationship('Post', back_populates='comments')
+
+    # 回复评论
+    # 评论被回复的评论id,一个评论与回复是一对多的关系
+    replied_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
+    # 被回复的评论的关系属性,remote_side是关系的远程侧,指的是回复的评论id
+    replied = db.relationship('Comment', back_populates='replies', remote_side=[id])
+
+    # 评论文章的评论的关系属性
+    replies = db.relationship('Comment', back_populates='replied', cascade='all')
