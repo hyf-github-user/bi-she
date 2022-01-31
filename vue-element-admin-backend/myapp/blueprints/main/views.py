@@ -2,10 +2,12 @@
 # 作者：我只是代码的搬运工
 # 文件名  :views.py
 # 时间    :2021/12/31 11:52
-from flask import Blueprint, render_template, send_from_directory, current_app, request
-from flask_login import current_user
-
-from myapp.models.user import Post
+from flask import Blueprint, render_template, send_from_directory, current_app, request, flash, url_for, redirect, abort
+from flask_login import current_user, login_required
+from exts import db
+from myapp.blueprints.user.forms import CommentForm
+from myapp.decorators import permission_required
+from myapp.models.user import Post, Category, Comment
 
 main_bp = Blueprint('main', __name__)
 
@@ -19,21 +21,23 @@ def index():
     if current_user.is_authenticated:
         page = request.args.get('page', 1, type=int)
         per_page = current_app.config['BLUELOG_POST_PER_PAGE']
+        # 获取与当前用户相关的文章
         pagination = Post.query \
+            .with_parent(current_user) \
             .order_by(Post.timestamp.desc()) \
             .paginate(page, per_page)
         posts = pagination.items
     else:
+        posts = None
         pagination = None
-        photos = None
 
-    return render_template('main/index.html', posts=posts)
+    return render_template('main/index.html', posts=posts, pagination=pagination)
 
 
 @main_bp.route('/explore')
 def explore():
     """
-
+    社区中心
     :return:
     """
     return render_template('main/explore.html')
@@ -41,4 +45,139 @@ def explore():
 
 @main_bp.route('/avatars/<path:filename>')
 def get_avatar(filename):
+    """
+    获取头像图片
+    :param filename:
+    :return:
+    """
     return send_from_directory(current_app.config['AVATARS_SAVE_PATH'], filename=filename)
+
+
+@main_bp.route('/post/<int:post_id>')
+def show_post(post_id):
+    """
+    展示文章详情
+    :param post_id:
+    :return:
+    """
+    # 根据id查找文章
+    post = Post.query.get_or_404(post_id)
+    # 获取当前评论的页数
+    page = request.args.get('page', 1, type=int)
+    per_page = current_app.config['BLUELOG_COMMENT_PER_PAGE']
+    # 获取评论分页对象(查询被管理员收到的评论)
+    pagination = Comment.query.with_parent(post).filter_by(reviewed=True).order_by(Comment.timestamp.asc()).paginate(
+        page, per_page)
+    comments = pagination.items
+    if current_user.is_authenticated:
+        # 如果用户登录了,便可以进行发表评论
+        form = CommentForm()
+        return render_template('main/post.html', comments=comments, post=post, pagination=pagination,
+                               form=form)
+    else:
+        pass
+
+
+@main_bp.route('/report/post/<int:post_id>', methods=['POST'])
+def report_post(post_id):
+    """
+    举报文章
+    :param post_id:
+    :return:
+    """
+    post = Post.query.get_or_404(post_id)
+    post.flag += 1
+    db.session.commit()
+    flash("文章已举报!", 'success')
+    return redirect(url_for('main.show_post', post_id=post_id))
+
+
+@main_bp.route('/category/<int:category_id>')
+def show_category(category_id):
+    """
+    展示分类详情
+    :param category_id:
+    :return:
+    """
+    # 获取分类
+    category = Category.query.get_or_404(category_id)
+    # 获取分类的分页的页数
+    page = request.args.get('page', 1, type=int)
+    # 获取分类的每页的数量
+    per_page = current_app.config['BLUELOG_CATEGORY_PER_PAGE']
+    # 获取分页对象
+    pagination = Post.query.with_parent(category).order_by(Post.timestamp.desc()).paginate(page, per_page)
+    posts = pagination.items
+    return render_template('main/category.html', category=category, pagination=pagination, posts=posts)
+
+
+@main_bp.route('/post/<int:post_id>/comment/new', methods=['POST'])
+@login_required
+@permission_required('COMMENT')
+def new_comment(post_id):
+    post = Post.query.get_or_404(post_id)
+    page = request.args.get('page', 1, type=int)
+    form = CommentForm()
+    if form.validate_on_submit():
+        body = form.body.data
+        comment = Comment(body=body, post=post)
+        replied_id = request.args.get('reply')
+        if replied_id:
+            comment.replied = Comment.query.get_or_404(replied_id)
+            # if comment.replied.author.receive_comment_notification:
+            #     push_comment_notification(photo_id=photo.id, receiver=comment.replied.author)
+        db.session.add(comment)
+        db.session.commit()
+        flash('评论已发表!', 'success')
+
+        # if current_user != post.author and post.author.receive_comment_notification:
+        #     push_comment_notification(photo_id, receiver=post.author, page=page)
+
+    # flash_errors(form)
+    return redirect(url_for('main.show_photo', post_id=post_id, page=page))
+
+
+@main_bp.route('/reply/comment/<int:comment_id>')
+def reply_comment(comment_id):
+    """
+    回复评论
+    :param comment_id:
+    :return:
+    """
+    pass
+
+
+@main_bp.route('/set_comment/<int:post_id>', methods=['POST'])
+def set_comment(post_id):
+    """
+    设置评论功能
+    :param post_id:
+    :return:
+    """
+    post = Post.query.get_or_404(post_id)
+    if current_user != post.author:
+        abort(403)
+
+    if post.can_comment:
+        post.can_comment = False
+        flash('评论已禁止!', 'info')
+    else:
+        post.can_comment = True
+        flash('评论已开启!', 'info')
+    db.session.commit()
+    return redirect(url_for('main.show_photo', post_id=post_id))
+
+
+@main_bp.route('/delete/comment/<int:comment_id>')
+def delete_comment(comment_id):
+    """
+    删除评论
+    :param comment_id:
+    :return:
+    """
+    pass
+
+
+@main_bp.route('/report/comment/<int:comment_id>')
+def report_comment(comment_id):
+    pass

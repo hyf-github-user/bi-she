@@ -2,7 +2,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from myapp import create_app
 from exts import db
-from myapp.models.user import User, Role, Permission, Post, Comment, Category
+from myapp.models.user import User, Role, Permission, Post, Comment, Category, Link
 
 app = create_app()  # 创建一个app对象
 

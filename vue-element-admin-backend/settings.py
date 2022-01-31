@@ -47,7 +47,7 @@ class BaseConfig(object):
     PHOTO_SAVE_PATH = os.path.join(BLUELOG_UPLOAD_PATH, 'photos')
     if not os.path.exists(PHOTO_SAVE_PATH):
         os.makedirs(PHOTO_SAVE_PATH)
-
+    MDEDITOR_FILE_UPLOADER = PHOTO_SAVE_PATH
     # 青牛云存储的设置
     QINIU_ACCESS_KEY = os.getenv('ACCESS_KEY')
     QINIU_SECRET_KEY = os.getenv('QINIU_KEY')
@@ -55,6 +55,10 @@ class BaseConfig(object):
     QINIU_BUCKET_DOMAIN = '七牛空间对应域名'
     # 文章的分页数
     BLUELOG_POST_PER_PAGE = 3
+    # 文章评论的分页数
+    BLUELOG_COMMENT_PER_PAGE = 3
+    # 分类的分页数
+    BLUELOG_CATEGORY_PER_PAGE = 3
 
 
 # 俩种配置

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% from 'bootstrap/form.html' import render_form, render_field %}
+
+{% block title %}{{ post.author.name }}的相册{% endblock %}
+
+{% block content %}
+    {#    文章详情#}
+    <div class="page-header">
+        <h1>{{ post.title }}
+            <span class="float-right">
+                {% if current_user.is_authenticated %}
+                    {# 编辑文章 #}
+                    <a class="btn btn-info btn-sm" href="{{ url_for('user.edit_post', post_id=post.id) }}">编辑</a>
+                    {# 删除文章 #}
+                    <form class="inline" method="post"
+                          action="{{ url_for('user.delete_post', post_id=post.id, next=url_for('main.index')) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('你确定删除文章吗?');">删除</button>
+                    </form>
+                {% endif %}
+            </span>
+        </h1>
+        <small>
+            分类: <a
+                href="{{ url_for('main.show_category', category_id=post.category.id) }}">{{ post.category.name }}</a><br>
+            日期: {{ moment(post.timestamp).format('LL') }}
+        </small>
+    </div>
+    <div class="row">
+        <div class="col-sm-8">
+            {# 展示post中的post_html内容 #}
+            {{ post.body_html | safe }}
+            <hr>
+            {# 分享文章链接 #}
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".postLinkModal">分享
+            </button>
+            <div class="modal fade postLinkModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">有关链接</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <input type="text" class="form-control"
+                                        {#   _external=True会显示完整的URL#}
+                                       value="{{ url_for('main.show_post', post_id=post.id, _external=True) }}"
+                                       readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {#            展示评论#}
+            <div class="comments" id="comments">
+                <h3>{{ pagination.total }} 条评论
+                    <small>
+                        {# 传递当前页数#}
+                        <a href="{{ url_for('main.show_post', post_id=post.id, page=pagination.pages or 1) }}#comments">
+                            最近</a>
+                    </small>
+                    {#  验证用户登录#}
+                    {% if current_user.is_authenticated %}
+                        <form class="float-right" method="post"
+                              action="{{ url_for('main.set_comment',post_id=post.id, next=request.full_path) }}">
+                            {# 用户是否关闭评论的功能#}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-warning btn-sm">
+                                {% if post.can_comment %}关闭{% else %}启动{% endif %} 评论
+                            </button>
+                        </form>
+                    {% endif %}
+                </h3>
+                {% if comments %}
+                    正在开发
+                {% else %}
+                    <div class="tip"><h5>暂无评论!</h5></div>
+                {% endif %}
+            </div>
+            {% if comments %}
+                {# 评论分页 #}
+                {{ render_pagination(pagination, fragment='#comments') }}
+            {% endif %}
+            {% if request.args.get('reply') %}
+                <div class="alert alert-dark">
+                    正在回复<strong>{{ request.args.get('author') }}</strong>:
+                    <a class="float-right" href="{{ url_for('main.show_post', post_id=post.id) }}">取消回复</a>
+                </div>
+            {% endif %}
+            {# 判断是否能发评论 #}
+            {% if post.can_comment %}
+                <div id="comment-form">
+                    {{ render_form(form, action=request.full_path) }}
+                </div>
+            {% else %}
+                <div class="tip"><h5>评论已被禁止!</h5></div>
+            {% endif %}
+        </div>
+        <div class="col-sm-4 sidebar">
+            {# 渲染右上角的小卡片 #}
+            {% include "main/_sidebar.html" %}
+        </div>
+    </div>
+
+    {# 删除照片与照片标签的确认框 #}
+    {% if current_user.is_authenticated %}
+        <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmModalLabel">删除确认框</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>你想删除这个项目吗?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <form class="delete-form" action="" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button class="btn btn-danger btn-confirm" type="submit">确认删除</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

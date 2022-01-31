@@ -155,6 +155,7 @@
     <script src="{{ url_for('static', filename='bootstrap/js/jquery.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
     {# 导入editor的js文件 #}
     <script src="{{ url_for('static',filename='editormd/examples/js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static',filename='editormd/lib/marked.min.js') }}"></script>

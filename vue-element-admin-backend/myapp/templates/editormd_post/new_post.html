@@ -2,9 +2,23 @@
 
 {% block content %}
     <form name="mdEditorForm" action='{{ url_for('user.new_post') }}' method='post'>
-        <div style='height: 70px;padding: 5px; text-align: center;'>
-            <span class="bs-tooltip-right">标题: </span>
-            <input type="text" name="title" style='height:30px;width:390px;'>&nbsp;&nbsp;&nbsp;&nbsp;
+        {# csrf保护 #}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div style='height: 250px;padding: 5px; text-align: left;'>
+            <div class="form-group">
+                <label for="title">标题:</label>
+                <input type="text" class="form-control" name="title" placeholder="文章主题">
+            </div>
+            <div class="form-group">
+                <label for="category">分类</label>
+                <select class="form-control" name="category">
+                    {% if categories %}
+                        {% for category in categories %}
+                            <option>{{ category.name }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
             <button id='confirmButton' class=" btn btn-primary btn-lg">发布</button>
         </div>
         <!-- 文章的主体内容 textarea -->

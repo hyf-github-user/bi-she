@@ -9,6 +9,8 @@ from flask_qiniustorage import Qiniu
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_wtf import CSRFProtect
+from flask_moment import Moment
+
 
 # 结合bootstrap
 bootstrap = Bootstrap()
@@ -28,6 +30,9 @@ avatars = Avatars()
 csrf = CSRFProtect()
 # 青牛云存储
 qiniu_store = Qiniu()
+# 时间格式
+moment = Moment()
+
 
 
 # 把user存入Session中

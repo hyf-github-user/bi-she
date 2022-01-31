@@ -242,12 +242,6 @@ class Permission(db.Model):
         'Role', secondary=roles_permissions, back_populates='permissions')  # 多对多的模型联系
 
 
-# 文章与分类是多对多模型,采用了中间表的关系描述
-post_category = db.Table('post_category',
-                         db.Column('post_id', db.Integer, db.ForeignKey('post.id')),
-                         db.Column('category_id', db.ForeignKey('category.id')))
-
-
 class Post(db.Model):
     """
     文章模型
@@ -266,8 +260,9 @@ class Post(db.Model):
     can_comment = db.Column(db.Boolean, default=True)  # 是否能评论
     # 标记被举报的次数
     flag = db.Column(db.Integer, default=0, comment="文章被举报次数")
-    # 文章与分类多对多的关系属性
-    categories = db.relationship('Category', secondary=post_category, back_populates='posts')
+    # 分类与文章一对多对多的关系属性
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    category = db.relationship('Category', back_populates='posts')
     # 文章与评论是一对多的关系
     comments = db.relationship('Comment', back_populates='post', cascade='all')
     # 用户与文章是一对多的关系
@@ -286,8 +281,8 @@ class Category(db.Model):
     # 分类创建时间
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
 
-    # 关系属性
-    posts = db.relationship('Post', secondary=post_category, back_populates='categories')
+    # 关系属性,分类与文章是一对多的关系
+    posts = db.relationship('Post', back_populates='category')
 
 
 class Comment(db.Model):
@@ -308,6 +303,7 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     post = db.relationship('Post', back_populates='comments')
 
+    reviewed = db.Column(db.Boolean, default=False, comment="是否通过审核")  # 判断是否通过审核
     # 回复评论
     # 评论被回复的评论id,一个评论与回复是一对多的关系
     replied_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
@@ -316,3 +312,13 @@ class Comment(db.Model):
 
     # 评论文章的评论的关系属性
     replies = db.relationship('Comment', back_populates='replied', cascade='all')
+
+
+class Link(db.Model):
+    """
+    友情链接
+    """
+    __tablename__ = 'link'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(30))
+    url = db.Column(db.String(255))

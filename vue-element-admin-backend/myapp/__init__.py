@@ -2,17 +2,19 @@
 # coding:utf-8
 import click
 from flask import Flask, render_template
+from flask_login import current_user
 from flask_wtf.csrf import CSRFError
 
 from myapp.api.article import api_article
 from myapp.api.comment import api_comment
 from myapp.api.login import login_bp
 from myapp.api.user import api_user
+from myapp.blueprints.ajax.views import ajax_bp
 from myapp.blueprints.auth.views import auth_bp
 from myapp.blueprints.main.views import main_bp
 from myapp.blueprints.user.views import user_bp
-from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf, qiniu_store
-from myapp.models.user import Role, User
+from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf, qiniu_store, moment
+from myapp.models.user import Role, User, Category, Comment, Link
 from myapp.utils import Result
 
 from settings import DevelopmentConfig
@@ -25,13 +27,12 @@ def create_app():
     register_extensions(app=app)
     # 注册蓝图
     register_blueprints(app=app)
-    # # 数据库数据初始化
-    # register_template_context(myapp=myapp)
     # 注册命令
     register_commands(app=app)
     # # 定义错误页面
     register_errors(app=app)
-
+    # 数据库数据初始化
+    register_template_context(app=app)
     return app
 
 
@@ -54,6 +55,8 @@ def register_extensions(app):
     cors.init_app(app=app)
     # 青牛云存储插件注册
     qiniu_store.init_app(app=app)
+    # 时间格式插件注册
+    moment.init_app(app=app)
 
 
 # 注册蓝图
@@ -67,6 +70,7 @@ def register_blueprints(app):
     app.register_blueprint(main_bp)
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(ajax_bp, url_prefix='/ajax')
 
 
 # 绑定初始化命令
@@ -221,3 +225,18 @@ def register_errors(app):
         """
         print("CSRF验证错误!")
         return Result.error(message="CSRF验证失败!")
+
+
+# 定义模板上下文处理函数
+def register_template_context(app):
+    @app.context_processor
+    def make_template_context():
+        # 查找categories
+        categories = Category.query.order_by(Category.name).all()
+        links = Link.query.order_by(Link.name).all()
+        # unread_comments存储没被审核的评论
+        if current_user.is_authenticated:
+            unread_comments = Comment.query.filter_by(reviewed=False).count()
+        else:
+            unread_comments = None
+        return dict(categories=categories, links=links, unread_comments=unread_comments)

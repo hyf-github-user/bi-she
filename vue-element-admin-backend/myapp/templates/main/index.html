@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
 
 {% block title %}
     首页
@@ -6,21 +7,20 @@
 
 {% block content %}
     {% if current_user.is_authenticated %}
-        {% for post in posts %}
-            <h3 class='text-primary'><a href='{{ url_for('user.show_post', post_id=post.id) }}'>{{ post.title }}</a>
-            </h3>
-            <p>
-            <div class='post-body'>
-                {% if post.body_html %}
-                    {{ post.body_html |safe|striptags|truncate }}
-                {% else %}
-                    {{ post.body }}
+        <div class="row">
+            <div class="col-sm-8">
+                {#  部分展示文章为一条一条 #}
+                {% include 'main/_posts.html' %}
+                {% if posts %}
+                    {# 展示分页 #}
+                    <div class="page-footer">{{ render_pagination(pagination) }}</div>
                 {% endif %}
             </div>
-            <small><a href='{{ url_for('user.show_post', post_id=post.id) }}'>加载更多</a></small>
-            </p>
-        {% endfor %}
-
+            <div class="col-sm-4 sidebar">
+                {#   右上角展示链接与分类#}
+                {% include 'main/_sidebar.html' %}
+            </div>
+        </div>
     {% else %}
         <div class="jumbotron">
             <div class="row">
