@@ -13,8 +13,8 @@ from myapp.blueprints.ajax.views import ajax_bp
 from myapp.blueprints.auth.views import auth_bp
 from myapp.blueprints.main.views import main_bp
 from myapp.blueprints.user.views import user_bp
-from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf, qiniu_store, moment
-from myapp.models.user import Role, User, Category, Comment, Link
+from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf, qiniu_store, moment, ckeditor
+from myapp.models.user import Role, User, Category, Comment, Link, Follow, Collect
 from myapp.utils import Result
 
 from settings import DevelopmentConfig
@@ -57,6 +57,8 @@ def register_extensions(app):
     qiniu_store.init_app(app=app)
     # 时间格式插件注册
     moment.init_app(app=app)
+    # 富文本编辑器
+    ckeditor.init_app(app=app)
 
 
 # 注册蓝图

@@ -10,6 +10,21 @@ from exts import db
 from myapp.utils.network import Result
 
 
+# 用户与用户关联模型(自我关联模型)
+class Follow(db.Model):
+    # 关注者的id
+    follower_id = db.Column(db.Integer, db.ForeignKey('user.id'),
+                            primary_key=True)
+    # 被关注的人的id
+    followed_id = db.Column(db.Integer, db.ForeignKey('user.id'),
+                            primary_key=True)
+    # 关注的时间
+    timestamp = db.Column(db.DateTime, default=datetime.now)
+    # 自我关联关系, joined表示和父查询一样加载记录,但使用联结,foreign_keys可以让外键找到对应外键,follower->follower_id,followed->followed_id
+    follower = db.relationship('User', foreign_keys=[follower_id], back_populates='following', lazy='joined')
+    followed = db.relationship('User', foreign_keys=[followed_id], back_populates='followers', lazy='joined')
+
+
 class User(db.Model, UserMixin):
     """
         用户表模型
@@ -46,6 +61,17 @@ class User(db.Model, UserMixin):
 
     # 用户与文章是一对多的关系
     posts = db.relationship('Post', back_populates='author', cascade='all')
+
+    # User与collect的一对多模型
+    collections = db.relationship('Collect', back_populates='collector',
+                                  cascade='all')  # cascade='all' 指的是当用户删除后,对应的collect就会被删掉
+
+    # 所有我关注的人, foreign_keys指定反向属性,foreign_keys可以让外键找到对应外键,follower->follower_id,followed->followed_id
+    following = db.relationship('Follow', foreign_keys=[Follow.follower_id], back_populates='follower',
+                                lazy='dynamic', cascade='all')
+    # 所有我的粉丝
+    followers = db.relationship('Follow', foreign_keys=[Follow.followed_id], back_populates='followed',
+                                lazy='dynamic', cascade='all')
 
     # 创建构造函数
     def __init__(self, **kwargs):
@@ -179,6 +205,50 @@ class User(db.Model, UserMixin):
         permission = Permission.query.filter_by(name=permission_name).first()
         return permission is not None and self.role is not None and permission in self.role.permissions
 
+    # 收藏图片方法
+    def collect(self, photo):
+        collect = Collect(collector=self, collected=photo)
+        db.session.add(collect)
+        db.session.commit()
+
+    # 取消收藏照片
+    def uncollect(self, photo):
+        # 根据user查询对应的collect
+        collect = Collect.query.with_parent(self).filter_by(collected_id=photo.id).first()
+        if collect:
+            db.session.delete(collect)
+            db.session.commit()
+
+    # 查找用户有无收藏此照片
+    def is_collecting(self, photo):
+        return Collect.query.with_parent(self).filter_by(collected_id=photo.id).first() is not None
+
+    # 关注用户自己
+    def follow(self, user):
+        # 如果没有关注自己
+        if not self.is_following(user):
+            # 关注自己
+            follow = Follow(follower=self, followed=user)
+            db.session.add(follow)
+            db.session.commit()
+
+    # 取消关注某人
+    def unfollow(self, user):
+        follow = self.following.filter_by(followed_id=user.id).first()
+        if follow:
+            db.session.delete(follow)
+            db.session.commit()
+
+    # 查看此用户有无关注这个用户
+    def is_following(self, user):
+        if user.id is None:  # when follow self, user.id will be None
+            return False
+        return self.following.filter_by(followed_id=user.id).first() is not None
+
+    # 查找自己关注了别人
+    def is_followed_by(self, user):
+        return self.followers.filter_by(follower_id=user.id).first() is not None
+
 
 # 权限与角色的关联表(多对多)
 roles_permissions = db.Table('roles_permissions',
@@ -250,10 +320,8 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="文章主键")
     # 文章主题
     title = db.Column(db.String(255))
-    # 文章内容,属于markdown的文件
+    # 文章内容
     body = db.Column(db.Text)
-    # markdown渲染之后的html文件
-    body_html = db.Column(db.Text)
     # 文章创建时间
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
     # 文章是否能被评论
@@ -268,6 +336,21 @@ class Post(db.Model):
     # 用户与文章是一对多的关系
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author = db.relationship('User', back_populates='posts')
+    # Post与collect的一对多模型
+    collectors = db.relationship('Collect', back_populates='collected',
+                                 cascade='all')  # cascade='all' 指的是当照片删除后,对应的collect就会被删掉
+
+
+# 收藏表(),使用关联模型把User与Photo的多对多模型给分离成一对多模型
+class Collect(db.Model):
+    collector_id = db.Column(db.Integer, db.ForeignKey('user.id'),  # 收藏照片人的ID  与User形成一对多模型
+                             primary_key=True)
+    collected_id = db.Column(db.Integer, db.ForeignKey('post.id'),  # 被用户收藏照片ID  与Photo形成一对多模型
+                             primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.now)  # 收藏时间
+
+    collector = db.relationship('User', back_populates='collections', lazy='joined')  # 收藏人(一对多) 对应User
+    collected = db.relationship('Post', back_populates='collectors', lazy='joined')  # 被收藏的照片(一对多)  对应Photo
 
 
 class Category(db.Model):

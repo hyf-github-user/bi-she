@@ -9,18 +9,13 @@
     {% include 'user/_header.html' %}
     <div class="row">
         <div class="col-md-12">
-            {% if photos %}
-                {% for photo in photos %}
-                    {{ photo_card(photo) }}
+            {% if posts %}
+                {% for post in posts %}
+                    {{ post_card(post) }}
                 {% endfor %}
             {% else %}
                 <div class="tip text-center">
                     <h3>暂无照片!</h3>
-                    {% if user==current_user %}
-                        <a class="btn btn-link" href="{{ url_for('main.upload') }}">上传照片</a>
-                    {% else %}
-                        <a class="btn btn-link" href="{{ url_for('main.explore') }}">个人中心</a>
-                    {% endif %}
                 </div>
             {% endif %}
         </div>

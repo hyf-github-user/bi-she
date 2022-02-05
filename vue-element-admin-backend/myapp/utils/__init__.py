@@ -3,7 +3,7 @@
 import os
 from urllib.parse import urlparse, urljoin
 
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, current_app
 
 from myapp.utils.rsa_message import RSAUtil
 from myapp.utils.network import Result
@@ -139,3 +139,7 @@ def mkdir_path(path):
     """
     if not os.path.exists(path):
         os.makedirs(path)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in current_app.config['BLUELOG_ALLOWED_IMAGE_EXTENSIONS']

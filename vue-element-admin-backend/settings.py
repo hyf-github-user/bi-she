@@ -59,6 +59,10 @@ class BaseConfig(object):
     BLUELOG_COMMENT_PER_PAGE = 3
     # 分类的分页数
     BLUELOG_CATEGORY_PER_PAGE = 3
+    # 富文本编辑器设置CKEditor
+    CKEDITOR_ENABLE_CSRF = True
+    CKEDITOR_FILE_UPLOADER = 'user.upload'
+    BLUELOG_ALLOWED_IMAGE_EXTENSIONS = ['ico', 'png', 'jpg', 'jpeg', 'gif']
 
 
 # 俩种配置

@@ -53,7 +53,7 @@ def get_avatar(filename):
     return send_from_directory(current_app.config['AVATARS_SAVE_PATH'], filename=filename)
 
 
-@main_bp.route('/post/<int:post_id>')
+@main_bp.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def show_post(post_id):
     """
     展示文章详情
@@ -69,13 +69,25 @@ def show_post(post_id):
     pagination = Comment.query.with_parent(post).filter_by(reviewed=True).order_by(Comment.timestamp.asc()).paginate(
         page, per_page)
     comments = pagination.items
+    form = CommentForm()
     if current_user.is_authenticated:
         # 如果用户登录了,便可以进行发表评论
-        form = CommentForm()
+        if form.validate_on_submit():
+            body = form.body.data
+            author = current_user._get_current_object()
+            comment = Comment(body=body, author=author, post=post)
+            # 判断是否回复评论
+            replied_id = request.args.get('reply')
+            if replied_id:
+                comment.replied = Comment.query.get_or_404(replied_id)
+            db.session.add(comment)
+            db.session.commit()
+            flash('评论已发表!', 'success')
+            return redirect(url_for('main.show_post', post_id=post_id))
         return render_template('main/post.html', comments=comments, post=post, pagination=pagination,
                                form=form)
-    else:
-        pass
+    return render_template('main/post.html', comments=comments, post=post, pagination=pagination,
+                           form=form)
 
 
 @main_bp.route('/report/post/<int:post_id>', methods=['POST'])

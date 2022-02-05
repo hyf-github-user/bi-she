@@ -2,6 +2,7 @@
 # coding:utf-8
 from flask_avatars import Avatars
 from flask_bootstrap import Bootstrap
+from flask_ckeditor import CKEditor
 from flask_dropzone import Dropzone
 from flask_login import LoginManager, AnonymousUserMixin
 from flask_mail import Mail
@@ -32,6 +33,8 @@ csrf = CSRFProtect()
 qiniu_store = Qiniu()
 # 时间格式
 moment = Moment()
+# 富文本编辑器
+ckeditor = CKEditor()
 
 
 

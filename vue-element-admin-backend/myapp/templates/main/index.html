@@ -7,8 +7,8 @@
 
 {% block content %}
     {% if current_user.is_authenticated %}
-        <div class="row">
-            <div class="col-sm-8">
+        <div class="row justify-content-md-center">
+            <div class="col-md-8">
                 {#  部分展示文章为一条一条 #}
                 {% include 'main/_posts.html' %}
                 {% if posts %}
@@ -22,6 +22,7 @@
             </div>
         </div>
     {% else %}
+        {#   未登录展示的部分    #}
         <div class="jumbotron">
             <div class="row">
                 <div class="col-md-8">

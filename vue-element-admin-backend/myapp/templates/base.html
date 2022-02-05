@@ -18,10 +18,6 @@
                   href="{{ url_for('static', filename='open-iconic/font/css/open-iconic-bootstrap.css') }}">
             {# 自定义css样式 #}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-            {# 导入editor的css文件 #}
-            <link id="theme-style" rel="stylesheet"
-                  href="{{ url_for('static', filename='editormd/css/editormd.preview.css') }}">
-            <link rel="stylesheet" href="{{ url_for('static',filename='editormd/css/editormd.css') }}"/>
         {% endblock %}
     {% endblock %}
 </head>
@@ -36,15 +32,10 @@
                 <img src="{{ url_for('static', filename='favicon.ico') }}"
                      class="d-inline-block align-top" alt="Bluelog">
             </a>
-            <a class="navbar-brand" href="https://www.baidu.com">蓝客</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
             {# 导航栏的菜单 #}
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    {{ render_nav_item('main.index', 'Home') }}
+                    {{ render_nav_item('main.index', '蓝客') }}
                     {{ render_nav_item('main.explore', '个人中心') }}
                     {# 下拉菜单 #}
                     <li class="nav-item dropdown">
@@ -62,18 +53,26 @@
                     {# 搜索栏 #}
                     <form class="form-inline my-2 my-lg-0">
                         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">搜索</button>
                     </form>
-                    {# 隐藏的菜单 #}
-                    <li class="nav-item">
-                        <a class="nav-link disabled">后台管理</a>
-                    </li>
                 </ul>
                 {#右上角的登录与注册按钮#}
                 <div class="navbar-nav ml-auto">
                     {#判断用户是否登录#}
                     {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('user.new_post') }}" class="btn btn-outline-success my-2 my-sm-0">发表文章</a>
+                        <li class="nav-item dropdown">
+                            {# 相关创建功能#}
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                创建 <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ url_for('user.new_post') }}">文章</a>
+                                <a class="dropdown-item" href="{{ url_for('user.new_category') }}">分类</a>
+                                <a class="dropdown-item" href="{{ url_for('user.new_link') }}">友情链接</a>
+                            </div>
+                        </li>
                         {# 用户登录后,展示通知#}
                         <a class="nav-item nav-link" href="#">
                             <span class="oi oi-bell"></span>
@@ -96,7 +95,7 @@
                             <div class="dropdown-menu dropdown-menu-right" role="menu">
                                 <h6 class="dropdown-header">{{ current_user.username }} 已登录</h6>
                                 <a class="dropdown-item"
-                                   href="#">
+                                   href="{{ url_for('user.index', username=current_user.username) }}">
                                     <span class="oi oi-person"></span> 个人中心
                                 </a>
                                 <div class="dropdown-divider"></div>
@@ -156,46 +155,6 @@
     <script src="{{ url_for('static', filename='bootstrap/js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
-    {# 导入editor的js文件 #}
-    <script src="{{ url_for('static',filename='editormd/examples/js/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='editormd/lib/marked.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='editormd/lib/prettify.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='editormd/lib/raphael.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='editormd/lib/underscore.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='editormd/lib/sequence-diagram.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='editormd/lib/flowchart.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='editormd/lib/jquery.flowchart.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='editormd/editormd.min.js') }}"></script>
-    <script type="text/javascript">
-        $(function () {
-            const editor = editormd("fancy-editormd", {
-                // width: "100%", 请不要添加
-                height: 640,
-                syncScrolling: "single",
-                path: "{{ url_for('static',filename='editormd/lib/') }}",
-                preview: true,
-                watch: true,
-                editor: false,
-                theme: "",
-                previewTheme: "",
-                editorTheme: "pastel-on-dark",
-                markdown: "",
-                codeFold: true,
-                saveHTMLToTextarea: true, // 保存 HTML 到 Textarea
-                searchReplace: true,
-                htmlDecode: "style,script,iframe|on*", // 开启 HTML 标签解析，为了安全性，默认不开启
-                emoji: true,
-                taskList: true,
-                tocm: true, // Using [TOCM]
-                tex: true,                   // 开启科学公式TeX语言支持，默认关闭
-                flowChart: true,             // 开启流程图支持，默认关闭
-                sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
-                // 开启图片上传功能
-                imageUpload: true,
-                imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                imageUploadURL: "{{ url_for('user.upload') }}",
-            });
-        });
     </script>
 {% endblock %}
 </body>
