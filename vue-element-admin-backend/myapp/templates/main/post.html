@@ -8,12 +8,14 @@
     {#    文章详情#}
     <div class="page-header">
         <h1>{{ post.title }}
-            {#            文章标题的右边#}
+            {# 文章标题的右边 #}
             <span class="float-right">
-                    {% if current_user.is_authenticated %}
-                        {#                        编辑文章#}
+                    {% if current_user == post.author or current_user.can('MODERATE') %}
+                        {# 编辑文章 #}
                         <a class="btn btn-info btn-sm" href="{{ url_for('user.edit_post', post_id=post.id) }}">编辑</a>
-                        {#                        删除文章#}
+                        {# 删除文章 #}
+                        {#                        <a class="btn btn-danger btn-sm text-white" data-toggle="modal" data-target="#confirm-delete"#}
+                        {#                           data-href="{{ url_for('user.delete_post', post_id=post.id, next=url_for('main.index')) }}">删除</a>#}
                         <form class="inline" method="post"
                               action="{{ url_for('user.delete_post', post_id=post.id, next=url_for('main.index')) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -31,12 +33,18 @@
     </div>
     <div class="row">
         <div class="col-sm-8">
-            {#            展示post中的post内容#}
+            {# 展示post中的post内容 #}
             {{ post.body | safe }}
             <hr>
-            {#            分享文章链接#}
+            {# 分享文章链接 #}
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".postLinkModal">分享
             </button>
+            {% if current_user.is_authenticatedand and current_user != post.author %}
+                <form class="inline" method="post" action="{{ url_for('main.report_photo', post_id=post.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-link btn-sm">举报</button>
+                </form>
+            {% endif %}
             <div class="modal fade postLinkModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog">
@@ -58,50 +66,8 @@
                     </div>
                 </div>
             </div>
-            {#            展示评论#}
-            <div class="comments" id="comments">
-                <h3>{{ pagination.total }} 条评论
-                    <small>
-                        {#                        传递当前页数#}
-                        <a href="{{ url_for('main.show_post', post_id=post.id, page=pagination.pages or 1) }}#comments">
-                            最近</a>
-                    </small>
-                    {#                    验证用户登录#}
-                    {% if current_user.is_authenticated %}
-                        <form class="float-right" method="post"
-                              action="{{ url_for('main.set_comment',post_id=post.id, next=request.full_path) }}">
-                            {#                            用户是否关闭评论的功能#}
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <button type="submit" class="btn btn-warning btn-sm">
-                                {% if post.can_comment %}关闭{% else %}启动{% endif %} 评论
-                            </button>
-                        </form>
-                    {% endif %}
-                </h3>
-                {% if comments %}
-                    正在开发
-                {% else %}
-                    <div class="tip"><h5>暂无评论!</h5></div>
-                {% endif %}
-            </div>
-            {% if comments %}
-                {#                评论分页#}
-                {{ render_pagination(pagination, fragment='#comments') }}
-            {% endif %}
-            {% if request.args.get('reply') %}
-                <div class="alert alert-dark">
-                    正在回复<strong>{{ request.args.get('author') }}</strong>:
-                    <a class="float-right" href="{{ url_for('main.show_post', post_id=post.id) }}">取消回复</a>
-                </div>
-            {% endif %}
-            {#            判断是否能发评论#}
-            {% if post.can_comment %}
-                <div id="comment-form">
-                    {{ render_form(form, action=request.full_path) }}
-                </div>
-            {% else %}
-                <div class="tip"><h5>评论已被禁止!</h5></div>
-            {% endif %}
+            {# 展示评论 #}
+            {% include 'main/_comment.html' %}
         </div>
         <div class="col-sm-4 sidebar">
             {#            渲染右上角的小卡片#}
@@ -109,7 +75,7 @@
         </div>
     </div>
 
-    {#    删除照片与照片标签的确认框#}
+    {#    删除文章的确认框#}
     {% if current_user.is_authenticated %}
         <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
              aria-hidden="true">

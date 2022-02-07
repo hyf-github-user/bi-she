@@ -23,7 +23,6 @@ def index():
         per_page = current_app.config['BLUELOG_POST_PER_PAGE']
         # 获取与当前用户相关的文章
         pagination = Post.query \
-            .with_parent(current_user) \
             .order_by(Post.timestamp.desc()) \
             .paginate(page, per_page)
         posts = pagination.items
@@ -70,22 +69,6 @@ def show_post(post_id):
         page, per_page)
     comments = pagination.items
     form = CommentForm()
-    if current_user.is_authenticated:
-        # 如果用户登录了,便可以进行发表评论
-        if form.validate_on_submit():
-            body = form.body.data
-            author = current_user._get_current_object()
-            comment = Comment(body=body, author=author, post=post)
-            # 判断是否回复评论
-            replied_id = request.args.get('reply')
-            if replied_id:
-                comment.replied = Comment.query.get_or_404(replied_id)
-            db.session.add(comment)
-            db.session.commit()
-            flash('评论已发表!', 'success')
-            return redirect(url_for('main.show_post', post_id=post_id))
-        return render_template('main/post.html', comments=comments, post=post, pagination=pagination,
-                               form=form)
     return render_template('main/post.html', comments=comments, post=post, pagination=pagination,
                            form=form)
 
@@ -132,7 +115,8 @@ def new_comment(post_id):
     form = CommentForm()
     if form.validate_on_submit():
         body = form.body.data
-        comment = Comment(body=body, post=post)
+        author = current_user._get_current_object()
+        comment = Comment(body=body, post=post, author=author, reviewed=True)
         replied_id = request.args.get('reply')
         if replied_id:
             comment.replied = Comment.query.get_or_404(replied_id)
@@ -144,22 +128,27 @@ def new_comment(post_id):
 
         # if current_user != post.author and post.author.receive_comment_notification:
         #     push_comment_notification(photo_id, receiver=post.author, page=page)
-
-    # flash_errors(form)
-    return redirect(url_for('main.show_photo', post_id=post_id, page=page))
+    return redirect(url_for('main.show_post', post_id=post_id, page=page))
 
 
 @main_bp.route('/reply/comment/<int:comment_id>')
+@login_required
+@permission_required('COMMENT')
 def reply_comment(comment_id):
     """
     回复评论
     :param comment_id:
     :return:
     """
-    pass
+    comment = Comment.query.get_or_404(comment_id)
+    return redirect(url_for('main.show_post',
+                            post_id=comment.post.id,
+                            reply=comment.id,
+                            author=comment.author.name) + '#comment-form')
 
 
 @main_bp.route('/set_comment/<int:post_id>', methods=['POST'])
+@login_required
 def set_comment(post_id):
     """
     设置评论功能
@@ -177,7 +166,7 @@ def set_comment(post_id):
         post.can_comment = True
         flash('评论已开启!', 'info')
     db.session.commit()
-    return redirect(url_for('main.show_photo', post_id=post_id))
+    return redirect(url_for('main.show_post', post_id=post_id))
 
 
 @main_bp.route('/delete/comment/<int:comment_id>')
@@ -187,7 +176,14 @@ def delete_comment(comment_id):
     :param comment_id:
     :return:
     """
-    pass
+    comment = Comment.query.get_or_404(comment_id)
+    if current_user != comment.author and current_user != comment.post.author \
+            and not current_user.can('MODERATE'):
+        abort(403)
+    db.session.delete(comment)
+    db.session.commit()
+    flash("评论已删除!", 'success')
+    return redirect(url_for('main.show_post', post_id=comment.post.id))
 
 
 @main_bp.route('/report/comment/<int:comment_id>')

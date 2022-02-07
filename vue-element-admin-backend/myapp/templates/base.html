@@ -32,6 +32,11 @@
                 <img src="{{ url_for('static', filename='favicon.ico') }}"
                      class="d-inline-block align-top" alt="Bluelog">
             </a>
+            {# 自动收缩的导航栏 #}
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             {# 导航栏的菜单 #}
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
@@ -151,7 +156,7 @@
 
 {% block scripts %}
     {# 导入js文件 #}
-    <script src="{{ url_for('static', filename='bootstrap/js/jquery.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}

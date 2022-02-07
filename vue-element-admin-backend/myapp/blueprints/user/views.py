@@ -3,7 +3,7 @@
 import os
 from datetime import datetime
 from flask import Blueprint, request, render_template, url_for, jsonify, current_app, send_from_directory, \
-    flash, redirect
+    flash, redirect, abort
 from flask_ckeditor import upload_fail, upload_success
 from flask_login import current_user, login_required, logout_user
 from exts import csrf, db
@@ -114,11 +114,11 @@ def edit_post(post_id):
         post.category = Category.query.get(form.category.data)
         db.session.commit()
         flash("文章更新成功!", 'success')
-        return redirect(url_for('main/show_post', post_id=post.id))
+        return redirect(url_for('main.show_post', post_id=post.id))
     form.title.data = post.title
     form.body.data = post.body
     form.category.data = post.category_id
-    return render_template('user/edit_post.html', post=post)
+    return render_template('user/edit_post.html', form=form)
 
 
 @user_bp.route('/post/<int:post_id>/delete', methods=['POST'])
@@ -130,9 +130,11 @@ def delete_post(post_id):
     :return:
     """
     post = Post.query.get_or_404(post_id)
+    if current_user != post.author:
+        abort(403)
     db.session.delete(post)
     db.session.commit()
-    return redirect(url_for('main.show_post', post_id=post.id))
+    return redirect(url_for('user.manage_post'))
 
 
 @user_bp.route('/category/new', methods=['GET', 'POST'])

@@ -14,6 +14,7 @@
     display: none;
 }
 
+/*限制文章图片的样式*/
 img {
     max-width: 100%;
     height: auto !important;
