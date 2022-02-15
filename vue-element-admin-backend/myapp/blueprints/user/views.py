@@ -6,7 +6,7 @@ from flask import Blueprint, request, render_template, url_for, jsonify, current
     flash, redirect, abort
 from flask_ckeditor import upload_fail, upload_success
 from flask_login import current_user, login_required, logout_user
-from exts import csrf, db
+from exts import csrf, db, qiniu_store
 from myapp.blueprints.user.forms import PostForm, CategoryForm, LinkForm
 from myapp.models.user import Post, Category, User, Link
 from myapp.utils import allowed_file
@@ -29,7 +29,7 @@ def index(username):
         logout_user()
     page = request.args.get('page', 1, type=int)  # 获取当前页数
     per_page = current_app.config['BLUELOG_POST_PER_PAGE']  # 文章分页数
-    # 获取分页对象
+    # 获取分页对象(获取当前用户的文章)
     pagination = Post.query.with_parent(user).order_by(Post.timestamp.desc()).paginate(page, per_page)
     posts = pagination.items
     return render_template('user/index.html', posts=posts, user=user, pagination=pagination)
@@ -47,15 +47,20 @@ def upload():
         return upload_fail('必须是照片!')
     ex = os.path.splitext(file.filename)[1]
     filename = datetime.now().strftime('%Y%m%d%H%M%S') + ex
-    file.save(os.path.join(current_app.config['PHOTO_SAVE_PATH'], filename))
-    url = url_for('user.image', filename=filename)
+    # 保存到青牛云里面
+    qiniu_store.save(file, filename)
+    # 获取青牛云存储的URL
+    url = qiniu_store.url(filename)
+    # 保存到本地的图片
+    # file.save(os.path.join(current_app.config['PHOTO_SAVE_PATH'], filename))
+    # url = url_for('user.image', filename=filename)
     return upload_success(url, filename)
 
 
 @user_bp.route('/post/image/<filename>')
 def image(filename):
     """
-    展示文章的图片
+    展示文章的图片(保存在本地的图片)
     :param filename:
     :return:
     """

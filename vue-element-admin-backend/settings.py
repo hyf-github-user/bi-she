@@ -49,10 +49,10 @@ class BaseConfig(object):
         os.makedirs(PHOTO_SAVE_PATH)
     MDEDITOR_FILE_UPLOADER = PHOTO_SAVE_PATH
     # 青牛云存储的设置
-    QINIU_ACCESS_KEY = os.getenv('ACCESS_KEY')
-    QINIU_SECRET_KEY = os.getenv('QINIU_KEY')
-    QQINIU_BUCKET_NAME = '七牛空间名称'
-    QINIU_BUCKET_DOMAIN = '七牛空间对应域名'
+    QINIU_ACCESS_KEY = os.getenv('ACCESS_KEY', "KSH6HWWJCKZHYyPyRRITljLkqEt3cJ0QYdUPMoar")
+    QINIU_SECRET_KEY = os.getenv('QINIU_KEY', "-X0yBa3CVu6s39i2KzqAV4jBj-a7clmttyCqNJAf")
+    QINIU_BUCKET_NAME = 'hyf-test'  # 青牛云存储空间名称
+    QINIU_BUCKET_DOMAIN = 'huyinfu.shop'  # 青牛云空间绑定的域名
     # 文章的分页数
     BLUELOG_POST_PER_PAGE = 3
     # 文章评论的分页数

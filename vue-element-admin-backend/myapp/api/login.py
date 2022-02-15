@@ -41,7 +41,8 @@ def get_info():
             "roles": [info.username],
             "introduction": "introduction",
             "avatar": "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif",
-            "name": info.name
+            "name": info.name,
+            "email": info.email
         }
         return Result.success(data=user_info)
     else:

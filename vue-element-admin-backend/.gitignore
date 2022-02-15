@@ -6,3 +6,5 @@
 .idea
 __pycache__
 .vscode
+# 删除青牛云缓存
+.qiniu_pythonsdk_hostscache.json
