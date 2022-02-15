@@ -1,29 +1,26 @@
 <template>
   <div class="user-activity">
+    <!--  人物的发表文章  -->
     <div class="post">
       <div class="user-block">
         <img class="img-circle" :src="'https://wpimg.wallstcn.com/57ed425a-c71e-4201-9428-68760c0537c4.jpg'+avatarPrefix">
-        <span class="username text-muted">Iron Man</span>
+        <span class="username text-muted">钢铁侠</span>
         <span class="description">Shared publicly - 7:30 PM today</span>
       </div>
       <p>
-        Lorem ipsum represents a long-held tradition for designers,
-        typographers and the like. Some people hate it and argue for
-        its demise, but others ignore the hate as they create awesome
-        tools to help create filler text for everyone from bacon lovers
-        to Charlie Sheen fans.
+        我是钢铁侠,我是钢铁侠,我是钢铁侠,我是钢铁侠,我是钢铁侠,我是钢铁侠,我是钢铁侠,我是钢铁侠
       </p>
       <ul class="list-inline">
         <li>
           <span class="link-black text-sm">
             <i class="el-icon-share" />
-            Share
+            分享
           </span>
         </li>
         <li>
           <span class="link-black text-sm">
             <svg-icon icon-class="like" />
-            Like
+            收藏
           </span>
         </li>
       </ul>
@@ -31,27 +28,23 @@
     <div class="post">
       <div class="user-block">
         <img class="img-circle" :src="'https://wpimg.wallstcn.com/9e2a5d0a-bd5b-457f-ac8e-86554616c87b.jpg'+avatarPrefix">
-        <span class="username text-muted">Captain American</span>
+        <span class="username text-muted">美国队长</span>
         <span class="description">Sent you a message - yesterday</span>
       </div>
       <p>
-        Lorem ipsum represents a long-held tradition for designers,
-        typographers and the like. Some people hate it and argue for
-        its demise, but others ignore the hate as they create awesome
-        tools to help create filler text for everyone from bacon lovers
-        to Charlie Sheen fans.
+        我是美国队长,我是美国队长,我是美国队长,我是美国队长,我是美国队长,我是美国队长,我是美国队长,我是美国队长,我是美国队长,我是美国队长
       </p>
       <ul class="list-inline">
         <li>
           <span class="link-black text-sm">
             <i class="el-icon-share" />
-            Share
+            分享
           </span>
         </li>
         <li>
           <span class="link-black text-sm">
             <svg-icon icon-class="like" />
-            Like
+            收藏
           </span>
         </li>
       </ul>
@@ -59,10 +52,11 @@
     <div class="post">
       <div class="user-block">
         <img class="img-circle" :src="'https://wpimg.wallstcn.com/fb57f689-e1ab-443c-af12-8d4066e202e2.jpg'+avatarPrefix">
-        <span class="username">Spider Man</span>
+        <span class="username">蜘蛛侠</span>
         <span class="description">Posted 4 photos - 2 days ago</span>
       </div>
       <div class="user-images">
+        <!--    图片展示区    -->
         <el-carousel :interval="6000" type="card" height="220px">
           <el-carousel-item v-for="item in carouselImages" :key="item">
             <img :src="item+carouselPrefix" class="image">
@@ -70,10 +64,10 @@
         </el-carousel>
       </div>
       <ul class="list-inline">
-        <li><span class="link-black text-sm"><i class="el-icon-share" /> Share</span></li>
+        <li><span class="link-black text-sm"><i class="el-icon-share" /> 分享</span></li>
         <li>
           <span class="link-black text-sm">
-            <svg-icon icon-class="like" /> Like</span>
+            <svg-icon icon-class="like" /> 收藏</span>
         </li>
       </ul>
     </div>

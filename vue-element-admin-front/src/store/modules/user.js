@@ -7,15 +7,13 @@ const state = {
   name: '',
   avatar: '',
   introduction: '',
-  roles: []
+  roles: [],
+  email: ''
 }
 
 const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
-  },
-  SET_INTRODUCTION: (state, introduction) => {
-    state.introduction = introduction
   },
   SET_NAME: (state, name) => {
     state.name = name
@@ -23,15 +21,22 @@ const mutations = {
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
   },
+  SET_INTRODUCTION: (state, introduction) => {
+    state.introduction = introduction
+  },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_EMAIL: (state, email) => {
+    state.email = email
   }
 }
 
 const actions = {
-  // user login
+  // 用户登录
   login({ commit }, userInfo) {
     const { username, password } = userInfo
+    // 异步调用login的ajax方法
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
@@ -44,27 +49,27 @@ const actions = {
     })
   },
 
-  // get user info
+  // 获取用户的身份信息
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
 
         if (!data) {
-          reject('Verification failed, please Login again.')
+          reject('认证失败,请重新登录!')
         }
 
-        const { roles, name, avatar, introduction } = data
-
+        const { roles, name, avatar, introduction, email } = data
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
           reject('getInfo: roles must be a non-null array!')
         }
-
+        // 设置用户信息
         commit('SET_ROLES', roles)
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_INTRODUCTION', introduction)
+        commit('SET_EMAIL', email)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -72,7 +77,7 @@ const actions = {
     })
   },
 
-  // user logout
+  // 用户退出登录
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
@@ -92,7 +97,7 @@ const actions = {
     })
   },
 
-  // remove token
+  // 移除token
   resetToken({ commit }) {
     return new Promise(resolve => {
       commit('SET_TOKEN', '')
@@ -102,23 +107,23 @@ const actions = {
     })
   },
 
-  // dynamically modify permissions
+  // 动态地修改权限
   async changeRoles({ commit, dispatch }, role) {
-    const token = role + '-token'
-
-    commit('SET_TOKEN', token)
-    setToken(token)
+    // const token = role + '-token'
+    //
+    // commit('SET_TOKEN', token)
+    // setToken(token)
 
     const { roles } = await dispatch('getInfo')
 
     resetRouter()
 
-    // generate accessible routes map based on roles
+    // 根据角色生成可访问路由图
     const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
-    // dynamically add accessible routes
+    // 动态添加可访问路由
     router.addRoutes(accessRoutes)
 
-    // reset visited views and cached views
+    // 重置访问的视图和缓存的视图
     dispatch('tagsView/delAllViews', null, { root: true })
   }
 }

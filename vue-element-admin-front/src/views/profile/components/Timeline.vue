@@ -15,26 +15,27 @@
 export default {
   data() {
     return {
+      // 时间线的数据
       timeline: [
         {
           timestamp: '2019/4/20',
-          title: 'Update Github template',
-          content: 'PanJiaChen committed 2019/4/20 20:46'
+          title: '测试1',
+          content: '测试1,测试1,测试1,测试1'
         },
         {
           timestamp: '2019/4/21',
-          title: 'Update Github template',
-          content: 'PanJiaChen committed 2019/4/21 20:46'
+          title: '测试2',
+          content: '测试2,测试2,测试2,测试2,测试2'
         },
         {
           timestamp: '2019/4/22',
-          title: 'Build Template',
-          content: 'PanJiaChen committed 2019/4/22 20:46'
+          title: '测试3',
+          content: '测试3,测试3,测试3,测试3,测试3,测试3'
         },
         {
           timestamp: '2019/4/23',
-          title: 'Release New Version',
-          content: 'PanJiaChen committed 2019/4/23 20:46'
+          title: '测试4',
+          content: '测试4,测试4,测试4,测试4,测试4,测试4'
         }
       ]
     }

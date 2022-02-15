@@ -10,39 +10,39 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
 
+// 全局路由守卫
 router.beforeEach(async(to, from, next) => {
   // start progress bar
   NProgress.start()
 
-  // set page title
+  // 设置页面的标题
   document.title = getPageTitle(to.meta.title)
 
-  // determine whether the user has logged in
+  // 确定用户是否已登录
   const hasToken = getToken()
 
   if (hasToken) {
     if (to.path === '/login') {
-      // if is logged in, redirect to the home page
+      // 如果已登录，则重定向到主页
       next({ path: '/' })
       NProgress.done() // hack: https://github.com/PanJiaChen/vue-element-admin/pull/2939
     } else {
-      // determine whether the user has obtained his permission roles through getInfo
+      // 通过getInfo判断用户是否获得了权限角色
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {
         next()
       } else {
         try {
-          // get user info
+          // 获取用户信息
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           const { roles } = await store.dispatch('user/getInfo')
-          console.log(roles)
-          // generate accessible routes map based on roles
+          // 根据角色生成可访问路由图
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
 
-          // dynamically add accessible routes
+          // 动态添加可访问路由
           router.addRoutes(accessRoutes)
 
-          // hack method to ensure that addRoutes is complete
+          // hack方法来确保addRoutes是完整的
           // set the replace: true, so the navigation will not leave a history record
           next({ ...to, replace: true })
         } catch (error) {

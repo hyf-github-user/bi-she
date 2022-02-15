@@ -48,9 +48,11 @@ const mutations = {
 }
 
 const actions = {
+  // 根据roles生成动态路由
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
       let accessedRoutes
+      // 判断当前的用户roles是否包含admin
       if (roles.includes('admin')) {
         // var role_route = []
         // // 进行异步数组的过滤
@@ -64,10 +66,13 @@ const actions = {
         //     }
         //   }
         // })
+        // 所有的路由都可以被访问,将asyncRoutes进行改造成从数据库中获取从而实现前端的权限管理
         accessedRoutes = asyncRoutes || []
       } else {
+        // 根据角色过滤不能访问的路由表
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }
+      // 设置动态路由表
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })
