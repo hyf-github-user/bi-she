@@ -9,9 +9,9 @@ from flask_mail import Mail
 from flask_qiniustorage import Qiniu
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_whooshee import Whooshee
 from flask_wtf import CSRFProtect
 from flask_moment import Moment
-
 
 # 结合bootstrap
 bootstrap = Bootstrap()
@@ -35,7 +35,8 @@ qiniu_store = Qiniu()
 moment = Moment()
 # 富文本编辑器
 ckeditor = CKEditor()
-
+# 全局搜索 需要重新创建索引的使用使用:whooshee.reindex()方法
+whooshee = Whooshee()
 
 
 # 把user存入Session中

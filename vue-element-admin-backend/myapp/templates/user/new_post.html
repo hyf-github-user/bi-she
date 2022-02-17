@@ -13,6 +13,7 @@
 {% endblock %}
 
 {% block scripts %}
+    {#  实现父类模板的js语句  #}
     {{ super() }}
     {#  默认从CDN加载  #}
     {{ ckeditor.load() }}

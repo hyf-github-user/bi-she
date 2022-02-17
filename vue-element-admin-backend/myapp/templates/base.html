@@ -55,10 +55,13 @@
                             <a class="dropdown-item" href="#">菜单三</a>
                         </div>
                     </li>
-                    {# 搜索栏 #}
-                    <form class="form-inline my-2 my-lg-0">
-                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">搜索</button>
+                    {# 搜索按钮#}
+                    <form class="form-inline my-2 my-lg-0" action="{{ url_for('main.search') }}">
+                        <input type="text" name="q" class="form-control mr-sm-1" placeholder="文章 或 用户"
+                               required>
+                        <button class="btn btn-light my-2 my-sm-0" type="submit">
+                            <span class="oi oi-magnifying-glass"></span>
+                        </button>
                     </form>
                 </ul>
                 {#右上角的登录与注册按钮#}

@@ -13,7 +13,8 @@ from myapp.blueprints.ajax.views import ajax_bp
 from myapp.blueprints.auth.views import auth_bp
 from myapp.blueprints.main.views import main_bp
 from myapp.blueprints.user.views import user_bp
-from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf, qiniu_store, moment, ckeditor
+from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf, qiniu_store, moment, ckeditor, \
+    whooshee
 from myapp.models.user import Role, User, Category, Comment, Link, Follow, Collect
 from myapp.utils import Result
 
@@ -59,6 +60,8 @@ def register_extensions(app):
     moment.init_app(app=app)
     # 富文本编辑器
     ckeditor.init_app(app=app)
+    # 全局搜索插件
+    whooshee.init_app(app=app)
 
 
 # 注册蓝图

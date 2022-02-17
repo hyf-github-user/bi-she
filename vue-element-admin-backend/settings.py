@@ -63,6 +63,8 @@ class BaseConfig(object):
     CKEDITOR_ENABLE_CSRF = True
     CKEDITOR_FILE_UPLOADER = 'user.upload'
     BLUELOG_ALLOWED_IMAGE_EXTENSIONS = ['ico', 'png', 'jpg', 'jpeg', 'gif']
+    # 搜索结果的分页数
+    BLUELOG_SEARCH_RESULT_PER_PAGE = 10
 
 
 # 俩种配置

@@ -158,12 +158,18 @@
                                     {% endif %}
                                     {# 确定删除评论的人 #}
                                     {% if current_user == comment.author or current_user == post.author or current_user.can('MODERATE') %}
-                                        <a class="dropdown-item" data-toggle="modal"
-                                           href="#"
-                                           data-href="{{ url_for('main.delete_comment', comment_id=comment.id) }}"
-                                           data-target="#confirm-delete">
-                                            <span class="oi oi-trash" aria-hidden="true"></span> 删除
-                                        </a>
+                                        {#                                        <a class="dropdown-item" data-toggle="modal"#}
+                                        {#                                           href="#"#}
+                                        {#                                           data-href="{{ url_for('main.delete_comment', comment_id=comment.id) }}"#}
+                                        {#                                           data-target="#confirm-delete">#}
+                                        {#                                            <span class="oi oi-trash" aria-hidden="true"></span> 删除#}
+                                        {#                                        </a>#}
+                                        <form class="inline" method="post"
+                                              action="{{ url_for('main.delete_comment', comment_id=comment.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                            <button type="submit" class="dropdown-item"
+                                                    onclick="return confirm('你确定删除评论吗?');"><span class="oi oi-trash" aria-hidden="true"></span>删除</button>
+                                        </form>
                                     {% endif %}
                                     {# 确定能举报评论的人 #}
                                     {% if current_user != comment.author %}

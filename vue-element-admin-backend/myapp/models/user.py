@@ -6,7 +6,7 @@ from flask_avatars import Identicon
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import check_password_hash, generate_password_hash
-from exts import db
+from exts import db, whooshee
 from myapp.utils.network import Result
 
 
@@ -24,7 +24,7 @@ class Follow(db.Model):
     follower = db.relationship('User', foreign_keys=[follower_id], back_populates='following', lazy='joined')
     followed = db.relationship('User', foreign_keys=[followed_id], back_populates='followers', lazy='joined')
 
-
+@whooshee.register_model('name', 'username')
 class User(db.Model, UserMixin):
     """
         用户表模型
@@ -311,7 +311,7 @@ class Permission(db.Model):
     roles = db.relationship(
         'Role', secondary=roles_permissions, back_populates='permissions')  # 多对多的模型联系
 
-
+@whooshee.register_model('title')
 class Post(db.Model):
     """
     文章模型
