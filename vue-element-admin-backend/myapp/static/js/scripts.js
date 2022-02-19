@@ -1,6 +1,6 @@
 $(function () {
-    const default_error_message = 'Server error, please try again later.';
-
+    const default_error_message = '服务器出错, 请重新启动!.';
+    // 验证csrf保护
     $.ajaxSetup({
         beforeSend: function (xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -8,7 +8,7 @@ $(function () {
             }
         }
     });
-
+    // ajax错误提示
     $(document).ajaxError(function (event, request, settings) {
         const data = JSON.parse(request.responseText);
         let message = null;
@@ -33,6 +33,7 @@ $(function () {
 
     let flash = null;
 
+    //出现弹窗函数
     function toast(body, category) {
         clearTimeout(flash);
         const $toast = $('#toast');
@@ -49,9 +50,9 @@ $(function () {
 
     let hover_timer = null;
 
+    // 展示悬窗用户信息
     function show_profile_popover(e) {
         const $el = $(e.target);
-
         hover_timer = setTimeout(function () {
             hover_timer = null;
             $.ajax({
@@ -75,6 +76,7 @@ $(function () {
         }, 500);
     }
 
+    // 隐藏悬窗用户信息
     function hide_profile_popover(e) {
         const $el = $(e.target);
 
@@ -90,6 +92,7 @@ $(function () {
         }
     }
 
+    // 更新粉丝数
     function update_followers_count(id) {
         const $el = $('#followers-count-' + id);
         $.ajax({
@@ -101,6 +104,7 @@ $(function () {
         });
     }
 
+    // 更新收藏数
     function update_collectors_count(id) {
         $.ajax({
             type: 'GET',
@@ -112,6 +116,7 @@ $(function () {
         });
     }
 
+    // 更新通知数
     function update_notifications_count() {
         const $el = $('#notification-badge');
         $.ajax({
@@ -128,6 +133,7 @@ $(function () {
         });
     }
 
+    // 用户关注函数
     function follow(e) {
         const $el = $(e.target);
         const id = $el.data('id');
@@ -144,6 +150,7 @@ $(function () {
         });
     }
 
+    // 用户取消关注函数
     function unfollow(e) {
         const $el = $(e.target);
         const id = $el.data('id');
@@ -160,6 +167,7 @@ $(function () {
         });
     }
 
+    // 用户收藏文章函数
     function collect(e) {
         const $el = $(e.target).data('href') ? $(e.target) : $(e.target).parent('.collect-btn');
         const id = $el.data('id');
@@ -176,6 +184,7 @@ $(function () {
         });
     }
 
+    // 用户取消收藏文章
     function uncollect(e) {
         const $el = $(e.target).data('href') ? $(e.target) : $(e.target).parent('.uncollect-btn');
         const id = $el.data('id');
@@ -191,31 +200,17 @@ $(function () {
         });
     }
 
+    // 悬浮框显示
     $('.profile-popover').hover(show_profile_popover.bind(this), hide_profile_popover.bind(this));
+    // 用户关注
     $(document).on('click', '.follow-btn', follow.bind(this));
     $(document).on('click', '.unfollow-btn', unfollow.bind(this));
+    // 用户收藏触发
     $(document).on('click', '.collect-btn', collect.bind(this));
     $(document).on('click', '.uncollect-btn', uncollect.bind(this));
 
-    // hide or show tag edit form
-    $('#tag-btn').click(function () {
-        $('#tags').hide();
-        $('#tag-form').show();
-    });
-    $('#cancel-tag').click(function () {
-        $('#tag-form').hide();
-        $('#tags').show();
-    });
-    // hide or show description edit form
-    $('#description-btn').click(function () {
-        $('#description').hide();
-        $('#description-form').show();
-    });
-    $('#cancel-description').click(function () {
-        $('#description-form').hide();
-        $('#description').show();
-    });
-    // delete confirm modal
+    //
+    // 确认删除弹窗
     $('#confirm-delete').on('show.bs.modal', function (e) {
         $('.delete-form').attr('action', $(e.relatedTarget).data('href'));
     });
@@ -227,3 +222,4 @@ $(function () {
     $("[data-toggle='tooltip']").tooltip({title: moment($(this).data('timestamp')).format('lll')})
 
 });
+

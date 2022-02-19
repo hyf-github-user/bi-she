@@ -14,6 +14,7 @@
                 <a class="profile-popover trend-card-avatar"
                    data-href="{{ url_for('ajax.get_profile', user_id=post.author.id) }}"
                    href="{{ url_for('user.index', username=post.author.username) }}">{{ post.author.name }}</a>
+                {# 文章发表时间 #}
                 <span class="float-right">
                 <small data-toggle="tooltip" data-placement="top" data-timestamp="{{ post.timestamp }}"
                        data-delay="500">
@@ -45,19 +46,21 @@
                 <span class="oi oi-comment-square"></span> {{ post.comments|length }}
                 <div class="float-right">
                     {% if current_user.is_authenticated %}
+                        {#  用户(任意)登录之后展示文章收藏功能  #}
                         <button class="{% if not current_user.is_collecting(post) %}hide{% endif %}
-                                     btn btn-outline-secondary btn-sm uncollect-btn"
+                                                             btn btn-outline-secondary btn-sm uncollect-btn"
                                 data-href="{{ url_for('ajax.uncollect', post_id=post.id) }}"
                                 data-id="{{ post.id }}">
                             <span class="oi oi-x"></span> 取消收藏
                         </button>
                         <button class="{% if current_user.is_collecting(post) %}hide{% endif %}
-                                     btn btn-outline-primary btn-sm collect-btn"
+                                                             btn btn-outline-primary btn-sm collect-btn"
                                 data-href="{{ url_for('ajax.collect', post_id=post.id) }}"
                                 data-id="{{ post.id }}">
                             <span class="oi oi-star"></span> 收藏
                         </button>
                     {% else %}
+                        {#  匿名用户的收藏 #}
                         <form class="inline" method="post"
                               action="{{ url_for('main.collect', post_id=post.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

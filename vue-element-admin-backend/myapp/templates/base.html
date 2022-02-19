@@ -142,6 +142,7 @@
         {% endfor %}
         {% block content %}{% endblock %}
         {% block footer %}
+            {# 脚注 #}
             <footer>
                 <p class="float-left">
                     <small> &copy; 2022 <a href="http://huyinfu.top/user" title="Written by HYF">HYF</a> -
@@ -156,13 +157,24 @@
         {% endblock %}
     </div>
 </main>
+<div id="toast"></div>
 
 {% block scripts %}
     {# 导入js文件 #}
-    <script src="{{ url_for('static', filename='bootstrap/js/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='bootstrap/js/popper.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    {#  导入自定义的js文件  #}
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
     {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
+    <script type="text/javascript">
+        const csrf_token = "{{ csrf_token() }}";
+        // 判断用户是否登录
+        {% if current_user.is_authenticated %}
+            const is_authenticated = true;
+        {% else %}
+            const is_authenticated = false;
+        {% endif %}
     </script>
 {% endblock %}
 </body>

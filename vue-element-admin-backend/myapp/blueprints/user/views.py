@@ -2,16 +2,15 @@
 # coding:utf-8
 import os
 from datetime import datetime
-
 from flask import Blueprint, request, render_template, url_for, current_app, send_from_directory, \
     flash, redirect, abort
 from flask_ckeditor import upload_fail, upload_success
 from flask_login import current_user, login_required, logout_user
-
 from exts import db, qiniu_store
 from myapp.blueprints.user.forms import PostForm, CategoryForm, LinkForm
-from myapp.models.user import Post, Category, User, Link
-from myapp.utils import allowed_file
+from myapp.decorators import confirm_required, permission_required
+from myapp.models.user import Post, Category, User, Link, Collect
+from myapp.utils import allowed_file, redirect_back
 
 user_bp = Blueprint("user", __name__)
 
@@ -182,6 +181,7 @@ def new_category():
         return redirect(url_for('user.manage_category'))
     return render_template('user/new_category.html', form=form)
 
+
 # 分类的管理接口
 # @user_bp.route('/category/manage/<username>')
 # @login_required
@@ -246,6 +246,8 @@ def new_link():
         return redirect(url_for('user.manage_link'))
 
     return render_template('user/new_link.html', form=form)
+
+
 # 友情链接的管理接口
 # @user_bp.route('/link/manage')
 # @login_required
@@ -295,3 +297,94 @@ def new_link():
 #     return redirect(url_for('user.manage_link'))
 
 
+@user_bp.route('/follow/<username>', methods=['POST'])
+@login_required
+@confirm_required
+@permission_required('FOLLOW')
+def follow(username):
+    """
+    关注用户视图
+    :param username:
+    :return:
+    """
+    # 获取要关注的用户
+    user = User.query.filter_by(username=username).first_or_404()
+    if current_user.is_following(user):
+        flash("已经关注了!", 'info')
+        return redirect(url_for('user.index', username=username))
+    current_user.follow(user)
+    flash("此用户已被关注!", 'success')
+    # if user.receive_follow_notification:
+    #     # 推送消息
+    #     push_follow_notification(follower=current_user, receiver=user)
+    return redirect_back()
+
+
+@user_bp.route('unfollow/<username>')
+@login_required
+def unfollow(username):
+    """
+     用户取消关注用户
+    :param username:
+    :return:
+    """
+    user = User.query.filter_by(username=username).first_or_404()
+    if not current_user.is_following(user):
+        flash("此用户没被关注,不能取消!", 'info')
+        return redirect(url_for('user.index', username=username))
+
+    current_user.unfollow(user)
+    flash("取消关注成功!", 'success')
+    return redirect_back()
+
+
+# 我关注的人
+@user_bp.route('/<username>/following')
+def show_following(username):
+    """
+    显示我关注的人的视图函数
+    :param username:
+    :return:
+    """
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    per_page = current_app.config['BLUELOG_USER_PER_PAGE']
+    pagination = user.following.paginate(page=page, per_page=per_page)
+    follows = pagination.items
+    return render_template('user/following.html', user=user, pagination=pagination, follows=follows)
+
+
+# 查看粉丝数
+@user_bp.route('/<username>/followers')
+def show_followers(username):
+    """
+    显示我的粉丝量的视图函数
+    :param username:
+    :return:
+    """
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    per_page = current_app.config['BLUELOG_USER_PER_PAGE']
+    pagination = user.followers.paginate(page=page, per_page=per_page)
+    follows = pagination.items
+    return render_template('user/followers.html', user=user, pagination=pagination, follows=follows)
+
+
+# 展示用户的所有收藏文章
+@user_bp.route('/<username>/collectors')
+def show_collections(username):
+    """
+    显示我所有收藏的文章数
+    :param username:
+    :return:
+    """
+    # 获取收藏的用户
+    user = User.query.filter_by(username=username).first_or_404()
+    # 获取当前页数
+    page = request.args.get('page', type=int)
+    # 获取文章的分页
+    per_page = current_app.config['BLUELOG_POST_PER_PAGE']
+    # 获取当前用户的所有收藏文章
+    pagination = Collect.query.with_parent(user).order_by(Collect.timestamp.desc()).paginate(page, per_page)
+    collects = pagination.items
+    return render_template('user/collections.html', user=user, pagination=pagination, collects=collects)

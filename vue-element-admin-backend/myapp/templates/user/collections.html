@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% from 'macros.html' import post_card with context %}
+
+{% block title %}{{ user.name }}'s 照片收藏{% endblock %}
+
+{% block content %}
+    {% include 'user/_header.html' %}
+    <div class="row">
+        <div class="col-md-12">
+            {% if user.public_collections or current_user == user %}
+                {% if collects %}
+                    {% for collect in collects %}
+                        {{ post_card(collect.collected) }}
+                    {% endfor %}
+                {% else %}
+                    <div class="tip">
+                        <h3>无收藏!</h3>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="tip">
+                    <h3>这个用户的收藏属于隐私,不可以查看呢!</h3>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% if collects %}
+        <div class="page-footer">
+            {{ render_pagination(pagination, align='center') }}
+        </div>
+    {% endif %}
+{% endblock %}

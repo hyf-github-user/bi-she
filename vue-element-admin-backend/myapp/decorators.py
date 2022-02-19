@@ -33,6 +33,7 @@ def permission_required(permission_name):
         @wraps(func)
         def decorated_function(*args, **kwargs):
             if not current_user.can(permission_name):
+                # 如果不具有权限
                 abort(403)
             return func(*args, **kwargs)
 

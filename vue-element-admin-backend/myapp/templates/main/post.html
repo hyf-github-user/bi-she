@@ -14,15 +14,8 @@
                         {# 编辑文章 #}
                         <a class="btn btn-info btn-sm" href="{{ url_for('user.edit_post', post_id=post.id) }}">编辑</a>
                         {# 删除文章 #}
-                        {#                        <a class="btn btn-danger btn-sm text-white" data-toggle="modal" data-target="#confirm-delete"#}
-                        {#                           data-href="{{ url_for('user.delete_post', post_id=post.id, next=url_for('main.index')) }}">删除</a>#}
-                        <form class="inline" method="post"
-                              action="{{ url_for('user.delete_post', post_id=post.id, next=url_for('main.index')) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <button type="submit" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('你确定删除文章吗?');">删除</button>
-                        </form>
-
+                        <a class="btn btn-danger btn-sm text-white" data-toggle="modal" data-target="#confirm-delete"
+                           data-href="{{ url_for('user.delete_post', post_id=post.id, next=url_for('main.index')) }}">删除</a>
                     {% endif %}
                 </span>
         </h1>
@@ -75,6 +68,8 @@
         <div class="col-sm-4 sidebar">
             {#            渲染右上角的小卡片#}
             {% include "main/_sidebar.html" %}
+            {# 文章收藏 #}
+            {% include 'main/_post_sidebar.html' %}
         </div>
     </div>
 

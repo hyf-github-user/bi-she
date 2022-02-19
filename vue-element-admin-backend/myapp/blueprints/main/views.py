@@ -6,8 +6,8 @@ from flask import Blueprint, render_template, send_from_directory, current_app, 
 from flask_login import current_user, login_required
 from exts import db
 from myapp.blueprints.user.forms import CommentForm
-from myapp.decorators import permission_required
-from myapp.models.user import Post, Category, Comment, User
+from myapp.decorators import permission_required, confirm_required
+from myapp.models.user import Post, Category, Comment, User, Collect
 from myapp.utils import redirect_back
 
 main_bp = Blueprint('main', __name__)
@@ -140,13 +140,13 @@ def new_comment(post_id):
         if replied_id:
             comment.replied = Comment.query.get_or_404(replied_id)
             # if comment.replied.author.receive_comment_notification:
-            #     push_comment_notification(photo_id=photo.id, receiver=comment.replied.author)
+            #     push_comment_notification(post_id=post.id, receiver=comment.replied.author)
         db.session.add(comment)
         db.session.commit()
         flash('评论已发表!', 'success')
 
         # if current_user != post.author and post.author.receive_comment_notification:
-        #     push_comment_notification(photo_id, receiver=post.author, page=page)
+        #     push_comment_notification(post_id, receiver=post.author, page=page)
     return redirect(url_for('main.show_post', post_id=post_id, page=page))
 
 
@@ -217,4 +217,65 @@ def report_comment(comment_id):
     comment.flag += 1
     db.session.commit()
     flash('评论已被举报!', 'success')
-    return redirect(url_for('main.show_post', photo_id=comment.post_id))
+    return redirect(url_for('main.show_post', post_id=comment.post_id))
+
+
+@main_bp.route('/collect/<int:post_id>', methods=['POST'])
+@login_required
+@confirm_required
+@permission_required('COLLECT')  # 判断是否有收藏的权限
+def collect(post_id):
+    """
+    用户收藏文章
+    :param post_id:
+    :return:
+    """
+    # 获取需要收藏的文章
+    post = Post.query.get_or_404(post_id)
+    # 判断用户是否收藏这个文章
+    if current_user.is_collecting(post):
+        flash("文章已被收藏!", 'info')
+        return redirect(url_for('main.show_post', post_id=post.id))
+    # 用户收藏文章(也包括匿名用户的收藏)
+    current_user.collect(post)
+    flash("照片已收藏!", 'success')
+    # # 推送照片被收藏的通知
+    # push_collect_notification(collector=current_user, post_id=post_id, receiver=post.author)
+    return redirect_back()
+
+
+# 取消收藏
+@main_bp.route('/uncollect/<int:post_id>', methods=['POST'])
+@login_required
+def uncollect(post_id):
+    """
+    取消收藏文章
+    :param post_id:
+    :return:
+    """
+    post = Post.query.get_or_404(post_id)
+    # 判断是否被收藏
+    if not current_user.is_collecting(post):
+        flash("文章没有被收藏,不用取消!", 'info')
+        return redirect_back()
+
+    current_user.uncollect(post)
+    flash("文章已取消收藏!", "success")
+    return redirect_back()
+
+
+# 展示文章的所有关注者
+@main_bp.route('/post/<int:post_id>/collectors')
+def show_collectors(post_id):
+    """
+    显示文章的收藏者
+    :param post_id:
+    :return:
+    """
+    post = Post.query.get_or_404(post_id)
+    page = request.args.get('page', type=int)
+    per_page = current_app.config['BLUELOG_POST_PER_PAGE']
+    pagination = Collect.query.with_parent(post).order_by(Collect.timestamp.asc()).paginate(page, per_page)
+    collects = pagination.items
+
+    return render_template('main/collectors.html', collects=collects, post=post, pagination=pagination)

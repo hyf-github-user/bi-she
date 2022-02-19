@@ -32,6 +32,12 @@
     <ul class="nav nav-tabs">
         {# 渲染个人页面的Post导航#}
         {{ render_nav_item('user.index', '文章', user.posts|length, username=user.username) }}
+        {# 渲染收集的图片 #}
+        {{ render_nav_item('user.show_collections', '收藏的文章', user.collections|length, username=user.username) }}
+        {# 渲染展示关注我的人 #}
+        {{ render_nav_item('user.show_following', '关注的人', user.following.count() - 1, username=user.username) }}
+        {# 我关注的 #}
+        {{ render_nav_item('user.show_followers', '我的粉丝', user.followers.count() - 1, username=user.username) }}
     </ul>
 </div>
 

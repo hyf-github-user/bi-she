@@ -12,17 +12,19 @@ from myapp.utils.network import Result
 
 # 用户与用户关联模型(自我关联模型)
 class Follow(db.Model):
+    # 自我关联关系, joined表示和父查询一样加载记录,但使用联结,foreign_keys可以让外键找到对应外键,follower->follower_id,followed->followed_id
     # 关注者的id
     follower_id = db.Column(db.Integer, db.ForeignKey('user.id'),
                             primary_key=True)
+    follower = db.relationship('User', foreign_keys=[follower_id], back_populates='following', lazy='joined')
     # 被关注的人的id
     followed_id = db.Column(db.Integer, db.ForeignKey('user.id'),
                             primary_key=True)
+    followed = db.relationship('User', foreign_keys=[followed_id], back_populates='followers', lazy='joined')
+
     # 关注的时间
     timestamp = db.Column(db.DateTime, default=datetime.now)
-    # 自我关联关系, joined表示和父查询一样加载记录,但使用联结,foreign_keys可以让外键找到对应外键,follower->follower_id,followed->followed_id
-    follower = db.relationship('User', foreign_keys=[follower_id], back_populates='following', lazy='joined')
-    followed = db.relationship('User', foreign_keys=[followed_id], back_populates='followers', lazy='joined')
+
 
 @whooshee.register_model('name', 'username')
 class User(db.Model, UserMixin):
@@ -205,29 +207,11 @@ class User(db.Model, UserMixin):
         permission = Permission.query.filter_by(name=permission_name).first()
         return permission is not None and self.role is not None and permission in self.role.permissions
 
-    # 收藏图片方法
-    def collect(self, photo):
-        collect = Collect(collector=self, collected=photo)
-        db.session.add(collect)
-        db.session.commit()
-
-    # 取消收藏照片
-    def uncollect(self, photo):
-        # 根据user查询对应的collect
-        collect = Collect.query.with_parent(self).filter_by(collected_id=photo.id).first()
-        if collect:
-            db.session.delete(collect)
-            db.session.commit()
-
-    # 查找用户有无收藏此照片
-    def is_collecting(self, photo):
-        return Collect.query.with_parent(self).filter_by(collected_id=photo.id).first() is not None
-
-    # 关注用户自己
+    # 关注用户行为
     def follow(self, user):
-        # 如果没有关注自己
+        # 判断是否关注它
         if not self.is_following(user):
-            # 关注自己
+            # 关注它
             follow = Follow(follower=self, followed=user)
             db.session.add(follow)
             db.session.commit()
@@ -248,6 +232,24 @@ class User(db.Model, UserMixin):
     # 查找自己关注了别人
     def is_followed_by(self, user):
         return self.followers.filter_by(follower_id=user.id).first() is not None
+
+    # 收藏图片方法
+    def collect(self, post):
+        collect = Collect(collector=self, collected=post)
+        db.session.add(collect)
+        db.session.commit()
+
+    # 取消收藏照片
+    def uncollect(self, post):
+        # 根据user查询对应的collect
+        collect = Collect.query.with_parent(self).filter_by(collected_id=post.id).first()
+        if collect:
+            db.session.delete(collect)
+            db.session.commit()
+
+    # 查找用户有无收藏此照片
+    def is_collecting(self, post):
+        return Collect.query.with_parent(self).filter_by(collected_id=post.id).first() is not None
 
 
 # 权限与角色的关联表(多对多)
@@ -310,6 +312,7 @@ class Permission(db.Model):
     name = db.Column(db.String(30), unique=True)  # 存储权限功能说明
     roles = db.relationship(
         'Role', secondary=roles_permissions, back_populates='permissions')  # 多对多的模型联系
+
 
 @whooshee.register_model('title')
 class Post(db.Model):
