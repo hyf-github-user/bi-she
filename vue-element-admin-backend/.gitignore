@@ -9,4 +9,4 @@ __pycache__
 # 删除青牛云缓存
 .qiniu_pythonsdk_hostscache.json
 # 删除迁移脚本
-./migrations
+migrations
