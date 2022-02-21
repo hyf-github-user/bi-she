@@ -5,12 +5,16 @@ from datetime import datetime
 from flask import Blueprint, request, render_template, url_for, current_app, send_from_directory, \
     flash, redirect, abort
 from flask_ckeditor import upload_fail, upload_success
-from flask_login import current_user, login_required, logout_user
-from exts import db, qiniu_store
-from myapp.blueprints.user.forms import PostForm, CategoryForm, LinkForm
+from flask_login import current_user, login_required, logout_user, fresh_login_required
+from exts import db, qiniu_store, avatars
+from myapp.blueprints.user.forms import PostForm, CategoryForm, LinkForm, EditProfileForm, ChangePasswordForm, \
+    ChangeEmailForm, NotificationSettingForm, PrivacySettingForm, DeleteAccountForm, UploadAvatarForm, CropAvatarForm
 from myapp.decorators import confirm_required, permission_required
 from myapp.models.user import Post, Category, User, Link, Collect
 from myapp.utils import allowed_file, redirect_back
+from myapp.utils.emails import send_change_email_email
+from myapp.utils.token import generate_token, validate_token
+from settings import Operations
 
 user_bp = Blueprint("user", __name__)
 
@@ -75,6 +79,7 @@ def image(filename):
 
 @user_bp.route('/post/new', methods=['GET', 'POST'])
 @login_required  # 确保管理员已登录
+@confirm_required  # 验证确认状态
 def new_post():
     """
     创建文章并发布
@@ -178,7 +183,7 @@ def new_category():
         db.session.add(category)
         db.session.commit()
         flash("分类已创建!", 'success')
-        return redirect(url_for('user.manage_category'))
+        return redirect_back()
     return render_template('user/new_category.html', form=form)
 
 
@@ -243,7 +248,7 @@ def new_link():
         db.session.add(link)
         db.session.commit()
         flash("链接已添加!", 'success')
-        return redirect(url_for('user.manage_link'))
+        return redirect_back()
 
     return render_template('user/new_link.html', form=form)
 
@@ -309,9 +314,11 @@ def follow(username):
     """
     # 获取要关注的用户
     user = User.query.filter_by(username=username).first_or_404()
+    # 判断用户是否关注了他
     if current_user.is_following(user):
         flash("已经关注了!", 'info')
         return redirect(url_for('user.index', username=username))
+    # 用户关注他
     current_user.follow(user)
     flash("此用户已被关注!", 'success')
     # if user.receive_follow_notification:
@@ -328,11 +335,13 @@ def unfollow(username):
     :param username:
     :return:
     """
+    # 获取要取消关注的用户
     user = User.query.filter_by(username=username).first_or_404()
+    # 查看用户是否已经关注了他
     if not current_user.is_following(user):
         flash("此用户没被关注,不能取消!", 'info')
         return redirect(url_for('user.index', username=username))
-
+    # 用户取消关注他
     current_user.unfollow(user)
     flash("取消关注成功!", 'success')
     return redirect_back()
@@ -346,7 +355,9 @@ def show_following(username):
     :param username:
     :return:
     """
+    # 通过用户名查询用户
     user = User.query.filter_by(username=username).first_or_404()
+    # 获取用户分页
     page = request.args.get('page', 1, type=int)
     per_page = current_app.config['BLUELOG_USER_PER_PAGE']
     pagination = user.following.paginate(page=page, per_page=per_page)
@@ -362,9 +373,12 @@ def show_followers(username):
     :param username:
     :return:
     """
+    # 获取要查看粉丝的用户
     user = User.query.filter_by(username=username).first_or_404()
+    # 获取用户分页数
     page = request.args.get('page', 1, type=int)
     per_page = current_app.config['BLUELOG_USER_PER_PAGE']
+    # 获取粉丝的分页对象
     pagination = user.followers.paginate(page=page, per_page=per_page)
     follows = pagination.items
     return render_template('user/followers.html', user=user, pagination=pagination, follows=follows)
@@ -388,3 +402,188 @@ def show_collections(username):
     pagination = Collect.query.with_parent(user).order_by(Collect.timestamp.desc()).paginate(page, per_page)
     collects = pagination.items
     return render_template('user/collections.html', user=user, pagination=pagination, collects=collects)
+
+
+@user_bp.route('/settings/profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    """
+    编辑个人信息
+    :return:
+    """
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        current_user.name = form.name.data
+        current_user.username = form.username.data
+        current_user.website = form.website.data
+        db.session.commit()
+        flash('个人信息已更新!', 'success')
+        return redirect(url_for('user.index', username=current_user.username))
+    form.name.data = current_user.name
+    form.username.data = current_user.username
+    form.website.data = current_user.website
+    return render_template('user/settings/edit_profile.html', form=form)
+
+
+@user_bp.route('/settings/change-password', methods=['GET', 'POST'])
+@fresh_login_required  # 重新登录
+def change_password():
+    """
+    重置密码
+    :return:
+    """
+    # 生成重置密码的表单
+    form = ChangePasswordForm()
+    # 验证表单的输入
+    if form.validate_on_submit():
+        # 验证旧密码
+        if current_user.validate_password(form.old_password.data):
+            # 设置密码
+            current_user.set_password(form.password.data)
+            db.session.commit()
+            flash('密码已更新!', 'success')
+            return redirect(url_for('user.index', username=current_user.username))
+        else:
+            flash('旧密码错误!', 'warning')
+    return render_template('user/settings/change_password.html', form=form)
+
+
+@user_bp.route('/settings/change-email', methods=['GET', 'POST'])
+@fresh_login_required  # 需要重新登录
+def change_email_request():
+    """
+    修改登录邮箱的请求
+    :return:
+    """
+    # 生成修改邮箱的表单
+    form = ChangeEmailForm()
+    if form.validate_on_submit():
+        # 产生验证的token
+        token = generate_token(user=current_user, operation=Operations.CHANGE_EMAIL, new_email=form.email.data.lower())
+        send_change_email_email(to=form.email.data, user=current_user, token=token)
+        flash('确认邮件已发送! 请检查你的邮箱', 'info')
+        return redirect(url_for('user.index', username=current_user.username))
+    return render_template('user/settings/change_email.html', form=form)
+
+
+@user_bp.route('/change-email/<token>')
+@login_required
+def change_email(token):
+    """
+    验证token并判断是什么操作然后进行相应的操作
+    :param token:
+    :return:
+    """
+    # 验证token并进行修改邮箱操作
+    if validate_token(user=current_user, token=token, operation=Operations.CHANGE_EMAIL):
+        flash('邮箱地址已修改!', 'success')
+        return redirect(url_for('user.index', username=current_user.username))
+    else:
+        flash('token验证失败!', 'warning')
+        return redirect(url_for('user.change_email_request'))
+
+
+@user_bp.route('/settings/notification-setting', methods=['GET', 'POST'])
+@login_required
+def notification_setting():
+    # 通知设置表单
+    form = NotificationSettingForm()
+    if form.validate_on_submit():
+        current_user.receive_collect_notification = form.receive_collect_notification.data
+        current_user.receive_comment_notification = form.receive_comment_notification.data
+        current_user.receive_follow_notification = form.receive_follow_notification.data
+        db.session.commit()
+        flash('消息通知设置已更新!', 'success')
+        return redirect(url_for('user.index', username=current_user.username))
+    form.receive_collect_notification.data = current_user.receive_collect_notification
+    form.receive_comment_notification.data = current_user.receive_comment_notification
+    form.receive_follow_notification.data = current_user.receive_follow_notification
+    return render_template('user/settings/edit_notification.html', form=form)
+
+
+@user_bp.route('/settings/privacy-setting', methods=['GET', 'POST'])
+@login_required
+def privacy_setting():
+    # 隐私设置表单
+    form = PrivacySettingForm()
+    if form.validate_on_submit():
+        current_user.public_collections = form.public_collections.data
+        db.session.commit()
+        flash('个人隐私设置已更新!', 'success')
+        return redirect(url_for('user.index', username=current_user.username))
+    form.public_collections.data = current_user.public_collections
+    return render_template('user/settings/edit_privacy.html', form=form)
+
+
+@user_bp.route('/settings/delete-account', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    # 注销用户的表单
+    form = DeleteAccountForm()
+    if form.validate_on_submit():
+        db.session.delete(current_user._get_current_object())
+        db.session.commit()
+        flash('此用户成功被注销!', 'success')
+        return redirect(url_for('main.index'))
+    return render_template('user/settings/delete_account.html', form=form)
+
+
+@user_bp.route('/settings/change-avatar', methods=['GET', 'POST'])
+@login_required
+@confirm_required
+def change_avatar():
+    """
+    修改头像
+    :return:
+    """
+    # 上传头像的表单
+    upload_form = UploadAvatarForm()
+    # 获取裁剪的头像的表单
+    crop_form = CropAvatarForm()
+    return render_template('user/settings/change_avatar.html', upload_form=upload_form, crop_form=crop_form)
+
+
+@user_bp.route('/settings/avatar/upload', methods=['POST'])
+@login_required
+@confirm_required
+def upload_avatar():
+    """
+    保存上传后的图片
+    :return:
+    """
+    # 上传图片的表单
+    form = UploadAvatarForm()
+    if form.validate_on_submit():
+        # 保存上传后的头像
+        image = form.image.data
+        filename = avatars.save_avatar(image)
+        current_user.avatar_raw = filename
+        db.session.commit()
+        flash('图片已上传,请裁剪图片', 'success')
+    return redirect(url_for('user.change_avatar'))
+
+
+@user_bp.route('/settings/avatar/crop', methods=['POST'])
+@login_required
+@confirm_required
+def crop_avatar():
+    """
+    处理裁剪图片后的结果并保存图片
+    :return:
+    """
+    # 裁剪头像的表单
+    form = CropAvatarForm()
+    if form.validate_on_submit():
+        # 获取裁剪头像的结果
+        x = form.x.data
+        y = form.y.data
+        w = form.w.data
+        h = form.h.data
+        # 使用flask-avatars裁剪图片并保存到数据库中
+        filenames = avatars.crop_avatar(current_user.avatar_raw, x, y, w, h)
+        current_user.avatar_s = filenames[0]
+        current_user.avatar_m = filenames[1]
+        current_user.avatar_l = filenames[2]
+        db.session.commit()
+        flash('头像已更新!', 'success')
+    return redirect(url_for('user.change_avatar'))

@@ -1,9 +1,9 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
 class Scope:
-    '''
+    """
     身份类的基类
-    '''
+    """
     allow_module = ()  # 允许访问的模块名
 
     def __add__(self, other):
@@ -13,16 +13,16 @@ class Scope:
 
 
 class user(Scope):
-    '''
-    # 普通用户
-    # '''
+    """
+    普通用户
+    """
     allow_module = ()  # 允许访问的视图函数
 
 
 class editor(Scope):
-    '''
-    # 协管员
-    # '''
+    """
+    协管员
+    """
     allow_module = ('login', 'get_info', 'logout')  # 允许访问的视图函数
     # 加上用户的身份权限
 
@@ -31,9 +31,9 @@ class editor(Scope):
 
 
 class admin(Scope):
-    '''
-    # 超级管理员
-    # '''
+    """
+    超级管理员
+    """
     allow_module = ('UserList', 'getById', 'updateUser',
                     'deleteUser', 'addUser')  # 允许访问的视图函数
     # 加上协管员的身份权限

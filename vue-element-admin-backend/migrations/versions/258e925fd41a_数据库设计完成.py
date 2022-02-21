@@ -1,8 +1,8 @@
-"""添加用户权限与Comment与Post与Category表与Link表
+"""数据库设计完成
 
-Revision ID: 6a79c0ad4a95
+Revision ID: 258e925fd41a
 Revises: 
-Create Date: 2022-02-06 00:06:06.632560
+Create Date: 2022-02-21 11:15:40.517227
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6a79c0ad4a95'
+revision = '258e925fd41a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -63,12 +63,17 @@ def upgrade():
     sa.Column('avatar_s', sa.String(length=64), nullable=True),
     sa.Column('avatar_m', sa.String(length=64), nullable=True),
     sa.Column('avatar_l', sa.String(length=64), nullable=True),
+    sa.Column('avatar_raw', sa.String(length=64), nullable=True),
     sa.Column('private_key', sa.Text(), nullable=True, comment='加密密码的私钥'),
     sa.Column('rsa_password', sa.Text(), nullable=True, comment='对密码进行加密之后的密文'),
     sa.Column('active', sa.Boolean(), nullable=True),
     sa.Column('confirmed', sa.Boolean(), nullable=True),
     sa.Column('locked', sa.Boolean(), nullable=True),
     sa.Column('role_id', sa.Integer(), nullable=True),
+    sa.Column('receive_comment_notification', sa.Boolean(), nullable=True),
+    sa.Column('receive_follow_notification', sa.Boolean(), nullable=True),
+    sa.Column('receive_collect_notification', sa.Boolean(), nullable=True),
+    sa.Column('public_collections', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -81,12 +86,24 @@ def upgrade():
     sa.ForeignKeyConstraint(['follower_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('follower_id', 'followed_id')
     )
+    op.create_table('notification',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('message', sa.Text(), nullable=False),
+    sa.Column('is_read', sa.Boolean(), nullable=True),
+    sa.Column('timestamp', sa.DateTime(), nullable=True),
+    sa.Column('receiver_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['receiver_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_notification_timestamp'), 'notification', ['timestamp'], unique=False)
     op.create_table('post',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False, comment='文章主键'),
     sa.Column('title', sa.String(length=255), nullable=True),
     sa.Column('body', sa.Text(), nullable=True),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.Column('can_comment', sa.Boolean(), nullable=True),
+    sa.Column('auth', sa.String(length=255), nullable=True),
+    sa.Column('status', sa.String(length=255), nullable=True),
     sa.Column('flag', sa.Integer(), nullable=True, comment='文章被举报次数'),
     sa.Column('category_id', sa.Integer(), nullable=True),
     sa.Column('author_id', sa.Integer(), nullable=True),
@@ -128,6 +145,8 @@ def downgrade():
     op.drop_table('collect')
     op.drop_index(op.f('ix_post_timestamp'), table_name='post')
     op.drop_table('post')
+    op.drop_index(op.f('ix_notification_timestamp'), table_name='notification')
+    op.drop_table('notification')
     op.drop_table('follow')
     op.drop_index(op.f('ix_user_email'), table_name='user')
     op.drop_table('user')

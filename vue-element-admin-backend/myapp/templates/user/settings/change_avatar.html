@@ -1,0 +1,39 @@
+{% extends 'user/settings/base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %}Change Avatar{% endblock %}
+
+{% block head %}
+    {# 引入css样式 #}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='jcrop/css/jquery.Jcrop.min.css') }}">
+{% endblock %}
+
+{% block setting_content %}
+    <div class="card w-100 bg-light">
+        <h3 class="card-header">修改头像</h3>
+        <div class="card-body">
+            {{ render_form(upload_form, action=url_for('user.upload_avatar')) }}
+            <small class="text-muted">
+                你头像大小必须小于3MB,只允许png与jpg格式的图片
+            </small>
+        </div>
+        <div class="card-body">
+            {# 裁剪图片 #}
+            {{ avatars.crop_box('main.get_avatar', filename=current_user.avatar_raw) }}
+            {# 预览图片 #}
+            {{ avatars.preview_box('main.get_avatar', filename=current_user.avatar_raw) }}
+        </div>
+        <div class="card-body">
+            {{ render_form(crop_form, action=url_for('user.crop_avatar')) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {# 引入js文件 #}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='jcrop/js/jquery.Jcrop.min.js') }}"></script>
+    {# 初始化Jcrop #}
+    {{ avatars.init_jcrop() }}
+{% endblock %}

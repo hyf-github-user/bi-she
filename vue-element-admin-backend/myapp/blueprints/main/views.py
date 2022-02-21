@@ -50,6 +50,7 @@ def get_avatar(filename):
     :param filename:
     :return:
     """
+    print(filename)
     return send_from_directory(current_app.config['AVATARS_SAVE_PATH'], filename=filename)
 
 
@@ -272,10 +273,12 @@ def show_collectors(post_id):
     :param post_id:
     :return:
     """
+    # 获取显示文章
     post = Post.query.get_or_404(post_id)
+    # 获取显示文章的分页数
     page = request.args.get('page', type=int)
     per_page = current_app.config['BLUELOG_POST_PER_PAGE']
+    # 获取文章收藏的分页对象
     pagination = Collect.query.with_parent(post).order_by(Collect.timestamp.asc()).paginate(page, per_page)
     collects = pagination.items
-
     return render_template('main/collectors.html', collects=collects, post=post, pagination=pagination)

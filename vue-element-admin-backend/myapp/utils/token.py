@@ -65,13 +65,13 @@ def verify_auth_token(token):
 
     uid = data['uid']
     scope = data['scope']
-    # 进行权限的功能的验证
-    endpoint = request.endpoint.split('.')[1]
-    allow = is_in_scope(scope, endpoint)  # 身份验证,判断是否视图函数是否合适
-    if not allow:
-        print("权限不够!")
-        g.token_permission = True
-        return Result.error(code=404, message="无此权限!"), False
+    # # 进行权限的功能的验证
+    # endpoint = request.endpoint.split('.')[1]
+    # allow = is_in_scope(scope, endpoint)  # 身份验证,判断是否视图函数是否合适
+    # if not allow:
+    #     print("权限不够!")
+    #     g.token_permission = True
+    #     return Result.error(code=404, message="无此权限!"), False
     return User(uid, scope), True  # 返回一个对象
 
 

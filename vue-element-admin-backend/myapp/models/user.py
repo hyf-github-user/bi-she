@@ -45,6 +45,8 @@ class User(db.Model, UserMixin):
     avatar_s = db.Column(db.String(64))
     avatar_m = db.Column(db.String(64))
     avatar_l = db.Column(db.String(64))
+    # 专门存放裁剪的头像
+    avatar_raw = db.Column(db.String(64))
     # 存放登录密码
     private_key = db.Column(db.Text(), comment="加密密码的私钥")
     rsa_password = db.Column(db.Text(), comment="对密码进行加密之后的密文")
@@ -58,6 +60,13 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
     role = db.relationship('Role', back_populates='users')
 
+    # 是否接收通知消息
+    receive_comment_notification = db.Column(db.Boolean, default=True)
+    receive_follow_notification = db.Column(db.Boolean, default=True)
+    receive_collect_notification = db.Column(db.Boolean, default=True)
+
+    # User与Notification的一对多关系模型,cascade=all当用户删除时,所对应的所有的notification全部要删除
+    notifications = db.relationship('Notification', back_populates='receiver', cascade='all')
     # 用户与评论是一对多的关系
     comments = db.relationship('Comment', back_populates='author', cascade='all')
 
@@ -67,6 +76,8 @@ class User(db.Model, UserMixin):
     # User与collect的一对多模型
     collections = db.relationship('Collect', back_populates='collector',
                                   cascade='all')  # cascade='all' 指的是当用户删除后,对应的collect就会被删掉
+    # 是否公开收藏
+    public_collections = db.Column(db.Boolean, default=False)
 
     # 所有我关注的人, foreign_keys指定反向属性,foreign_keys可以让外键找到对应外键,follower->follower_id,followed->followed_id
     following = db.relationship('Follow', foreign_keys=[Follow.follower_id], back_populates='follower',
@@ -83,6 +94,8 @@ class User(db.Model, UserMixin):
         self.set_private_key()  # 生成私钥与保存公钥
         # 自定义生成头像
         self.generate_avatar()
+        # 用户关注自己
+        self.follow(self)
 
     # 更新用户信息
     def update(self, username, name, email, active, locked, confirmed, role_id):
@@ -329,6 +342,10 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
     # 文章是否能被评论
     can_comment = db.Column(db.Boolean, default=True)  # 是否能评论
+    # 文章重要性
+    auth = db.Column(db.String(255), default='一般')
+    # 文章的状态
+    status = db.Column(db.String(255), default='published')
     # 标记被举报的次数
     flag = db.Column(db.Integer, default=0, comment="文章被举报次数")
     # 分类与文章一对多对多的关系属性
@@ -408,3 +425,17 @@ class Link(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30))
     url = db.Column(db.String(255))
+
+
+class Notification(db.Model):
+    """
+    用户通知模型
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.Text, nullable=False)
+    # 是否已读
+    is_read = db.Column(db.Boolean, default=False)
+    timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
+    # User与Notification的一对多关系
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    receiver = db.relationship('User', back_populates='notifications')
