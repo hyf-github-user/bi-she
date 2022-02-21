@@ -41,7 +41,6 @@ router.beforeEach(async(to, from, next) => {
 
           // 动态添加可访问路由
           router.addRoutes(accessRoutes)
-
           // hack方法来确保addRoutes是完整的
           // set the replace: true, so the navigation will not leave a history record
           next({ ...to, replace: true })

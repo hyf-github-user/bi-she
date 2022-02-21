@@ -15,8 +15,13 @@ import chartsRouter from './modules/charts'
 import tableRouter from './modules/table'
 // 用户管理侧边栏
 import userRouter from './modules/user'
+// 导入通知路由
+import noticeRouter from './modules/notifications'
+// 导入文章路由
+import articleRouter from './modules/article'
 // 固定的路由
 export const constantRoutes = [
+  // 下面都是登录的路由
   {
     path: '/redirect',
     component: Layout,
@@ -62,6 +67,19 @@ export const constantRoutes = [
       }
     ]
   },
+  // 展示图标
+  {
+    path: '/icon',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/icons/index'),
+        name: 'Icons',
+        meta: { title: '图标', icon: 'icon', noCache: true }
+      }
+    ]
+  },
   // 个人中心的路由
   {
     path: '/profile',
@@ -73,7 +91,7 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/profile/index'),
         name: 'Profile',
-        meta: { title: 'profile', icon: 'user', noCache: true }
+        meta: { title: '个人中心', icon: 'user', noCache: true }
       }
     ]
   }
@@ -89,9 +107,9 @@ export const asyncRoutes = [
     alwaysShow: true, // will always show the root menu
     name: 'Permission',
     meta: {
-      title: 'permission',
+      title: '权限测试页',
       icon: 'lock',
-      roles: ['editor'] // you can set roles in root nav
+      roles: ['editor', 'admin'] // you can set roles in root nav
     },
     children: [
       {
@@ -99,8 +117,8 @@ export const asyncRoutes = [
         component: () => import('@/views/permission/page'),
         name: 'PagePermission',
         meta: {
-          title: 'pagePermission',
-          roles: [] // or you can only set roles in sub nav
+          title: '页面权限',
+          roles: ['admin', 'editor'] // or you can only set roles in sub nav
         }
       },
       {
@@ -108,7 +126,7 @@ export const asyncRoutes = [
         component: () => import('@/views/permission/directive'),
         name: 'DirectivePermission',
         meta: {
-          title: 'directivePermission'
+          title: '指令权限'
           // if do not set roles, means: this page does not require permission
         }
       },
@@ -117,31 +135,16 @@ export const asyncRoutes = [
         component: () => import('@/views/permission/role'),
         name: 'RolePermission',
         meta: {
-          title: 'rolePermission',
+          title: '角色权限',
           roles: ['admin']
         }
       }
     ]
   },
-
-  {
-    path: '/icon',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/icons/index'),
-        name: 'Icons',
-        meta: { title: 'icons', icon: 'icon', noCache: true }
-      }
-    ]
-  },
-
-  /** when your routing map is too long, you can split it into small modules **/
-  componentsRouter,
-  chartsRouter,
+  /** 当你的路由太长了,可以采用模块化的方法 **/
+  noticeRouter, // 通知路由
   userRouter,
-  tableRouter,
+  articleRouter, // 文章路由
   // 示例路由
   {
     path: '/example',
@@ -149,7 +152,7 @@ export const asyncRoutes = [
     redirect: '/example/list',
     name: 'Example',
     meta: {
-      title: 'example',
+      title: '综合实例',
       icon: 'el-icon-s-help'
     },
     children: [
@@ -157,20 +160,20 @@ export const asyncRoutes = [
         path: 'create',
         component: () => import('@/views/example/create'),
         name: 'CreateArticle',
-        meta: { title: 'createArticle', icon: 'edit' }
+        meta: { title: '创建文章', icon: 'edit' }
       },
       {
         path: 'edit/:id(\\d+)',
         component: () => import('@/views/example/edit'),
         name: 'EditArticle',
-        meta: { title: 'editArticle', noCache: true, activeMenu: '/example/list' },
+        meta: { title: '编辑文章', noCache: true, activeMenu: '/example/list' },
         hidden: true
       },
       {
         path: 'list',
         component: () => import('@/views/example/list'),
         name: 'ArticleList',
-        meta: { title: 'articleList', icon: 'list' }
+        meta: { title: '文章列表', icon: 'list' }
       }
     ]
   },
@@ -183,7 +186,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/tab/index'),
         name: 'Tab',
-        meta: { title: 'tab', icon: 'tab' }
+        meta: { title: 'Tab', icon: 'tab' }
       }
     ]
   },
@@ -194,7 +197,7 @@ export const asyncRoutes = [
     redirect: '/excel/export-excel',
     name: 'Excel',
     meta: {
-      title: 'excel',
+      title: 'Excel',
       icon: 'excel'
     },
     children: [
@@ -202,28 +205,31 @@ export const asyncRoutes = [
         path: 'export-excel',
         component: () => import('@/views/excel/export-excel'),
         name: 'ExportExcel',
-        meta: { title: 'exportExcel' }
+        meta: { title: '导出 Excel' }
       },
       {
         path: 'export-selected-excel',
         component: () => import('@/views/excel/select-excel'),
         name: 'SelectExcel',
-        meta: { title: 'selectExcel' }
+        meta: { title: '导出 已选择项' }
       },
       {
         path: 'export-merge-header',
         component: () => import('@/views/excel/merge-header'),
         name: 'MergeHeader',
-        meta: { title: 'mergeHeader' }
+        meta: { title: '导出 多级表头' }
       },
       {
         path: 'upload-excel',
         component: () => import('@/views/excel/upload-excel'),
         name: 'UploadExcel',
-        meta: { title: 'uploadExcel' }
+        meta: { title: '上传 Excel' }
       }
     ]
   },
+  componentsRouter,
+  chartsRouter,
+  tableRouter,
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

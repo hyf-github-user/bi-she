@@ -23,6 +23,7 @@ export default {
     ])
   },
   created() {
+    // 根据用户的角色动态选择登录成功的面板
     if (!this.roles.includes('admin')) {
       this.currentRole = 'editorDashboard'
     }
