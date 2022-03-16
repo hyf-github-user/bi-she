@@ -177,6 +177,27 @@ export const asyncRoutes = [
       }
     ]
   },
+  // 系统监控
+  {
+    path: '/monitor',
+    component: Layout,
+    redirect: 'noRedirect',
+    alwaysShow: true,
+    name: 'monitor',
+    meta: {
+      permissions: ['admin', 'monitor'],
+      title: '系统监控',
+      icon: 'monitor'
+    },
+    children: [
+      {
+        path: 'service',
+        component: () => import('@/views/monitor/service'),
+        name: 'monitor-service',
+        meta: { permissions: ['admin', 'monitor-service'], title: '服务监控', icon: 'codeConsole', noCache: true }
+      }
+    ]
+  },
   // 表格的路由
   {
     path: '/tab',
@@ -235,7 +256,7 @@ export const asyncRoutes = [
 ]
 
 const createRouter = () => new Router({
-  mode: 'history', // 去除URL带有的#号
+  // mode: 'history', // 去除URL带有的#号
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })

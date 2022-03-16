@@ -1,5 +1,6 @@
 <template>
   <div class="drawer-container">
+    <!--  悬浮的设置按钮  -->
     <div>
       <h3 class="drawer-title">{{ $t('settings.title') }}</h3>
 
@@ -22,14 +23,6 @@
         <span>{{ $t('settings.sidebarLogo') }}</span>
         <el-switch v-model="sidebarLogo" class="drawer-switch" />
       </div>
-      <a v-if="isShowJob" href="https://panjiachen.github.io/vue-element-admin-site/zh/job/" target="_blank" class="job-link">
-        <el-alert
-          title="部门目前非常缺人！有兴趣的可以点击了解详情。坐标: 字节跳动"
-          type="success"
-          :closable="false"
-        />
-      </a>
-
       <div v-if="lang === 'zh'" class="drawer-item">
         <span>菜单支持拼音搜索</span>
         <el-switch v-model="supportPinyinSearch" class="drawer-switch" />
@@ -134,7 +127,7 @@ export default {
     float: right
   }
 
-  .job-link{
+  .job-link {
     display: block;
     position: absolute;
     width: 100%;

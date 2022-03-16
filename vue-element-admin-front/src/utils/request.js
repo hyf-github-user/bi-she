@@ -1,27 +1,24 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
+import { MessageBox, Message, Notification } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import router from '@/router'
 
-// 创建一个axios的实例
+// 创建axios实例
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
 
-// 请求拦截器
+// request拦截器
 service.interceptors.request.use(
   config => {
-    // do something before request is sent
-
     if (store.getters.token) {
-      // let each request carry token
-      // ['X-Token'] is a custom headers key
-      // please modify it according to the actual situation
-      // jwt验证
-      config.headers.Authorization = 'jwt' + ' ' + getToken()
+      // 让每个请求携带自定义token
+      config.headers['Authorization'] = 'Bearer ' + getToken()
     }
+    config.headers['Content-Type'] = 'application/json'
     return config
   },
   error => {
@@ -32,53 +29,83 @@ service.interceptors.request.use(
 )
 
 // 响应拦截器
+// response 拦截器
 service.interceptors.response.use(
-  /**
-   * If you want to get http information such as headers or status
-   * Please return  response => response
-   */
-
-  /**
-   * Determine the request status by custom code
-   * Here is just an example
-   * You can also judge the status by HTTP Status Code
-   */
   response => {
-    const res = response.data
-    console.log('响应拦截器的响应: ', res)
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 200) {
+    const code = response.status
+    if (code < 200 || code > 300) {
       Message({
-        message: res.message,
+        message: response.errors,
         type: 'error',
-        duration: 5 * 1000
+        duration: 3 * 1000
       })
-
-      // 508: 错误 token; 512: 其它  in; 514: Token 过期;
-      if (res.code === 508 || res.code === 512 || res.code === 514) {
-        // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
-        })
-      }
-      return Promise.reject(new Error(res.message || 'Error'))
+      return Promise.reject('error')
     } else {
-      return res
+      return response.data
     }
   },
   error => {
-    console.log('err' + error) // for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+    let code = 0
+    let errors = ''
+    let errorData = ''
+    try {
+      code = error.response.status
+      errors = error.response.data.errors
+      errorData = error.response.data
+    } catch (e) {
+      if (error.toString().indexOf('timeout')) {
+        Message({
+          message: '请求超时!',
+          type: 'error',
+          duration: 3 * 1000
+        })
+        return Promise.reject(error)
+      }
+    }
+    if (code === 401) {
+      MessageBox.confirm(
+        '登录状态过期了哦，您可以继续留在该页面，或者重新登录',
+        '系统提示',
+        {
+          confirmButtonText: '重新登录',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        store.dispatch('user/resetToken').then(() => {
+          location.reload() // 为了重新实例化vue-router对象 避免bug
+        })
+      })
+    } else if (code === 403) {
+      // 权限不够时走的路由
+      router.push({ path: '/401' })
+    } else if (code === 400) {
+      Message({
+        message: errors || errorData || '服务端错误',
+        type: 'error',
+        duration: 3 * 1000
+      })
+    } else if (code === 404) {
+      Notification.error({
+        title: '错误',
+        message: '请求接口不存在!'
+      })
+    } else if (code === 502) {
+      Notification.error({
+        title: '错误',
+        message: errors || errorData || '后端服务器连接失败!'
+      })
+    } else if (code === 500) {
+      Notification.error({
+        title: '错误',
+        message: errors || errorData || '服务端错误!'
+      })
+    } else {
+      Notification.error({
+        title: '错误',
+        message: errors || errorData || '服务端未知错误!'
+      })
+    }
     return Promise.reject(error)
   }
 )

@@ -22,7 +22,10 @@
     "crypto-js": "^4.1.1",
     "driver.js": "0.9.5",
     "dropzone": "5.5.1",
-    "echarts": "4.2.1",
+    "echarts": "^4.9.0",
+    "echarts-gl": "^1.1.1",
+    "vue-echarts": "^5.0.0-beta.0",
+
     "element-ui": "2.13.2",
     "file-saver": "2.0.1",
     "fuse.js": "3.4.4",

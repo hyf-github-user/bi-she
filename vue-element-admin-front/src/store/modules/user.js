@@ -70,6 +70,7 @@ const actions = {
         commit('SET_AVATAR', avatar)
         commit('SET_INTRODUCTION', introduction)
         commit('SET_EMAIL', email)
+        console.log('data: ', data)
         resolve(data)
       }).catch(error => {
         reject(error)
