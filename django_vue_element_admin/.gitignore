@@ -6,5 +6,5 @@
 */.idea
 */__pycache__
 logs
-db.splite3
+.db.splite3
 */migrations
