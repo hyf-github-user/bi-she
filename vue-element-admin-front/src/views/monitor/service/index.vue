@@ -70,7 +70,7 @@
   </div>
 </template>
 <script>
-import ECharts from 'echarts'
+import ECharts from 'vue-echarts'
 import 'echarts-gl'
 import 'echarts/lib/chart/bar'
 import 'echarts/lib/component/tooltip'
@@ -81,7 +81,7 @@ export default {
   components: { 'v-chart': ECharts },
   data() {
     return {
-      websocket: null,
+      websock: null,
       monitor: null, // 监控定时器
       service: {
         'platform': '',
@@ -198,8 +198,8 @@ export default {
       clearInterval(this.monitor)
     }
     // 关闭socket
-    if (this.websocket) {
-      this.websocket.close()
+    if (this.websock) {
+      this.websock.close()
     }
   },
   methods: {
@@ -208,22 +208,22 @@ export default {
         this.service = res.data
       })
     },
-    initWebSocket() { // 初始化websocket
-      const websocket_uri = process.env.VUE_APP_WS_API + '/monitor/service?token=' + getToken()
-      this.websocket = new WebSocket(websocket_uri)
-      this.websocket.onmessage = this.websocket_onmessage
-      this.websocket.onopen = this.websocket_onopen
-      this.websocket.onerror = this.websocket_onerror
-      this.websocket.onclose = this.websocket_close
+    initWebSocket() { // 初始化weosocket
+      const wsuri = process.env.VUE_APP_WS_API + '/monitor/service?token=' + getToken()
+      this.websock = new WebSocket(wsuri)
+      this.websock.onmessage = this.websocketonmessage
+      this.websock.onopen = this.websocketonopen
+      this.websock.onerror = this.websocketonerror
+      this.websock.onclose = this.websocketclose
     },
-    websocket_onopen() { // 连接建立之后执行send方法发送数据
+    websocketonopen() { // 连接建立之后执行send方法发送数据
       const data = { 'tonken': getToken() }
-      this.monitor = setInterval(this.websocket_send, 2000, JSON.stringify(data))
+      this.monitor = setInterval(this.websocketsend, 2000, JSON.stringify(data))
     },
-    websocket_onerror() { // 连接建立失败重连
+    websocketonerror() { // 连接建立失败重连
       this.initWebSocket()
     },
-    websocket_onmessage(e) { // 数据接收
+    websocketonmessage(e) { // 数据接收
       const data = JSON.parse(e.data)
       this.service_data = data
       // 添加echarts数据,且最多8个
@@ -238,28 +238,28 @@ export default {
       this.cpuInfo.series[0].data.push(parseFloat(data.cpu.percent))
       this.memInfo.series[0].data.push(parseFloat(data.mem.percent))
     },
-    websocket_send(Data) { // 数据发送
-      this.websocket.send(Data)
+    websocketsend(Data) { // 数据发送
+      this.websock.send(Data)
     },
-    websocket_close(e) { // 关闭
+    websocketclose(e) { // 关闭
       console.log('断开连接', e)
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-::v-deep .box-card {
-  margin-bottom: 5px;
-  span {
-    margin-right: 40px;
+ ::v-deep .box-card {
+    margin-bottom: 5px;
+    span {
+      margin-right: 40px;
+    }
   }
-}
 .title {
-  text-align: center;
-  margin: 10px 0
-}
+    text-align: center;
+    margin: 10px 0
+  }
 .echarts{
-  width: 100%;
-  min-width: 400px;
+    width: 100%;
+    min-width: 400px;
 }
 </style>

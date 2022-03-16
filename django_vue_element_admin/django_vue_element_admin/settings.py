@@ -39,6 +39,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',  # swagger文档
     'corsheaders',  # 跨域
+    'easyaudit',
+    # websocket
+    'channels',
+    # 定时任务
+    'django_apscheduler',
+    # model过滤
+    'django_filters',
+    # django_user_agents
+    'django_user_agents',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,7 +71,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 使用自定义中间件,来自定义响应
+    # 获取用户系统信息与浏览器信息
+    'django_user_agents.middleware.UserAgentMiddleware',
+    # IP黑名单校验
+    'django_vue_element_admin.myapps.utils.middleware.IpBlackListMiddleware',
+    # 在线用户监控
+    'django_vue_element_admin.myapps.utils.middleware.OnlineUsersMiddleware',
+    # crud变更记录中间件
+    'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
+    # 下面两个中间件放置在最后位置, 且两者保证顺序
+    'django_vue_element_admin.myapps.utils.middleware.OperationLogMiddleware',
     'django_vue_element_admin.myapps.utils.middleware.ResponseMiddleware',
 ]
 
@@ -85,6 +103,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'django_vue_element_admin.wsgi.application'
+# channels配置(配置ASGI, 用于实现WebSocket)
+ASGI_APPLICATION = 'django_vue_element_admin.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -185,7 +205,7 @@ else:
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'redis://{REDIS_STR}{REDIS_HOST}:{REDIS_PORT}/6',
+        'LOCATION': f'redis://{REDIS_STR}{REDIS_HOST}:{REDIS_PORT}/0',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -193,7 +213,7 @@ CACHES = {
     # session
     'session': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'redis://{REDIS_STR}{REDIS_HOST}:{REDIS_PORT}/7',
+        'LOCATION': f'redis://{REDIS_STR}{REDIS_HOST}:{REDIS_PORT}/1',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -201,7 +221,7 @@ CACHES = {
     # 用户信息/ip黑名单
     'user_info': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'redis://{REDIS_STR}{REDIS_HOST}:{REDIS_PORT}/8',
+        'LOCATION': f'redis://{REDIS_STR}{REDIS_HOST}:{REDIS_PORT}/2',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -209,10 +229,23 @@ CACHES = {
     # 在线用户监测
     'online_user': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'redis://{REDIS_STR}{REDIS_HOST}:{REDIS_PORT}/9',
+        'LOCATION': f'redis://{REDIS_STR}{REDIS_HOST}:{REDIS_PORT}/3',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
+    },
+}
+
+# django-channels配置
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels_redis.core.RedisChannelLayer",
+        'CONFIG': {
+            'hosts': [f'redis://{REDIS_STR}{REDIS_HOST}:{REDIS_PORT}/4'],
+            'symmetric_encryption_keys': [SECRET_KEY],
+            'capacity': 1500,
+            'expiry': 10
+        },
     },
 }
 # 设置Django session使用redis作为后端存储

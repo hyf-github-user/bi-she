@@ -185,16 +185,40 @@ export const asyncRoutes = [
     alwaysShow: true,
     name: 'monitor',
     meta: {
-      permissions: ['admin', 'monitor'],
       title: '系统监控',
-      icon: 'monitor'
+      icon: 'el-icon-data-analysis',
+      roles: ['admin']
     },
     children: [
+      {
+        path: 'users',
+        component: () => import('@/views/monitor/users'),
+        name: 'monitor-users',
+        meta: { title: '在线用户', icon: 'people', roles: ['admin'], noCache: true }
+      },
+      {
+        path: 'ip',
+        component: () => import('@/views/monitor/ip'),
+        name: 'monitor-ip',
+        meta: { title: 'IP黑名单', icon: 'eye', roles: ['admin'], noCache: true }
+      },
+      // {
+      //   path: 'crud',
+      //   component: () => import('@/views/monitor/crud'),
+      //   name: 'monitor-crud',
+      //   meta: {  title: 'crud日志', icon: 'log',roles: ['admin'], noCache: true }
+      // },
+      {
+        path: 'error',
+        component: () => import('@/views/monitor/error'),
+        name: 'monitor-error',
+        meta: { title: '错误日志', icon: 'bug', roles: ['admin'], noCache: true }
+      },
       {
         path: 'service',
         component: () => import('@/views/monitor/service'),
         name: 'monitor-service',
-        meta: { permissions: ['admin', 'monitor-service'], title: '服务监控', icon: 'codeConsole', noCache: true }
+        meta: { title: '服务监控', icon: 'el-icon-s-home', roles: ['admin'], noCache: true }
       }
     ]
   },

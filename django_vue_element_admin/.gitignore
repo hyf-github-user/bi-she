@@ -1,5 +1,10 @@
+#忽略当前目录的
 .DS_Store
-db.splite3
-.idea
+#忽略子目录的.DS_Store
+*/.DS_Store
+# 忽略子目录的文件
+*/.idea
 */__pycache__
+logs
+db.splite3
 */migrations

@@ -1,8 +1,8 @@
 from django.db import models
+
 from django_vue_element_admin.myapps.utils.models import BaseModel
 
 
-# Create your test_model here.
 class Permissions(BaseModel):
     """
     权限
@@ -20,9 +20,10 @@ class Permissions(BaseModel):
     menu = models.BooleanField(verbose_name='是否为菜单')  # True为菜单,False为接口
     method = models.CharField(max_length=8, blank=True, default='', choices=method_choices, verbose_name='方法')
     path = models.CharField(max_length=200, blank=True, default='', verbose_name='请求路径正则')
-    # 自我关联模型
     pid = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, verbose_name='父权限')
     desc = models.CharField(max_length=30, blank=True, default='', verbose_name='权限描述')
+
+    objects = models.Manager()
 
     def __str__(self):
         return self.name
@@ -39,10 +40,11 @@ class Roles(BaseModel):
     角色
     """
     name = models.CharField(max_length=32, unique=True, verbose_name='角色')
-    # 角色与权限是多对多的关系
     permissions = models.ManyToManyField('Permissions', db_table='system_roles_to_system_permissions',
                                          blank=True, verbose_name='权限')
-    description = models.CharField(max_length=50, blank=True, default='', verbose_name='描述')
+    desc = models.CharField(max_length=50, blank=True, default='', verbose_name='描述')
+
+    objects = models.Manager()
 
     def __str__(self):
         return self.name
@@ -59,8 +61,9 @@ class Departments(BaseModel):
     组织架构 部门
     """
     name = models.CharField(max_length=32, unique=True, verbose_name='部门')
-    # 自我关联模型
     pid = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, verbose_name='父部门')
+
+    objects = models.Manager()
 
     def __str__(self):
         return self.name
