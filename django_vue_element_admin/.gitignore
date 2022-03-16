@@ -1,0 +1,5 @@
+.DS_Store
+db.splite3
+.idea
+*/__pycache__
+*/migrations
