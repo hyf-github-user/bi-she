@@ -43,18 +43,18 @@
                     {{ render_nav_item('main.index', '蓝客') }}
                     {{ render_nav_item('main.explore', '个人中心') }}
                     {# 下拉菜单 #}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-toggle="dropdown" aria-expanded="false">
-                            菜单
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">菜单一</a>
-                            <a class="dropdown-item" href="#">菜单二</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">菜单三</a>
-                        </div>
-                    </li>
+{#                    <li class="nav-item dropdown">#}
+{#                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"#}
+{#                           data-toggle="dropdown" aria-expanded="false">#}
+{#                            菜单#}
+{#                        </a>#}
+{#                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
+{#                            <a class="dropdown-item" href="#">菜单一</a>#}
+{#                            <a class="dropdown-item" href="#">菜单二</a>#}
+{#                            <div class="dropdown-divider"></div>#}
+{#                            <a class="dropdown-item" href="#">菜单三</a>#}
+{#                        </div>#}
+{#                    </li>#}
                     {# 搜索按钮#}
                     <form class="form-inline my-2 my-lg-0" action="{{ url_for('main.search') }}">
                         <input type="text" name="q" class="form-control mr-sm-1" placeholder="文章 或 用户"

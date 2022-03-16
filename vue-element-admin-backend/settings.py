@@ -20,7 +20,7 @@ class BaseConfig(object):
         os.makedirs(BLUELOG_UPLOAD_PATH)
     # session加密
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev key')
-    TOKEN_EXPIRATION = 30 * 24 * 3600  # 令牌过期时间
+    TOKEN_EXPIRATION = 100000  # 令牌过期时间
     JWT_SECRET = "safasfasfas"
     # 配置数据库连接
     # mysql + pymysql://user:password@hostip:port/数据名称

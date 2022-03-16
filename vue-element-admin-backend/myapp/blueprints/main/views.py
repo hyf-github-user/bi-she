@@ -239,8 +239,8 @@ def collect(post_id):
         return redirect(url_for('main.show_post', post_id=post.id))
     # 用户收藏文章(也包括匿名用户的收藏)
     current_user.collect(post)
-    flash("照片已收藏!", 'success')
-    # # 推送照片被收藏的通知
+    flash("文章已收藏!", 'success')
+    # # 推送文章被收藏的通知
     # push_collect_notification(collector=current_user, post_id=post_id, receiver=post.author)
     return redirect_back()
 

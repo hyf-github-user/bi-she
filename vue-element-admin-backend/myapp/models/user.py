@@ -268,9 +268,9 @@ class User(db.Model, UserMixin):
 # 权限与角色的关联表(多对多)
 roles_permissions = db.Table('roles_permissions',
                              db.Column('role_id', db.Integer,
-                                       db.ForeignKey('role.id')),
+                                       db.ForeignKey('role.id'), primary_key=True),
                              db.Column('permission_id', db.Integer,
-                                       db.ForeignKey('permission.id'))
+                                       db.ForeignKey('permission.id'), primary_key=True)
                              )
 
 
