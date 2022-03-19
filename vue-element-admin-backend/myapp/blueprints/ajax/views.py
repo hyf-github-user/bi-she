@@ -5,7 +5,8 @@
 from flask import Blueprint, jsonify, render_template
 from flask_login import current_user
 
-from myapp.models.user import Post, User
+from myapp.models.user import Post, User, Notification
+from myapp.utils.notifications import push_collect_notification, push_follow_notification
 
 ajax_bp = Blueprint("ajax", __name__)
 
@@ -45,6 +46,19 @@ def collectors_count(post_id):
     return jsonify(count=count)
 
 
+@ajax_bp.route('/notifications-count')
+def notifications_count():
+    """
+    ajax获取未读的通知数
+    :return:
+    """
+    if not current_user.is_authenticated:
+        return jsonify(message='需要登录!'), 403
+
+    count = Notification.query.with_parent(current_user).filter_by(is_read=False).count()
+    return jsonify(count=count)
+
+
 @ajax_bp.route('/collect/<int:post_id>', methods=['POST'])
 def collect(post_id):
     """
@@ -65,8 +79,8 @@ def collect(post_id):
 
     current_user.collect(post)
     # 发送收藏通知
-    # if current_user != post.author and post.author.receive_collect_notification:
-    #     push_collect_notification(collector=current_user, post_id=post_id, receiver=post.author)
+    if current_user != post.author and post.author.receive_collect_notification:
+        push_collect_notification(collector=current_user, post_id=post_id, receiver=post.author)
     return jsonify(message='文章已收藏!')
 
 
@@ -108,8 +122,8 @@ def follow(username):
 
     current_user.follow(user)
     # 发送关注的通知
-    # if user.receive_collect_notification:
-    #     push_follow_notification(follower=current_user, receiver=user)
+    if user.receive_collect_notification:
+        push_follow_notification(follower=current_user, receiver=user)
     return jsonify(message='关注用户成功!')
 
 

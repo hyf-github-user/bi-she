@@ -67,6 +67,8 @@ class BaseConfig(object):
     BLUELOG_SEARCH_RESULT_PER_PAGE = 10
     # 用户展示分页数
     BLUELOG_USER_PER_PAGE = 3
+    # 用户通知的分页数
+    BLUELOG_NOTIFICATION_PER_PAGE = 3
 
 
 # 俩种配置

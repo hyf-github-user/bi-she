@@ -13,6 +13,7 @@ from myapp.decorators import confirm_required, permission_required
 from myapp.models.user import Post, Category, User, Link, Collect
 from myapp.utils import allowed_file, redirect_back
 from myapp.utils.emails import send_change_email_email
+from myapp.utils.notifications import push_follow_notification
 from myapp.utils.token import generate_token, validate_token
 from settings import Operations
 
@@ -321,9 +322,10 @@ def follow(username):
     # 用户关注他
     current_user.follow(user)
     flash("此用户已被关注!", 'success')
-    # if user.receive_follow_notification:
-    #     # 推送消息
-    #     push_follow_notification(follower=current_user, receiver=user)
+    # 发送通知
+    if user.receive_follow_notification:
+        # 推送消息
+        push_follow_notification(follower=current_user, receiver=user)
     return redirect_back()
 
 

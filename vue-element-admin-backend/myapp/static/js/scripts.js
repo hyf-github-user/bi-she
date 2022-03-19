@@ -118,7 +118,7 @@ $(function () {
 
     // 更新通知数
     function update_notifications_count() {
-        const $el = $('#notification-badge');
+        const $el = $('#notification-ba');
         $.ajax({
             type: 'GET',
             url: $el.data('href'),
@@ -214,9 +214,9 @@ $(function () {
     $('#confirm-delete').on('show.bs.modal', function (e) {
         $('.delete-form').attr('action', $(e.relatedTarget).data('href'));
     });
-
+    // 设置定时刷新通知数
     if (is_authenticated) {
-        setInterval(update_notifications_count, 30000);
+        setInterval(update_notifications_count, 10);
     }
 
     $("[data-toggle='tooltip']").tooltip({title: moment($(this).data('timestamp')).format('lll')})

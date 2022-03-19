@@ -7,8 +7,9 @@ from flask_login import current_user, login_required
 from exts import db
 from myapp.blueprints.main.forms import CommentForm
 from myapp.decorators import permission_required, confirm_required
-from myapp.models.user import Post, Category, Comment, User, Collect
+from myapp.models.user import Post, Category, Comment, User, Collect, Notification
 from myapp.utils import redirect_back
+from myapp.utils.notifications import push_comment_notification
 
 main_bp = Blueprint('main', __name__)
 
@@ -147,14 +148,15 @@ def new_comment(post_id):
         replied_id = request.args.get('reply')
         if replied_id:
             comment.replied = Comment.query.get_or_404(replied_id)
-            # if comment.replied.author.receive_comment_notification:
-            #     push_comment_notification(post_id=post.id, receiver=comment.replied.author)
+            # 判断用户是否收到回复评论的消息通知
+            if comment.replied.author.receive_comment_notification:
+                push_comment_notification(post_id=post.id, receiver=comment.replied.author)
         db.session.add(comment)
         db.session.commit()
         flash('评论已发表!', 'success')
-
-        # if current_user != post.author and post.author.receive_comment_notification:
-        #     push_comment_notification(post_id, receiver=post.author, page=page)
+        # 文章的新评论通知
+        if current_user != post.author and post.author.receive_comment_notification:
+            push_comment_notification(post_id, receiver=post.author, page=page)
     return redirect(url_for('main.show_post', post_id=post_id, page=page))
 
 
@@ -296,3 +298,56 @@ def show_collectors(post_id):
     pagination = Collect.query.with_parent(post).order_by(Collect.timestamp.asc()).paginate(page, per_page)
     collects = pagination.items
     return render_template('main/collectors.html', collects=collects, post=post, pagination=pagination)
+
+@main_bp.route('/notifications')
+@login_required
+def show_notifications():
+    """
+    展示用户的通知
+    :return:
+    """
+    # 获取页数
+    page = request.args.get('page', 1, type=int)
+    per_page = current_app.config['BLUELOG_NOTIFICATION_PER_PAGE']
+    notifications = Notification.query.with_parent(current_user)
+    # 获取过滤的关键字
+    filter_rule = request.args.get('filter')
+    if filter_rule == 'unread':
+        # 获取未读的通知数
+        notifications = notifications.filter_by(is_read=False)
+
+    pagination = notifications.order_by(Notification.timestamp.desc()).paginate(page, per_page)
+    notifications = pagination.items
+    return render_template('main/notifications.html', pagination=pagination, notifications=notifications)
+
+
+@main_bp.route('/notification/read/<int:notification_id>', methods=['POST'])
+@login_required
+def read_notification(notification_id):
+    """
+    确认单个通知
+    :param notification_id:
+    :return:
+    """
+    notification = Notification.query.get_or_404(notification_id)
+    if current_user != notification.receiver:
+        abort(403)
+
+    notification.is_read = True
+    db.session.commit()
+    flash('通知已确认!', 'success')
+    return redirect(url_for('main.show_notifications'))
+
+
+@main_bp.route('/notifications/read/all', methods=['POST'])
+@login_required
+def read_all_notification():
+    """
+    确认所有通知
+    :return:
+    """
+    for notification in current_user.notifications:
+        notification.is_read = True
+    db.session.commit()
+    flash('所有通知已确认!', 'success')
+    return redirect(url_for('main.show_notifications'))

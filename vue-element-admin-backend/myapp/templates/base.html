@@ -41,20 +41,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     {{ render_nav_item('main.index', '蓝客') }}
-                    {{ render_nav_item('main.explore', '个人中心') }}
-                    {# 下拉菜单 #}
-{#                    <li class="nav-item dropdown">#}
-{#                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"#}
-{#                           data-toggle="dropdown" aria-expanded="false">#}
-{#                            菜单#}
-{#                        </a>#}
-{#                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
-{#                            <a class="dropdown-item" href="#">菜单一</a>#}
-{#                            <a class="dropdown-item" href="#">菜单二</a>#}
-{#                            <div class="dropdown-divider"></div>#}
-{#                            <a class="dropdown-item" href="#">菜单三</a>#}
-{#                        </div>#}
-{#                    </li>#}
+                    {{ render_nav_item('main.explore', '探索中心') }}
                     {# 搜索按钮#}
                     <form class="form-inline my-2 my-lg-0" action="{{ url_for('main.search') }}">
                         <input type="text" name="q" class="form-control mr-sm-1" placeholder="文章 或 用户"
@@ -77,18 +64,19 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ url_for('user.new_post') }}">文章</a>
-                                <a class="dropdown-item" href="{{ url_for('user.new_category') }}">分类</a>
-                                <a class="dropdown-item" href="{{ url_for('user.new_link') }}">友情链接</a>
+                                {# 只有admin角色才能创建#}
+                                {% if current_user.role.name == 'admin' %}
+                                    <a class="dropdown-item" href="{{ url_for('user.new_category') }}">分类</a>
+                                    <a class="dropdown-item" href="{{ url_for('user.new_link') }}">友情链接</a>
+                                {% endif %}
                             </div>
                         </li>
                         {# 用户登录后,展示通知#}
-                        <a class="nav-item nav-link" href="#">
+                        <a class="nav-item nav-link" href="{{ url_for('main.show_notifications', filter='unread') }}">
                             <span class="oi oi-bell"></span>
-                            {# notification_count推荐提醒数量是由模板上下文处理函数传入的#}
-                            {# 使用ajax的方法请求后端数据 #}
                             <span id="notification-badge"
                                   class="{% if notification_count == 0 %}hide{% endif %} badge badge-danger badge-notification"
-                                  data-href="#">{{ notification_count }}</span>
+                                  data-href="{{ url_for('ajax.notifications_count') }}">{{ notification_count }}</span>
                         </a>
                         {# 展示个人用户的功能#}
                         <div class="dropdown nav-item">

@@ -252,7 +252,7 @@ class User(db.Model, UserMixin):
         db.session.add(collect)
         db.session.commit()
 
-    # 取消收藏照片
+    # 取消收藏文章
     def uncollect(self, post):
         # 根据user查询对应的collect
         collect = Collect.query.with_parent(self).filter_by(collected_id=post.id).first()
@@ -260,7 +260,7 @@ class User(db.Model, UserMixin):
             db.session.delete(collect)
             db.session.commit()
 
-    # 查找用户有无收藏此照片
+    # 查找用户有无收藏此文章
     def is_collecting(self, post):
         return Collect.query.with_parent(self).filter_by(collected_id=post.id).first() is not None
 
@@ -358,19 +358,19 @@ class Post(db.Model):
     author = db.relationship('User', back_populates='posts')
     # Post与collect的一对多模型
     collectors = db.relationship('Collect', back_populates='collected',
-                                 cascade='all')  # cascade='all' 指的是当照片删除后,对应的collect就会被删掉
+                                 cascade='all')  # cascade='all' 指的是当文章删除后,对应的collect就会被删掉
 
 
-# 收藏表(),使用关联模型把User与Photo的多对多模型给分离成一对多模型
+# 收藏表(),使用关联模型把User与Post的多对多模型给分离成一对多模型
 class Collect(db.Model):
-    collector_id = db.Column(db.Integer, db.ForeignKey('user.id'),  # 收藏照片人的ID  与User形成一对多模型
+    collector_id = db.Column(db.Integer, db.ForeignKey('user.id'),  # 收藏文章人的ID  与User形成一对多模型
                              primary_key=True)
-    collected_id = db.Column(db.Integer, db.ForeignKey('post.id'),  # 被用户收藏照片ID  与Photo形成一对多模型
+    collected_id = db.Column(db.Integer, db.ForeignKey('post.id'),  # 被用户收藏文章ID  与Post形成一对多模型
                              primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.now)  # 收藏时间
 
     collector = db.relationship('User', back_populates='collections', lazy='joined')  # 收藏人(一对多) 对应User
-    collected = db.relationship('Post', back_populates='collectors', lazy='joined')  # 被收藏的照片(一对多)  对应Photo
+    collected = db.relationship('Post', back_populates='collectors', lazy='joined')  # 被收藏的文章(一对多)  对应Post
 
 
 class Category(db.Model):
