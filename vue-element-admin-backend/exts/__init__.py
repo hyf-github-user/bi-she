@@ -19,8 +19,6 @@ bootstrap = Bootstrap()
 db = SQLAlchemy()
 # 用户前后端交互
 cors = CORS()
-# 文件拖动上传扩展
-dropzone = Dropzone()
 # # 用于用户登录验证
 login_manager = LoginManager()
 # 用于发送QQ邮箱

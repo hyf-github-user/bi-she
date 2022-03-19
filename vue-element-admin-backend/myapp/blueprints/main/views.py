@@ -5,7 +5,7 @@
 from flask import Blueprint, render_template, send_from_directory, current_app, request, flash, url_for, redirect, abort
 from flask_login import current_user, login_required
 from exts import db
-from myapp.blueprints.user.forms import CommentForm
+from myapp.blueprints.main.forms import CommentForm
 from myapp.decorators import permission_required, confirm_required
 from myapp.models.user import Post, Category, Comment, User, Collect
 from myapp.utils import redirect_back
@@ -50,7 +50,6 @@ def get_avatar(filename):
     :param filename:
     :return:
     """
-    print(filename)
     return send_from_directory(current_app.config['AVATARS_SAVE_PATH'], filename=filename)
 
 
@@ -130,13 +129,21 @@ def show_category(category_id):
 @login_required
 @permission_required('COMMENT')
 def new_comment(post_id):
+    """
+    创建文章评论
+    :param post_id:
+    :return:
+    """
+    # 根据ID获取评论对象
     post = Post.query.get_or_404(post_id)
     page = request.args.get('page', 1, type=int)
     form = CommentForm()
+    # 验证评论的表单
     if form.validate_on_submit():
         body = form.body.data
         author = current_user._get_current_object()
         comment = Comment(body=body, post=post, author=author, reviewed=True)
+        # 判断是否是回复评论
         replied_id = request.args.get('reply')
         if replied_id:
             comment.replied = Comment.query.get_or_404(replied_id)
@@ -169,6 +176,7 @@ def reply_comment(comment_id):
 
 @main_bp.route('/set_comment/<int:post_id>', methods=['POST'])
 @login_required
+@permission_required('COMMENT')
 def set_comment(post_id):
     """
     设置评论功能
@@ -191,6 +199,7 @@ def set_comment(post_id):
 
 @main_bp.route('/delete/comment/<int:comment_id>', methods=['POST'])
 @login_required
+@permission_required('COMMENT')
 def delete_comment(comment_id):
     """
     删除评论
@@ -208,6 +217,7 @@ def delete_comment(comment_id):
 
 
 @main_bp.route('/report/comment/<int:comment_id>')
+@login_required
 def report_comment(comment_id):
     """
     举报评论
@@ -248,6 +258,8 @@ def collect(post_id):
 # 取消收藏
 @main_bp.route('/uncollect/<int:post_id>', methods=['POST'])
 @login_required
+@confirm_required
+@permission_required('COLLECT')  # 判断是否有收藏的权限
 def uncollect(post_id):
     """
     取消收藏文章
@@ -267,6 +279,8 @@ def uncollect(post_id):
 
 # 展示文章的所有关注者
 @main_bp.route('/post/<int:post_id>/collectors')
+@login_required
+@confirm_required
 def show_collectors(post_id):
     """
     显示文章的收藏者

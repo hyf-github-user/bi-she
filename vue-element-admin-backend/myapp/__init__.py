@@ -13,7 +13,7 @@ from myapp.blueprints.ajax.views import ajax_bp
 from myapp.blueprints.auth.views import auth_bp
 from myapp.blueprints.main.views import main_bp
 from myapp.blueprints.user.views import user_bp
-from exts import bootstrap, db, cors, dropzone, mail, avatars, login_manager, csrf, qiniu_store, moment, ckeditor, \
+from exts import bootstrap, db, cors, mail, avatars, login_manager, csrf, qiniu_store, moment, ckeditor, \
     whooshee
 from myapp.models.user import Role, User, Category, Comment, Link, Follow, Collect
 from myapp.utils import Result
@@ -42,8 +42,6 @@ def register_extensions(app):
     bootstrap.init_app(app=app)
     # 数据库注册
     db.init_app(app=app)
-    # 上传文件的注册
-    dropzone.init_app(app=app)
     # flask-login注册
     login_manager.init_app(app=app)
     # 电子邮箱注册
@@ -188,6 +186,7 @@ def register_errors(app):
         :param e:
         :return:
         """
+        print("400错误!", e)
         return render_template('errors/400.html'), 400
 
     @app.errorhandler(403)
@@ -197,6 +196,7 @@ def register_errors(app):
         :param e:
         :return:
         """
+        print("权限错误!", e)
         return render_template('errors/403.html'), 403
 
     @app.errorhandler(404)
@@ -206,10 +206,12 @@ def register_errors(app):
         :param e:
         :return:
         """
+        print("404错误!", e)
         return render_template('errors/404.html'), 404
 
     @app.errorhandler(413)
     def request_entity_too_large(e):
+        print("413错误!", e)
         return render_template('errors/413.html'), 413
 
     @app.errorhandler(500)
@@ -219,6 +221,7 @@ def register_errors(app):
         :param e:
         :return:
         """
+        print("服务器错误!", e)
         return render_template('errors/500.html'), 500
 
     @app.errorhandler(CSRFError)
@@ -228,7 +231,7 @@ def register_errors(app):
         :param e:
         :return:
         """
-        print("CSRF验证错误!")
+        print("CSRF验证错误!", e)
         return Result.error(message="CSRF验证失败!")
 
 

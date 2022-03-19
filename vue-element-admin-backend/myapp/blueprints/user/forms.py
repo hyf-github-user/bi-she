@@ -38,10 +38,7 @@ class PostForm(MyBaseForm):
                                  for category in Category.query.order_by(Category.name).all()]
 
 
-# 评论表单
-class CommentForm(MyBaseForm):
-    body = TextAreaField('内容', validators=[DataRequired()])
-    submit = SubmitField('发表')
+
 
 
 class CategoryForm(MyBaseForm):
