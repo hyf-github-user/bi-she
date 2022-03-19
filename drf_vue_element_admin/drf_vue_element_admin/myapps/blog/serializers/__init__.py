@@ -4,7 +4,7 @@
 # 时间    :2022/3/18 17:06
 from rest_framework import serializers
 
-from drf_vue_element_admin.myapps.blog.models import Post, Category, Comment, Link, Permission, Role, User
+from drf_vue_element_admin.myapps.blog.models import Post, Category, Comment, Link, Permission, Role, User, Notification
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -74,4 +74,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User  # 指定的模型类
+        fields = '__all__'
+
+class NotificationSerializer(serializers.ModelSerializer):
+    """
+    前台通知的序列化器
+    """
+
+    class Meta:
+        model = Notification  # 指定的模型类
         fields = '__all__'

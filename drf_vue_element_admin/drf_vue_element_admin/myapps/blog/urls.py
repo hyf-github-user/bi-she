@@ -1,7 +1,7 @@
 from rest_framework import routers
 
 from drf_vue_element_admin.myapps.blog.views import UserViewSet, RoleViewSet, PostViewSet, PermissionViewSet, \
-    LinkViewSet, CommentViewSet, CategoryViewSet
+    LinkViewSet, CommentViewSet, CategoryViewSet, NotificationViewSet
 
 urlpatterns = [
 
@@ -15,4 +15,5 @@ router.register(r'permission', PermissionViewSet, basename='permission')
 router.register(r'link', LinkViewSet, basename='link')
 router.register(r'comment', CommentViewSet, basename='comment')
 router.register(r'category', CategoryViewSet, basename='category')
+router.register(r'notification', NotificationViewSet, basename='notification')
 urlpatterns += router.urls

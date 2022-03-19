@@ -6,7 +6,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from drf_vue_element_admin.myapps.blog.models import Post, Comment, User, Permission, Link, Category, Notification, Role
 from drf_vue_element_admin.myapps.blog.serializers import RoleSerializer, UserSerializer, PostSerializer, \
-    CategorySerializer, CommentSerializer, PermissionSerializer, LinkSerializer
+    CategorySerializer, CommentSerializer, PermissionSerializer, LinkSerializer, NotificationSerializer
 
 
 class UserViewSet(ModelViewSet):
@@ -42,3 +42,8 @@ class CommentViewSet(ModelViewSet):
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+class NotificationViewSet(ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
