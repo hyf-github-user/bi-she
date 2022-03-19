@@ -14,11 +14,11 @@ import chartsRouter from './modules/charts'
 // table侧边栏
 import tableRouter from './modules/table'
 // 用户管理侧边栏
-import userRouter from './modules/user'
+import userRouter from './modules/blog/users'
 // 导入通知路由
-import noticeRouter from './modules/notifications'
+import noticeRouter from './modules/blog/notifications'
 // 导入文章路由
-import articleRouter from './modules/article'
+import articleRouter from './modules/blog/post'
 // 固定的路由
 export const constantRoutes = [
   // 下面都是登录的路由
@@ -142,9 +142,6 @@ export const asyncRoutes = [
     ]
   },
   /** 当你的路由太长了,可以采用模块化的方法 **/
-  noticeRouter, // 通知路由
-  userRouter,
-  articleRouter, // 文章路由
   // 示例路由
   {
     path: '/example',
@@ -177,6 +174,24 @@ export const asyncRoutes = [
       }
     ]
   },
+  // 博客管理
+  {
+    path: '/blog',
+    component: Layout,
+    redirect: 'noRedirect',
+    alwaysShow: true, // will always show the root menu
+    name: 'blog',
+    meta: {
+      title: '博客管理',
+      icon: 'lock',
+      roles: ['editor', 'admin'] // you can set roles in root nav
+    },
+    children: [
+      userRouter, // 用户管理
+      noticeRouter, // 通知路由
+      articleRouter // 文章路由
+    ]
+  },
   // 系统监控
   {
     path: '/monitor',
@@ -202,18 +217,6 @@ export const asyncRoutes = [
         name: 'monitor-ip',
         meta: { title: 'IP黑名单', icon: 'eye', roles: ['admin'], noCache: true }
       },
-      // {
-      //   path: 'crud',
-      //   component: () => import('@/views/monitor/crud'),
-      //   name: 'monitor-crud',
-      //   meta: {  title: 'crud日志', icon: 'log',roles: ['admin'], noCache: true }
-      // },
-      {
-        path: 'error',
-        component: () => import('@/views/monitor/error'),
-        name: 'monitor-error',
-        meta: { title: '错误日志', icon: 'bug', roles: ['admin'], noCache: true }
-      },
       {
         path: 'service',
         component: () => import('@/views/monitor/service'),
@@ -232,43 +235,6 @@ export const asyncRoutes = [
         component: () => import('@/views/tab/index'),
         name: 'Tab',
         meta: { title: 'Tab', icon: 'tab' }
-      }
-    ]
-  },
-  // Excel处理路由
-  {
-    path: '/excel',
-    component: Layout,
-    redirect: '/excel/export-excel',
-    name: 'Excel',
-    meta: {
-      title: 'Excel',
-      icon: 'excel'
-    },
-    children: [
-      {
-        path: 'export-excel',
-        component: () => import('@/views/excel/export-excel'),
-        name: 'ExportExcel',
-        meta: { title: '导出 Excel' }
-      },
-      {
-        path: 'export-selected-excel',
-        component: () => import('@/views/excel/select-excel'),
-        name: 'SelectExcel',
-        meta: { title: '导出 已选择项' }
-      },
-      {
-        path: 'export-merge-header',
-        component: () => import('@/views/excel/merge-header'),
-        name: 'MergeHeader',
-        meta: { title: '导出 多级表头' }
-      },
-      {
-        path: 'upload-excel',
-        component: () => import('@/views/excel/upload-excel'),
-        name: 'UploadExcel',
-        meta: { title: '上传 Excel' }
       }
     ]
   },

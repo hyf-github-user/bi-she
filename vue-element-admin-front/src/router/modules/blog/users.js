@@ -13,20 +13,20 @@ const userRouter = {
   children: [
     {
       path: 'ManageUser',
-      component: () => import('@/views/user/ManageUser/index'), // 父路由
+      component: () => import('@/views/blog/components/user/ManageUser'), // 父路由
       name: '管理用户',
       meta: { title: '管理用户', roles: ['admin', 'editor'], icon: 'people' }
     },
     {
       path: 'AddUser',
       name: '添加用户',
-      component: () => import('@/views/user/AddUser/index'),
+      component: () => import('@/views/blog/components/user/AddUser'),
       meta: { title: '添加用户', roles: ['admin'], icon: 'el-icon-circle-plus' }
     },
     {
       path: 'UpdateUser',
       name: '更新用户',
-      component: () => import('@/views/user/UpdateUser/index'),
+      component: () => import('@/views/blog/components/user/UpdateUser'),
       meta: { title: '更新用户' },
       hidden: true // 隐藏这个菜单栏
     }

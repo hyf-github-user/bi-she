@@ -13,14 +13,14 @@ const noticeRouter = {
   children: [
     {
       path: 'ManageNotice',
-      component: () => import('@/views/notice/ManageNotice/index'), // 父路由
+      component: () => import('@/views/blog/components/notice/ManageNotice'), // 父路由
       name: '管理通知',
       meta: { title: '管理通知', roles: ['admin', 'editor'], icon: 'message' }
     },
     {
       path: 'PublishNotice',
       name: '发布通知',
-      component: () => import('@/views/notice/PublishNotice/index'),
+      component: () => import('@/views/blog/components/notice/PublishNotice'),
       meta: { title: '发布通知', roles: ['admin', 'editor'], icon: 'el-icon-circle-plus' }
     }
   ]
