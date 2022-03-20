@@ -9,7 +9,7 @@ from myapp.blueprints.main.forms import CommentForm
 from myapp.decorators import permission_required, confirm_required
 from myapp.models.user import Post, Category, Comment, User, Collect, Notification
 from myapp.utils import redirect_back
-from myapp.utils.notifications import push_comment_notification
+from myapp.utils.notifications import push_comment_notification, push_collect_notification
 
 main_bp = Blueprint('main', __name__)
 
@@ -253,7 +253,7 @@ def collect(post_id):
     current_user.collect(post)
     flash("文章已收藏!", 'success')
     # # 推送文章被收藏的通知
-    # push_collect_notification(collector=current_user, post_id=post_id, receiver=post.author)
+    push_collect_notification(collector=current_user, post_id=post_id, receiver=post.author)
     return redirect_back()
 
 
@@ -298,6 +298,7 @@ def show_collectors(post_id):
     pagination = Collect.query.with_parent(post).order_by(Collect.timestamp.asc()).paginate(page, per_page)
     collects = pagination.items
     return render_template('main/collectors.html', collects=collects, post=post, pagination=pagination)
+
 
 @main_bp.route('/notifications')
 @login_required

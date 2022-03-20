@@ -118,7 +118,7 @@ $(function () {
 
     // 更新通知数
     function update_notifications_count() {
-        const $el = $('#notification-ba');
+        const $el = $('#notification-badge');
         $.ajax({
             type: 'GET',
             url: $el.data('href'),
@@ -216,7 +216,7 @@ $(function () {
     });
     // 设置定时刷新通知数
     if (is_authenticated) {
-        setInterval(update_notifications_count, 10);
+        setInterval(update_notifications_count, 3000);
     }
 
     $("[data-toggle='tooltip']").tooltip({title: moment($(this).data('timestamp')).format('lll')})

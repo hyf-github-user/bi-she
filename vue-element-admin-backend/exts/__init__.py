@@ -3,7 +3,6 @@
 from flask_avatars import Avatars
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
-from flask_dropzone import Dropzone
 from flask_login import LoginManager, AnonymousUserMixin
 from flask_mail import Mail
 from flask_qiniustorage import Qiniu
