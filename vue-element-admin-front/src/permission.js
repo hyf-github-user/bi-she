@@ -36,10 +36,8 @@ router.beforeEach(async(to, from, next) => {
           // 获取用户信息
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           const { roles } = await store.dispatch('user/getInfo')
-          console.log('roles: ', roles)
           // 根据角色生成可访问路由图
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
-          console.log('accessRoutes: ', accessRoutes)
           // 动态添加可访问路由
           router.addRoutes(accessRoutes)
           // hack方法来确保addRoutes是完整的

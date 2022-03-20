@@ -11,8 +11,8 @@
             <el-button type="warning" icon="el-icon-refresh-left" size="medium" @click="resetForm()">重置</el-button>
           </el-form-item>
         </el-form>
-        <el-button v-permission="['admin','monitor-ip-add']" type="primary" style="margin-bottom:20px" icon="el-icon-plus" size="medium" @click="createIp()">新增</el-button>
-        <el-button v-permission="['admin','monitor-ip-mdel']" type="danger" icon="el-icon-delete" :disabled="multipleSelection.length ? false : true" size="medium" @click="deleteIps(form)">删除</el-button>
+        <el-button v-permission="['admin']" type="primary" style="margin-bottom:20px" icon="el-icon-plus" size="medium" @click="createIp()">新增</el-button>
+        <el-button v-permission="['admin']" type="danger" icon="el-icon-delete" :disabled="multipleSelection.length ? false : true" size="medium" @click="deleteIps(form)">删除</el-button>
       </el-col>
     </el-row>
     <el-row>

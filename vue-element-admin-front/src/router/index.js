@@ -14,11 +14,11 @@ import chartsRouter from './modules/charts'
 // table侧边栏
 import tableRouter from './modules/table'
 // 用户管理侧边栏
-import userRouter from './modules/blog/users'
+import userRouter from './modules/users'
 // 导入通知路由
-import noticeRouter from './modules/blog/notifications'
-// 导入文章路由
-import articleRouter from './modules/blog/post'
+// import noticeRouter from './modules/notifications'
+// // 导入文章路由
+// import articleRouter from './modules/post'
 // 固定的路由
 export const constantRoutes = [
   // 下面都是登录的路由
@@ -174,24 +174,9 @@ export const asyncRoutes = [
       }
     ]
   },
-  // 博客管理
-  {
-    path: '/blog',
-    component: Layout,
-    redirect: 'noRedirect',
-    alwaysShow: true, // will always show the root menu
-    name: 'blog',
-    meta: {
-      title: '博客管理',
-      icon: 'lock',
-      roles: ['editor', 'admin'] // you can set roles in root nav
-    },
-    children: [
-      userRouter, // 用户管理
-      noticeRouter, // 通知路由
-      articleRouter // 文章路由
-    ]
-  },
+  userRouter, // 用户管理
+  // noticeRouter, // 通知路由
+  // articleRouter, // 文章路由
   // 系统监控
   {
     path: '/monitor',

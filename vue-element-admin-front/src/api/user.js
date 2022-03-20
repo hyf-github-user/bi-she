@@ -1,70 +1,55 @@
 import request from '@/utils/request'
 
-export function login(data) {
+// 添加用户信息
+export function addUser(data) {
   return request({
-    url: '/oauth/login/',
+    url: '/blog/users/',
     method: 'post',
     data
   })
 }
 
-export function getInfo(token) {
+// 删除单个用户信息
+export function deleteUser(id) {
   return request({
-    url: '/oauth/info/',
-    method: 'get',
-    params: { token }
+    url: `/blog/users/${id}/`,
+    method: 'delete',
+    params: { id }
   })
 }
 
-export function logout() {
+//  批量删除用户
+export function deleteUsers(ids) {
   return request({
-    url: '/oauth/logout/',
-    method: 'post'
+    url: '/blog/users/',
+    method: 'delete',
+    data: { 'ids': ids }
+  })
+}
+
+// 更新用户信息
+export function updateUser(id, data) {
+  return request({
+    url: `/blog/users/${id}/`,
+    method: 'put',
+    data
   })
 }
 
 // 获取所有用户
-export function getUsers(page, size) {
+export function getUsers(data) {
   return request({
-    url: '/user/UserList',
+    url: '/blog/users/',
     method: 'get',
-    params: { page, size }
+    params: data
   })
 }
 
 // 根据某个id获取用户
 export function getById(id) {
   return request({
-    url: '/user/getById',
-    method: 'get',
-    params: { id }
-  })
-}
-
-// 添加用户信息
-export function addUser(data) {
-  return request({
-    url: '/user/addUser',
-    method: 'post',
-    data
-  })
-}
-
-// 更新用户信息
-export function updateUser(data) {
-  return request({
-    url: '/user/updateUser',
-    method: 'put',
-    data
-  })
-}
-
-// 删除用户信息
-export function deleteUser(id) {
-  return request({
-    url: '/user/deleteUser',
-    method: 'delete',
-    params: { id }
+    url: `/blog/users/${id}/`,
+    method: 'get'
   })
 }
 

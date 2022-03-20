@@ -13,14 +13,14 @@ const articleRouter = {
   children: [
     {
       path: 'ManageArticles',
-      component: () => import('@/views/blog/components/posts/ManageArticles'), // 父路由
+      component: () => import('@/views/posts/ManageArticles'), // 父路由
       name: '管理文章',
       meta: { title: '管理文章', roles: ['admin', 'editor'], icon: 'list' }
     },
     {
       path: 'AddArticle',
       name: '创建文章',
-      component: () => import('@/views/blog/components/posts/AddArticle'),
+      component: () => import('@/views/posts/AddArticle'),
       meta: { title: '创建文章', roles: ['admin', 'editor'], icon: 'el-icon-circle-plus' }
     }
   ]

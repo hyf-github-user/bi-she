@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
@@ -80,7 +80,6 @@ const actions = {
         commit('SET_INTRODUCTION', introduction)
         commit('SET_EMAIL', email)
         commit('SET_MOBILE', mobile)
-        console.log('data: ', username)
         resolve(data)
       }).catch(error => {
         reject(error)

@@ -1,8 +1,4 @@
-<template>
-  <div>
-    <h1>我是文章管理</h1>
-  </div>
-</template>>
+<template />
 
 <script>
 export default {
