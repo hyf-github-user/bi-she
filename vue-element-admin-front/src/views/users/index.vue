@@ -189,7 +189,7 @@ export default {
     return {
       form: {
         page: 1,
-        size: 10,
+        size: 2,
         search: ''
       },
       tableData: [],
@@ -201,6 +201,7 @@ export default {
     }
   },
   created() {
+    // 请求后端获取数据
     this.search()
   },
   methods: {
