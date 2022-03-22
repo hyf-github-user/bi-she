@@ -35,7 +35,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(120), nullable=False)  # 登录名称
     password_hash = db.Column(db.String(120))  # 哈希密码
-    auth = db.Column(db.SmallInteger, default=1)  # 级别(分为1,2,3 三个等级)
+    auth = db.Column(db.SmallInteger, default=2)  # 级别(分为1,2,3 三个等级)
     name = db.Column(db.String(20), nullable=False)  # 真实姓名
     email = db.Column(db.String(254), nullable=False,
                       unique=True, index=True)  # 用户邮箱
@@ -186,9 +186,9 @@ class User(db.Model, UserMixin):
         if not user.check_password(password):  # 密码错误
             return Result.error(message="用户名或密码错误!"), False
         # 用户类别判断
-        scope = 'admin' if user.auth == 4 else \
-            'editor' if user.auth == 3 \
-                else 'user'
+        scope = 'admin' if user.auth == 3 else \
+            'user' if user.auth == 2 \
+                else 'locked'
         return {'uid': user.id, 'scope': scope}, True
 
     # 产生token
@@ -297,7 +297,6 @@ class Role(db.Model):
         roles_permissions_map = {
             'locked': ['FOLLOW', 'COLLECT'],
             'user': ['FOLLOW', 'COLLECT', 'COMMENT', 'UPLOAD'],
-            'editor': ['FOLLOW', 'COLLECT', 'COMMENT', 'UPLOAD', 'MODERATE'],
             'admin': ['FOLLOW', 'COLLECT', 'COMMENT', 'UPLOAD', 'MODERATE', 'ADMINISTER']
         }
         # 遍历权限列表,创建各种身份,四种身份

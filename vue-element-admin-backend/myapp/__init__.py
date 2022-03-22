@@ -112,7 +112,7 @@ def register_commands(app):
         db.create_all()  # 根据模型生成相应的表
         click.echo('初始化权限与角色的数据库...')
         Role.init_role()
-        admin = User.query.filter_by(auth=4).first()  # 首先查询是否存在超级管理员
+        admin = User.query.filter_by(auth=3).first()  # 首先查询是否存在超级管理员
         if admin is not None:
             click.echo('超级管理员账户已存在,正在更新管理员信息....')
             admin.username = username
@@ -138,8 +138,6 @@ def register_commands(app):
     @click.option('--test_username', prompt=True, help='用户名用来登录')
     @click.option('--test_name', prompt=True, help='真实姓名')
     @click.option('--test_email', prompt=True, help='QQ邮箱')
-    @click.option('--test_password', prompt=False, hide_input=True,
-                  confirmation_prompt=True, help='密码用来登录')
     def test(test_username, test_name, test_email):
         """
         测试

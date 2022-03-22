@@ -19,27 +19,17 @@ class user(Scope):
     allow_module = ()  # 允许访问的视图函数
 
 
-class editor(Scope):
-    """
-    协管员
-    """
-    allow_module = ('login', 'get_info', 'logout')  # 允许访问的视图函数
-    # 加上用户的身份权限
-
-    def __init__(self):
-        self + user()
-
-
 class admin(Scope):
     """
     超级管理员
     """
     allow_module = ('UserList', 'getById', 'updateUser',
                     'deleteUser', 'addUser')  # 允许访问的视图函数
+
     # 加上协管员的身份权限
 
     def __init__(self):
-        self + editor()
+        self + user()
 
 
 def is_in_scope(scope, endpoint):
