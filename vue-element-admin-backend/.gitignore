@@ -10,5 +10,5 @@ __pycache__
 .qiniu_pythonsdk_hostscache.json
 # 删除迁移脚本
 migrations
-# 删除密钥
+# 删除密码公钥
 rsa_pubkey

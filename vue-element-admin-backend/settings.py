@@ -24,7 +24,13 @@ class BaseConfig(object):
     JWT_SECRET = "safasfasfas"
     # 配置数据库连接
     # mysql + pymysql://user:password@hostip:port/数据名称
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:hu15879093053@localhost:3306/grad_pro'
+    DATABASE_USER = os.getenv('DATABASE_USER', 'root')
+    DATABASE_PWD = os.getenv('DATABASE_PWD', 'hu15879093053')
+    DATABASE_NAME = os.getenv('DATABASE_NAME', 'grad_pro')
+    DATABASE_HOST = os.getenv('DATABASE_HOST', '127.0.0.1')
+    DATABASE_PORT = os.getenv('DATABASE_PORT', '3306')
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{}:{}@{}:{}/{}'.format(DATABASE_USER, DATABASE_PWD, DATABASE_HOST,
+                                                                      DATABASE_PORT, DATABASE_NAME)
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # True时会追踪对象修改并且发送信号,需要额外的内存
     ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', '1348977728@qq.com')
     # 配置邮箱
@@ -69,6 +75,9 @@ class BaseConfig(object):
     BLUELOG_USER_PER_PAGE = 3
     # 用户通知的分页数
     BLUELOG_NOTIFICATION_PER_PAGE = 3
+    # 创建rsa的公钥保存文件夹
+    if not os.path.exists(RAS_PATH):
+        os.makedirs(RAS_PATH)
 
 
 # 俩种配置
