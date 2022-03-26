@@ -2,7 +2,7 @@
 # coding:utf-8
 from io import BytesIO
 
-from flask import Blueprint, flash, redirect, url_for, render_template, make_response
+from flask import Blueprint, flash, redirect, url_for, render_template, make_response, current_app
 from flask_login import current_user, login_required, login_user, logout_user, login_fresh, confirm_login
 
 from exts import db
@@ -56,6 +56,15 @@ def register():
         username = form.username.data
         password = form.password.data
         user = User(username=username, name=name, email=email)
+        if email == current_app.config['ADMIN_EMAIL']:
+            user = User(
+                username=username,
+                auth=4,
+                name=name,
+                email=current_app.config['ADMIN_EMAIL'],
+                confirmed=True,
+                active=True
+            )
         # 设置rsa与hash密码
         user.set_password(password=password)
         # 提交到数据库

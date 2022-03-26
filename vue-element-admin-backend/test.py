@@ -25,3 +25,6 @@ def upload_qiniu(filestorage):
         url = 'http://huyinfu.shop/' + filename
         return url
     return None
+
+import sys
+sys.executable()
