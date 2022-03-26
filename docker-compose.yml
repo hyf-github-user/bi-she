@@ -1,0 +1,113 @@
+version: "2"
+services:
+  # 博客前后台采用的数据库
+  blog-mysql:
+    image: mysql/mysql-server:latest
+    container_name: blog-mysql
+    #使用该参数，container内的root拥有真正的root权限，否则，container内的root只是外部的一个普通用户权限
+    #设置为true，不然数据卷可能挂载不了，启动不起
+    privileged: true
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root" #输入自己的密码
+      MYSQL_DATABASE: "grad_pro"
+      TZ: Asia/Shanghai
+    # expose暴露给其它容器
+    expose:
+      - "3306"
+    command:
+      --wait_timeout=31536000
+      --interactive_timeout=31536000
+      --max_connections=1000
+      --default-authentication-plugin=mysql_native_password
+    volumes:
+      - "./mysql/data:/var/lib/mysql"
+      - "./mysql/conf/my.cnf:/etc/mysql/my.cnf"
+      - "./mysql/logs:/logs"
+    restart: always
+    networks:
+      - blog_net
+
+  # 博客后台使用的数据库
+  blog-redis:
+    image: redis:latest
+    container_name: blog-redis
+    ports:
+      - "6380:6379"
+    # expose暴露给其它容器
+    expose:
+      - "6379"
+    restart: always
+    volumes:
+      - "./redis/data:/data"
+      - "./redis/conf/redis.conf:/etc/redis/redis.conf"
+    command: redis-server /etc/redis/redis.conf
+    networks:
+      - blog_net
+  # 博客后台的前端(纯Vue)
+  blog-nginx:
+    container_name: blog-nginx
+    ports:
+      - "80:80"
+    build: ./nginx
+    depends_on:
+      - blog-backed-django
+      - blog-front
+    restart: always
+    volumes:
+      - "./nginx/logs:/var/log/nginx"
+      - "./nginx/my.conf:/etc/nginx/conf.d/my.conf"
+    networks:
+      - blog_net
+  
+  # 博客前台环境(纯Flask)
+  blog-front:
+    container_name: blog-front
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_USER: "root"
+      DATABASE_PWD: "root"
+      DATABASE_NAME: "grad_pro"
+      DATABASE_HOST: "blog-mysql"
+      DATABASE_PORT: 3306
+    build: ./vue-element-admin-backend
+    depends_on:
+      - blog-mysql
+    links:
+      - blog-mysql
+    restart: always
+    # 运行flask项目
+    command: python3 app.py runserver -h 0.0.0.0 -p 5000
+    networks:
+      - blog_net
+  # 博客后台管理的后端(DRF框架)
+  blog-backed-django:
+    container_name: blog-backed-django
+    ports:
+      - "8000:8000"
+    build: ./drf_vue_element_admin
+    # 添加数据库密码
+    environment:
+      DATABASE_USER: "root"
+      DATABASE_PWD: "root"
+      DATABASE_NAME: "grad_pro"
+      DATABASE_HOST: "blog-mysql"
+      DATABASE_PORT: 3306
+      TZ: Asia/Shanghai
+      REDIS_PWD: ''
+      REDIS_HOST: "blog-redis"
+      REDIS_PORT: 6379
+    # 运行django项目
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - blog-mysql
+      - blog-redis
+    restart: always
+    networks:
+      - blog_net
+  
+networks:
+  blog_net:
+    driver: bridge

@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class InformationConfig(AppConfig):
-    name = 'information'
+    name = 'drf_vue_element_admin.myapps.information'

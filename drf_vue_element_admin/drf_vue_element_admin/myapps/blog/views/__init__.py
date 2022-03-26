@@ -3,6 +3,8 @@
 # 文件名  :__init__.py.py
 # 时间    :2022/3/18 17:20
 from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from drf_vue_element_admin.myapps.blog.models import Post, Comment, User, Permission, Link, Category, Notification, Role
@@ -72,3 +74,18 @@ class NotificationViewSet(ModelViewSet):
     # 提供根据通知接收者的username进行查找
     filter_backends = (SearchFilter,)
     search_fields = ('receiver.username',)
+
+
+class TransactionView(APIView):
+
+    def get(self, request):
+        # 获取通知总数
+        notifications = Notification.objects.all().count()
+        # 获取评论总数
+        comments = Comment.objects.all().count()
+        # 获取用户总数
+        users = User.objects.all().count()
+        # 获取文章总数
+        posts = Post.objects.all().count()
+
+        return Response(data={'notifications': notifications, 'comments': comments, 'users': users, 'posts': posts})

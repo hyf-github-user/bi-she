@@ -10,7 +10,7 @@ export function searchUser(name) {
 
 export function transactionList(query) {
   return request({
-    url: '/data/transaction/list',
+    url: '/blog/transaction/list/',
     method: 'get',
     params: query
   })

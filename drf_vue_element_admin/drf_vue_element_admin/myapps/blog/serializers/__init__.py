@@ -76,6 +76,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User  # 指定的模型类
         fields = '__all__'
 
+
 class NotificationSerializer(serializers.ModelSerializer):
     """
     前台通知的序列化器
@@ -84,3 +85,7 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification  # 指定的模型类
         fields = '__all__'
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    pass

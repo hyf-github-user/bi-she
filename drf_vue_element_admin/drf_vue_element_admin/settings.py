@@ -28,7 +28,7 @@ SECRET_KEY = 'slw4%)p$p0sej-8_p^_26(!4!y$_rh3dbh4!kxi)fhkq@t2x=m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -97,16 +97,21 @@ ASGI_APPLICATION = 'drf_vue_element_admin.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+DATABASE_USER = os.getenv('DATABASE_USER', 'root')
+DATABASE_PWD = os.getenv('DATABASE_PWD', 'hu15879093053')
+DATABASE_NAME = os.getenv('DATABASE_NAME', 'grad_pro')
+DATABASE_HOST = os.getenv('DATABASE_HOST', '127.0.0.1')
+DATABASE_PORT = os.getenv('DATABASE_PORT', '3306')
 
 DATABASES = {
     # 配置mysql数据库
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'grad_pro',  # 数据库库名（需提前创建好数据库）
-        'USER': 'root',  # 用户名
-        'PASSWORD': 'hu15879093053',  # 连接密码
-        'HOST': '127.0.0.1',  # 主机
-        'PORT': '3306',  # mysql端口
+        'NAME': DATABASE_NAME,  # 数据库库名（需提前创建好数据库）
+        'USER': DATABASE_USER,  # 用户名
+        'PASSWORD': DATABASE_PWD,  # 连接密码
+        'HOST': DATABASE_HOST,  # 主机
+        'PORT': DATABASE_PORT,  # mysql端口
     }
 }
 

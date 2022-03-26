@@ -25,9 +25,9 @@ REDIS_PWD = os.getenv('REDIS_PWD', '******')
 # 迁移生成数据库模型
 python manage.py makemigrations oauth monitor information
 # 数据库模型迁移同步到数据库
-python manage.py createsuperuser 
-# 创建超级用户用于管理系统登录
 python manage.py migrate
+# 创建超级用户用于管理系统登录
+python manage.py createsuperuser 
 # 运行后端接口服务,必须是在8000端口
 python manage.py runserver 127.0.0.1:8000
 ```
