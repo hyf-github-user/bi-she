@@ -91,6 +91,10 @@
               prop="auth"
             />
             <el-table-column
+              label="角色信息"
+              prop="role"
+            />
+            <el-table-column
               label="个人网站"
               prop="website"
             />
@@ -108,11 +112,6 @@
               label="锁定状态"
               prop="locked"
               :formatter="formatter3"
-            />
-            <el-table-column
-              label="身份信息"
-              prop="role"
-              :formatter="formatter4"
             />
             <el-table-column
               label="收藏通知"
@@ -215,12 +214,6 @@ export default {
     // 锁定格式化
     formatter3(row) {
       return row.locked ? '已锁定' : '未锁定'
-    },
-    // 身份信息格式化
-    formatter4(row) {
-      return row.role === 1 ? '锁定用户'
-        : (row.role === 2 ? '普通用户'
-          : (row.role === 3 ? '协管员' : '管理员'))
     },
     // 格式化收藏通知
     formatter5(row) {

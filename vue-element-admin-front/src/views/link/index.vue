@@ -40,7 +40,7 @@
       <el-col>
         <el-card class="box-card">
           <div slot="header" class="clearfix">
-            <span>评论列表</span>
+            <span>链接列表</span>
           </div>
           <el-table
             ref="multipleTable"
@@ -54,7 +54,7 @@
               type="selection"
             />
             <el-table-column
-              label="发表日期"
+              label="创建日期"
               prop="timestamp"
               sortable
             >
@@ -72,49 +72,21 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="作者名"
-              prop="author"
+              label="链接名称"
+              prop="name"
             >
               <template slot-scope="scope">
-                <el-popover trigger="hover" placement="top">
-                  <p>姓名: {{ scope.row.author.name }}</p>
-                  <p>邮箱: {{ scope.row.author.email }}</p>
-                  <p>RSA私钥: {{ scope.row.author.rsa_password }}</p>
-                  <div slot="reference" class="name-wrapper">
-                    <el-tag size="medium">{{ scope.row.author.username }}</el-tag>
-                  </div>
-                </el-popover>
+                <span style="margin-left: 10px">{{ scope.row.name }}</span>
               </template>
             </el-table-column>
             <el-table-column
-              label="评论内容"
-              prop="body"
+              label="链接地址"
+              prop="url"
             >
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.body }}</span>
+                <span style="margin-left: 10px">{{ scope.row.url }}</span>
               </template>
             </el-table-column>
-            <el-table-column
-              label="审核"
-              prop="reviewed"
-              :formatter="formatter"
-            />
-            <el-table-column
-              label="举报次数"
-              prop="flag"
-            />
-            <!--            <el-table-column-->
-            <!--              label="回复评论"-->
-            <!--              prop="replied"-->
-            <!--            >-->
-            <!--              <template v-show="scope.row.replied" slot-scope="scope">-->
-            <!--                <el-popover trigger="hover" placement="top">-->
-            <!--                  <p>回复的人: {{ scope.row.replied.author.username }}</p>-->
-            <!--                  <p>回复的内容: {{ scope.row.replied.body }}</p>-->
-            <!--                </el-popover>-->
-            <!--              </template>-->
-            <!--            </el-table-column>-->
-
             <el-table-column
               fixed="right"
               align="center"

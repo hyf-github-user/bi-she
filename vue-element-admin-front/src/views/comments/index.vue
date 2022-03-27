@@ -76,14 +76,15 @@
               prop="author"
             >
               <template slot-scope="scope">
-                <el-popover trigger="hover" placement="top">
-                  <p>姓名: {{ scope.row.author.name }}</p>
-                  <p>邮箱: {{ scope.row.author.email }}</p>
-                  <p>RSA私钥: {{ scope.row.author.rsa_password }}</p>
-                  <div slot="reference" class="name-wrapper">
-                    <el-tag size="medium">{{ scope.row.author.username }}</el-tag>
-                  </div>
-                </el-popover>
+                <span style="margin-left: 10px">{{ scope.row.author }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="文章标题"
+              prop="post"
+            >
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.post }}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -94,6 +95,7 @@
                 <span style="margin-left: 10px">{{ scope.row.body }}</span>
               </template>
             </el-table-column>
+
             <el-table-column
               label="审核"
               prop="reviewed"

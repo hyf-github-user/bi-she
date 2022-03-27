@@ -8,7 +8,7 @@ export default {
   components: { elFrame },
   data() {
     return {
-      ManagementApi: process.env.VUE_APP_BASE_API + '/admin/'
+      ManagementApi: process.env.VUE_APP_BASE_API + '/oauth/register/'
     }
   }
 }

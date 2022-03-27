@@ -8,9 +8,9 @@
           </div>
           <div>
             <el-form ref="form" :rules="rules" :model="form" label-width="80px">
-              <el-form-item label="姓名" prop="name">
-                <el-input v-model="form.name" style="width: 40%" />
-                <span style="color: #C0C0C0;margin-left: 10px;">用户真实姓名或昵称</span>
+              <el-form-item label="姓名" prop="username">
+                <el-input v-model="form.username" style="width: 40%" />
+                <span style="color: #C0C0C0;margin-left: 10px;">登录账号</span>
               </el-form-item>
               <el-form-item label="手机号" prop="mobile">
                 <el-input v-model="form.mobile" style="width: 40%" />
@@ -45,7 +45,7 @@ export default {
       },
       form: { },
       rules: {
-        name: [
+        username: [
           { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
         email: [
@@ -60,14 +60,14 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'name',
+      'username',
       'avatar',
       'mobile',
       'email'
     ])
   },
   created() {
-    this.form = { name: this.name, mobile: this.mobile, email: this.email }
+    this.form = { username: this.username, mobile: this.mobile, email: this.email }
     // store.dispatch('user/getInfo').then(() => {})
     // console.log(this.form)
   },

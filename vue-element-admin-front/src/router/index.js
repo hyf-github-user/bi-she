@@ -195,18 +195,17 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'swagger',
-        component: () => import('@/views/tool/swagger'),
-        name: 'tool-swagger',
-        meta: { roles: ['admin'], title: '系统接口', icon: 'documentation', noCache: true }
-      },
-      {
         path: 'management',
         component: () => import('@/views/tool/backend_manage'),
         name: 'tool-manage',
         meta: { roles: ['admin'], title: '后台管理', icon: 'el-icon-s-operation', noCache: true }
+      },
+      {
+        path: 'swagger',
+        component: () => import('@/views/tool/swagger'),
+        name: 'tool-swagger',
+        meta: { roles: ['admin'], title: '系统接口', icon: 'documentation', noCache: true }
       }
-
     ]
   },
   // 404 page must be placed at the end !!!

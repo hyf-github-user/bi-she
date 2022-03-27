@@ -7,7 +7,6 @@ const getters = {
   cachedViews: state => state.tagsView.cachedViews,
   token: state => state.user.token,
   avatar: state => state.user.avatar,
-  name: state => state.user.name,
   username: state => state.user.username,
   email: state => state.user.email,
   mobile: state => state.user.mobile,

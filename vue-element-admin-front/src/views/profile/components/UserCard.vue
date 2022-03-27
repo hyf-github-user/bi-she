@@ -19,7 +19,6 @@
       </div>
       <ul class="user-info">
         <li><div style="height: 100%"><svg-icon icon-class="login" /> 登录账号<div class="user-right">{{ username }}</div></div></li>
-        <li><svg-icon icon-class="user1" /> 用户姓名 <div class="user-right">{{ name }}</div></li>
         <li><svg-icon icon-class="phone" /> 手机号码 <div class="user-right">{{ mobile }}</div></li>
         <li><svg-icon icon-class="email" /> 用户邮箱 <div class="user-right">{{ email }}</div></li>
         <li>

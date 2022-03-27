@@ -20,16 +20,16 @@
         <el-input v-model="ruleForm.website" />
       </el-form-item>
 
-      <el-form-item label="邮箱" prop="auth">
+      <el-form-item label="邮箱" prop="email">
         <el-input v-model="ruleForm.email" />
       </el-form-item>
 
-      <el-form-item label="登录密码" prop="rsa_password_hash">
+      <el-form-item label="登录密码" readonly>
         <el-input v-model="ruleForm.rsa_password" readonly />
       </el-form-item>
 
-      <el-form-item label="身份信息" prop="role_id">
-        <el-radio-group v-model="ruleForm.role.id">
+      <el-form-item label="身份信息" prop="role">
+        <el-radio-group v-model="ruleForm.role">
           <el-radio :label="1">锁定用户</el-radio>
           <el-radio :label="2">普通用户</el-radio>
           <el-radio :label="3">管理员</el-radio>
@@ -48,7 +48,7 @@
 
       <el-form-item label="锁定状态" prop="locked">
         <el-radio v-model="ruleForm.locked" :label="1">已锁定</el-radio>
-        <el-radio v-model="ruleForm.locked" :label="0" :disabled="ruleForm.role.id==1">未锁定</el-radio>
+        <el-radio v-model="ruleForm.locked" :label="0" :disabled="ruleForm.role==1">未锁定</el-radio>
       </el-form-item>
 
       <el-form-item label="收藏通知" prop="receive_collect_notification">
@@ -56,17 +56,17 @@
         <el-radio v-model="ruleForm.receive_collect_notification" :label="0">未接收</el-radio>
       </el-form-item>
 
-      <el-form-item label="评论通知" prop="confirmed">
+      <el-form-item label="评论通知" prop="receive_comment_notification">
         <el-radio v-model="ruleForm.receive_comment_notification" :label="1">接收</el-radio>
         <el-radio v-model="ruleForm.receive_comment_notification" :label="0">未接收</el-radio>
       </el-form-item>
 
-      <el-form-item label="关注通知" prop="confirmed">
+      <el-form-item label="关注通知" prop="receive_follow_notification">
         <el-radio v-model="ruleForm.receive_follow_notification" :label="1">接收</el-radio>
         <el-radio v-model="ruleForm.receive_follow_notification" :label="0">未接收</el-radio>
       </el-form-item>
 
-      <el-form-item label="收藏隐私" prop="confirmed">
+      <el-form-item label="收藏隐私" prop="public_collections">
         <el-radio v-model="ruleForm.public_collections" :label="1">公开</el-radio>
         <el-radio v-model="ruleForm.public_collections" :label="0">未公开</el-radio>
       </el-form-item>
@@ -102,11 +102,7 @@ export default {
         name: '',
         rsa_password: '',
         email: '',
-        role: {
-          id: '',
-          description: '',
-          name: ''
-        },
+        role: '',
         active: '',
         confirmed: '',
         locked: '',
@@ -149,9 +145,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.curId) {
-            if (!this.ruleForm.department) {
-              this.ruleForm.department = null
-            }
+            console.log(this.ruleForm)
             updateUser(this.curId, this.ruleForm).then(res => {
               this.$message({
                 message: '修改成功',

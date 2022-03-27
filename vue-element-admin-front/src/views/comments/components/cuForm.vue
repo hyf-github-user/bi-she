@@ -1,75 +1,28 @@
 <template>
   <el-dialog :visible.sync="dialogVisible" :title="curId ? '编辑评论' : '新增评论列表'" width="700px" :before-close="close">
     <el-form ref="ruleForm" label-position="left  " :model="ruleForm" status-icon :rules="rules" label-width="100px" class="demo-ruleForm">
-      <el-form-item label="注册时间">
-        <el-input v-model="ruleForm.register_time" readonly />
+      <el-form-item label="发表时间">
+        <el-input v-model="ruleForm.timestamp" readonly />
       </el-form-item>
 
-      <el-form-item label="用户ID">
+      <el-form-item label="评论ID" readonly>
         <el-input v-model="ruleForm.id" readonly />
       </el-form-item>
 
-      <el-form-item label="登录名" prop="username">
-        <el-input v-model="ruleForm.username" />
+      <el-form-item label="作者名" prop="author" readonly>
+        <el-input v-model="ruleForm.author" readonly />
       </el-form-item>
 
-      <el-form-item label="用户名" prop="name">
-        <el-input v-model="ruleForm.name" />
+      <el-form-item label="审核" prop="reviewed">
+        <el-radio v-model="ruleForm.reviewed" :label="1">通过</el-radio>
+        <el-radio v-model="ruleForm.reviewed" :label="0">未通过</el-radio>
       </el-form-item>
-      <el-form-item label="个人网站" prop="website">
-        <el-input v-model="ruleForm.website" />
-      </el-form-item>
-
-      <el-form-item label="邮箱" prop="auth">
-        <el-input v-model="ruleForm.email" />
+      <el-form-item label="举报次数" prop="flag" readonly>
+        <el-input v-model="ruleForm.flag" readonly />
       </el-form-item>
 
-      <el-form-item label="登录密码" prop="rsa_password_hash">
-        <el-input v-model="ruleForm.rsa_password" readonly />
-      </el-form-item>
-
-      <el-form-item label="身份信息" prop="role_id">
-        <el-radio-group v-model="ruleForm.role">
-          <el-radio :label="1">锁定用户</el-radio>
-          <el-radio :label="2">普通用户</el-radio>
-          <el-radio :label="3">协管员</el-radio>
-          <el-radio :label="4">管理员</el-radio>
-        </el-radio-group>
-      </el-form-item>
-
-      <el-form-item label="激活状态" prop="active">
-        <el-radio v-model="ruleForm.active" :label="1">已激活</el-radio>
-        <el-radio v-model="ruleForm.active" :label="0">未激活</el-radio>
-      </el-form-item>
-
-      <el-form-item label="确认状态" prop="confirmed">
-        <el-radio v-model="ruleForm.confirmed" :label="1">已确认</el-radio>
-        <el-radio v-model="ruleForm.confirmed" :label="0">未确认</el-radio>
-      </el-form-item>
-
-      <el-form-item label="锁定状态" prop="locked">
-        <el-radio v-model="ruleForm.locked" :label="1">已锁定</el-radio>
-        <el-radio v-model="ruleForm.locked" :label="0" :disabled="ruleForm.role==1">未锁定</el-radio>
-      </el-form-item>
-
-      <el-form-item label="收藏通知" prop="receive_collect_notification">
-        <el-radio v-model="ruleForm.receive_collect_notification" :label="1">接收</el-radio>
-        <el-radio v-model="ruleForm.receive_collect_notification" :label="0">未接收</el-radio>
-      </el-form-item>
-
-      <el-form-item label="评论通知" prop="confirmed">
-        <el-radio v-model="ruleForm.receive_comment_notification" :label="1">接收</el-radio>
-        <el-radio v-model="ruleForm.receive_comment_notification" :label="0">未接收</el-radio>
-      </el-form-item>
-
-      <el-form-item label="关注通知" prop="confirmed">
-        <el-radio v-model="ruleForm.receive_follow_notification" :label="1">接收</el-radio>
-        <el-radio v-model="ruleForm.receive_follow_notification" :label="0">未接收</el-radio>
-      </el-form-item>
-
-      <el-form-item label="收藏隐私" prop="confirmed">
-        <el-radio v-model="ruleForm.public_collections" :label="1">公开</el-radio>
-        <el-radio v-model="ruleForm.public_collections" :label="0">未公开</el-radio>
+      <el-form-item label="评论内容" prop="body">
+        <el-input v-model="ruleForm.body" />
       </el-form-item>
 
       <el-form-item>
@@ -80,7 +33,7 @@
   </el-dialog>
 </template>
 <script>
-import { getById, addUser, updateUser } from '@/api/user'
+import { getById, addComment, updateComment } from '@/api/comment'
 export default {
   name: 'CuForm',
   props: {
@@ -98,20 +51,11 @@ export default {
     return {
       ruleForm: {
         id: '',
-        register_time: '',
-        username: '',
-        name: '',
-        rsa_password: '',
-        email: '',
-        role_id: '',
-        active: '',
-        confirmed: '',
-        locked: '',
-        website: '',
-        receive_collect_notification: '',
-        receive_comment_notification: '',
-        receive_follow_notification: '',
-        public_collections: ''
+        timestamp: '',
+        author: '',
+        reviewed: '',
+        flag: '',
+        body: ''
       },
       rules: {
         username: [
@@ -149,7 +93,7 @@ export default {
             if (!this.ruleForm.department) {
               this.ruleForm.department = null
             }
-            updateUser(this.curId, this.ruleForm).then(res => {
+            updateComment(this.curId, this.ruleForm).then(res => {
               this.$message({
                 message: '修改成功',
                 type: 'success'
@@ -157,7 +101,7 @@ export default {
               this.search()
             })
           } else {
-            addUser(this.ruleForm).then(res => {
+            addComment(this.ruleForm).then(res => {
               this.$message({
                 message: '新增成功',
                 type: 'success'
