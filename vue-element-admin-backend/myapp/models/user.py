@@ -284,6 +284,7 @@ class Role(db.Model):
     name = db.Column(db.String(30), unique=True,
                      nullable=False, default="user")  # 身份描述(四种)
     description = db.Column(db.String(255))  # 身份描述
+    timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
     # 关系属性
     # 一对多的关系属性 身份与用户是一对多模型
     users = db.relationship('User', back_populates='role')
@@ -322,6 +323,7 @@ class Permission(db.Model):
     __tablename__ = "permission"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30), unique=True)  # 存储权限功能说明
+    timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
     roles = db.relationship(
         'Role', secondary=roles_permissions, back_populates='permissions')  # 多对多的模型联系
 
@@ -424,6 +426,7 @@ class Link(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30))
     url = db.Column(db.String(255))
+    timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
 
 
 class Notification(db.Model):
