@@ -58,26 +58,3 @@ class RbacPermission(BasePermission):
             if 'admin' in request.user.roles.values_list('name', flat=True):
                 return True
         # RBAC权限验证
-        # Step 1 验证redis中是否存储权限数据
-        request_method = request.method
-        # Step 2 判断请求路径是否在权限控制中
-        url_keys = conn.hkeys('user_permissions_manage')
-        for url_key in url_keys:
-            if re.match(settings.REGEX_URL.format(url=self.pro_uri(url_key.decode())), request_url):
-                redis_key = url_key.decode()
-                break
-        else:
-            return True
-        # Step 3 redis权限验证
-        permissions = json.loads(conn.hget('user_permissions_manage', redis_key).decode())
-        method_hit = False  # 同一接口配置不同权限验证
-        for permission in permissions:
-            if permission.get('method') == request_method:
-                method_hit = True
-                if permission.get('sign') in user_permissions:
-                    return True
-        else:
-            if method_hit:
-                return False
-            else:
-                return True

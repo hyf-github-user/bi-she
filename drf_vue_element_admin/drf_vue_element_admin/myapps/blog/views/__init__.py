@@ -2,6 +2,7 @@
 # 作者：我只是代码的搬运工
 # 文件名  :__init__.py.py
 # 时间    :2022/3/18 17:20
+from django_redis import get_redis_connection
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -76,7 +77,7 @@ class NotificationViewSet(ModelViewSet):
     search_fields = ('receiver.username',)
 
 
-class TransactionView(APIView):
+class BlogDataView(APIView):
 
     def get(self, request):
         # 获取通知总数
@@ -88,4 +89,9 @@ class TransactionView(APIView):
         # 获取文章总数
         posts = Post.objects.all().count()
 
-        return Response(data={'notifications': notifications, 'comments': comments, 'users': users, 'posts': posts})
+        # 流量
+        conn = get_redis_connection('user_info')
+        visits = conn.get('visits')
+
+        return Response(data={'notifications': notifications, 'comments': comments, 'users': users, 'posts': posts,
+                              'visits': visits})

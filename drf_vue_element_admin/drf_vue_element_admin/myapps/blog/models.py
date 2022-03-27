@@ -1,12 +1,15 @@
 from django.db import models
 
-
 # Create your models here.
+from django.utils import timezone
 
 
 class Category(models.Model):
     name = models.CharField(unique=True, max_length=64, blank=True, null=True)
     timestamp = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'category'
@@ -17,6 +20,9 @@ class Collect(models.Model):
     collector = models.OneToOneField('User', models.DO_NOTHING, primary_key=True)
     collected = models.OneToOneField('Post', models.DO_NOTHING)
     timestamp = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.collector.username + "收藏了" + self.collected.title
 
     class Meta:
         db_table = 'collect'
@@ -33,6 +39,9 @@ class Comment(models.Model):
     reviewed = models.IntegerField(blank=True, null=True)
     replied = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
 
+    def __str__(self):
+        return self.author.username + "的评论"
+
     class Meta:
         db_table = 'comment'
         ordering = ['id']
@@ -42,6 +51,9 @@ class Follow(models.Model):
     follower = models.OneToOneField('User', models.DO_NOTHING, primary_key=True, related_name="follower")
     followed = models.OneToOneField('User', models.DO_NOTHING, related_name='followed')
     timestamp = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.follower.username + "关注了" + self.followed.username
 
     class Meta:
         db_table = 'follow'
@@ -53,6 +65,9 @@ class Link(models.Model):
     name = models.CharField(max_length=30, blank=True, null=True)
     url = models.CharField(max_length=255, blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'link'
         ordering = ['id']
@@ -60,9 +75,12 @@ class Link(models.Model):
 
 class Notification(models.Model):
     message = models.TextField()
-    is_read = models.IntegerField(blank=True, null=True)
-    timestamp = models.DateTimeField(blank=True, null=True)
-    receiver = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
+    is_read = models.IntegerField(blank=True, default=0)
+    timestamp = models.DateTimeField(blank=True, null=True, default=timezone.now)
+    receiver = models.ForeignKey('User', models.DO_NOTHING, blank=True)
+
+    def __str__(self):
+        return self.message
 
     class Meta:
         db_table = 'notification'
@@ -72,21 +90,27 @@ class Notification(models.Model):
 class Permission(models.Model):
     name = models.CharField(unique=True, max_length=30, blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'permission'
         ordering = ['id']
 
 
 class Post(models.Model):
-    title = models.CharField(max_length=255, blank=True, null=True)
-    body = models.TextField(blank=True, null=True)
-    timestamp = models.DateTimeField(blank=True, null=True)
-    can_comment = models.IntegerField(blank=True, null=True)
-    auth = models.CharField(max_length=255, blank=True, null=True)
-    status = models.CharField(max_length=255, blank=True, null=True)
-    flag = models.IntegerField(blank=True, null=True)
-    category = models.ForeignKey(Category, models.DO_NOTHING, blank=True, null=True)
-    author = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True)
+    body = models.TextField(blank=True)
+    timestamp = models.DateTimeField(blank=True, null=True, default=timezone.now)
+    can_comment = models.IntegerField(blank=True, null=True, default=1)
+    importance = models.IntegerField(blank=True, null=True, default=1)
+    status = models.CharField(max_length=255, blank=True, null=True, default="draft")
+    flag = models.IntegerField(blank=True, null=True, default=0)
+    category = models.ForeignKey(Category, models.DO_NOTHING, blank=True)
+    author = models.ForeignKey('User', models.DO_NOTHING, blank=True)
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         db_table = 'post'
@@ -97,6 +121,9 @@ class Role(models.Model):
     name = models.CharField(unique=True, max_length=30)
     description = models.CharField(max_length=255, blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'role'
         ordering = ['id']
@@ -105,6 +132,9 @@ class Role(models.Model):
 class RolesPermissions(models.Model):
     role = models.OneToOneField('Role', models.DO_NOTHING, primary_key=True)
     permission = models.OneToOneField('Permission', models.DO_NOTHING)
+
+    def __str__(self):
+        return self.role.name + "的权限: " + self.permission.name
 
     class Meta:
         db_table = 'roles_permissions'
@@ -134,6 +164,9 @@ class User(models.Model):
     receive_follow_notification = models.IntegerField(blank=True, null=True)
     receive_collect_notification = models.IntegerField(blank=True, null=True)
     public_collections = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.username
 
     class Meta:
         db_table = 'user'

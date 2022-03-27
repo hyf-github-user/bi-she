@@ -2,10 +2,10 @@ from django.urls import path
 from rest_framework import routers
 
 from drf_vue_element_admin.myapps.blog.views import UserViewSet, RoleViewSet, PostViewSet, PermissionViewSet, \
-    LinkViewSet, CommentViewSet, CategoryViewSet, NotificationViewSet, TransactionView
+    LinkViewSet, CommentViewSet, CategoryViewSet, NotificationViewSet, BlogDataView
 
 urlpatterns = [
-    path('transaction/list/', TransactionView.as_view())
+    path('data/', BlogDataView.as_view())
 ]
 router = routers.DefaultRouter()
 # 注册用户视图

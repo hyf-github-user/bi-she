@@ -17,6 +17,7 @@ class Users(AbstractUser):
     """
     继承django的系统user
     """
+
     name = models.CharField(max_length=20, default='', blank=True, verbose_name='真实姓名')
     mobile = models.CharField(max_length=11, unique=True, null=True, blank=True, default=None, verbose_name='手机号码')
     image = models.ImageField(upload_to='avatar/%Y/%m', default='avatar/default.png', blank=True, verbose_name='头像')
@@ -53,6 +54,15 @@ class Users(AbstractUser):
         }
         return user_info
 
+    # def set_password(self, raw_password):
+    #     """
+    #     重写设置密码的功能
+    #     :param raw_password:
+    #     :return:
+    #     """
+    #     print("你输入的密码是: ", raw_password)
+    #     self.set_password(raw_password)
+
 
 class Permissions(BaseModel):
     """
@@ -67,11 +77,7 @@ class Permissions(BaseModel):
     )
 
     name = models.CharField(max_length=30, verbose_name='权限名')
-    sign = models.CharField(max_length=30, unique=True, verbose_name='权限标识')
-    menu = models.BooleanField(verbose_name='是否为菜单')  # True为菜单,False为接口
     method = models.CharField(max_length=8, blank=True, default='', choices=method_choices, verbose_name='方法')
-    path = models.CharField(max_length=200, blank=True, default='', verbose_name='请求路径正则')
-    pid = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, verbose_name='父权限')
     desc = models.CharField(max_length=30, blank=True, default='', verbose_name='权限描述')
 
     def __str__(self):

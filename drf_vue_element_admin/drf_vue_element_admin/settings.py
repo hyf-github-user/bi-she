@@ -61,7 +61,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 获取用户系统信息与浏览器信息
     'django_user_agents.middleware.UserAgentMiddleware',
     # IP黑名单校验
@@ -112,6 +112,9 @@ DATABASES = {
         'PASSWORD': DATABASE_PWD,  # 连接密码
         'HOST': DATABASE_HOST,  # 主机
         'PORT': DATABASE_PORT,  # mysql端口
+        'OPTIONS': {
+            "init_command": "SET foreign_key_checks = 0;",
+        }
     }
 }
 
@@ -199,7 +202,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # 去掉默认Logo或换成自己Logo链接
-SIMPLEUI_LOGO = 'http://huyinfu.shop/code-wallpaper-8.jpg'
+# SIMPLEUI_LOGO = 'http://huyinfu.shop/code-wallpaper-8.jpg'
 # simpleui配置项
 SIMPLEUI_HOME_INFO = False  # 设置admin站点不显示simpleui的git页
 
@@ -303,5 +306,8 @@ CORS_ALLOW_HEADERS = (
     'x-token',
     'X-Token',
 )
+# 添加可以响应的iframe子页面
+# X_FRAME_OPTIONS = 'ALLOW-FROM http://localhost:9527/'
+
 # 自动添加主键
 DEFAULT_AUTO_FIELD = 'django.db.test_model.AutoField'
