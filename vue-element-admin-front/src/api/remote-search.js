@@ -8,9 +8,9 @@ export function searchUser(name) {
   })
 }
 
-export function transactionList(query) {
+export function blogData(query) {
   return request({
-    url: '/blog/transaction/list/',
+    url: '/blog/data/',
     method: 'get',
     params: query
   })

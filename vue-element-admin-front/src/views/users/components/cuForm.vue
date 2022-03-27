@@ -29,11 +29,10 @@
       </el-form-item>
 
       <el-form-item label="身份信息" prop="role_id">
-        <el-radio-group v-model="ruleForm.role">
+        <el-radio-group v-model="ruleForm.role.id">
           <el-radio :label="1">锁定用户</el-radio>
           <el-radio :label="2">普通用户</el-radio>
-          <el-radio :label="3">协管员</el-radio>
-          <el-radio :label="4">管理员</el-radio>
+          <el-radio :label="3">管理员</el-radio>
         </el-radio-group>
       </el-form-item>
 
@@ -49,7 +48,7 @@
 
       <el-form-item label="锁定状态" prop="locked">
         <el-radio v-model="ruleForm.locked" :label="1">已锁定</el-radio>
-        <el-radio v-model="ruleForm.locked" :label="0" :disabled="ruleForm.role==1">未锁定</el-radio>
+        <el-radio v-model="ruleForm.locked" :label="0" :disabled="ruleForm.role.id==1">未锁定</el-radio>
       </el-form-item>
 
       <el-form-item label="收藏通知" prop="receive_collect_notification">
@@ -103,7 +102,11 @@ export default {
         name: '',
         rsa_password: '',
         email: '',
-        role_id: '',
+        role: {
+          id: '',
+          description: '',
+          name: ''
+        },
         active: '',
         confirmed: '',
         locked: '',

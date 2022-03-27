@@ -8,14 +8,14 @@ const userRouter = {
   meta: {
     title: '用户管理',
     icon: 'peoples',
-    roles: ['admin', 'editor']
+    roles: ['admin']
   },
   children: [
     {
       path: 'ManageUser',
       component: () => import('@/views/users'), // 父路由
       name: '管理用户',
-      meta: { title: '管理用户', roles: ['admin', 'editor'], icon: 'people' }
+      meta: { title: '管理用户', roles: ['admin'], icon: 'people' }
     }
   ]
 }

@@ -53,6 +53,7 @@ export default {
     },
     handleSubmit() {
       const arr = Object.keys(this.listObj).map(v => this.listObj[v])
+      // 处理上传的图片
       if (!this.checkAllSuccess()) {
         this.$message('Please wait for all images to be uploaded successfully. If there is a network problem, please refresh the page and upload again!')
         return

@@ -1,28 +1,34 @@
 import Layout from '@/layout'
 
-const articleRouter = {
-  path: '/article',
+const postRouter = {
+  path: '/posts',
   component: Layout,
-  name: '文章管理',
-  alwaysShow: true, // 当子路由有一个不显示时会导致这个父路由不显示,可以设置alwayShow属性进行总是显示
+  redirect: '/posts/list',
+  name: 'posts',
   meta: {
     title: '文章管理',
-    icon: 'example',
-    roles: ['admin', 'editor']
+    icon: 'el-icon-s-help'
   },
   children: [
     {
-      path: 'ManageArticles',
-      component: () => import('@/views/posts/ManageArticles'), // 父路由
-      name: '管理文章',
-      meta: { title: '管理文章', roles: ['admin', 'editor'], icon: 'list' }
+      path: 'create',
+      component: () => import('@/views/posts/create'),
+      name: 'CreateArticle',
+      meta: { title: '创建文章', icon: 'edit' }
     },
     {
-      path: 'AddArticle',
-      name: '创建文章',
-      component: () => import('@/views/posts/AddArticle'),
-      meta: { title: '创建文章', roles: ['admin', 'editor'], icon: 'el-icon-circle-plus' }
+      path: 'edit/:id(\\d+)',
+      component: () => import('@/views/posts/edit'),
+      name: 'EditArticle',
+      meta: { title: '编辑文章', noCache: true, activeMenu: '/posts/list' },
+      hidden: true
+    },
+    {
+      path: 'list',
+      component: () => import('@/views/posts/list'),
+      name: 'ArticleList',
+      meta: { title: '文章列表', icon: 'list' }
     }
   ]
 }
-export default articleRouter
+export default postRouter

@@ -314,9 +314,9 @@ const asyncRoutes = [
   },
 
   {
-    path: '/example',
+    path: '/posts',
     component: 'layout/Layout',
-    redirect: '/example/list',
+    redirect: '/posts/list',
     name: 'Example',
     meta: {
       title: 'example',
@@ -325,20 +325,20 @@ const asyncRoutes = [
     children: [
       {
         path: 'create',
-        component: 'views/example/create',
+        component: 'views/posts/create',
         name: 'CreateArticle',
         meta: { title: 'createArticle', icon: 'edit' }
       },
       {
         path: 'edit/:id(\\d+)',
-        component: 'views/example/edit',
+        component: 'views/posts/edit',
         name: 'EditArticle',
         meta: { title: 'editArticle', noCache: true },
         hidden: true
       },
       {
         path: 'list',
-        component: 'views/example/list',
+        component: 'views/posts/list',
         name: 'ArticleList',
         meta: { title: 'articleList', icon: 'list' }
       }

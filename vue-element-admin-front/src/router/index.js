@@ -9,16 +9,14 @@ import Layout from '@/layout'
 /* 侧边栏的路由 */
 // 组件侧边栏
 import componentsRouter from './modules/components'
-// 图标侧边栏
-import chartsRouter from './modules/charts'
-// table侧边栏
-import tableRouter from './modules/table'
 // 用户管理侧边栏
 import userRouter from './modules/users'
+import postRouter from '@/router/modules/post'
+import commentRouter from '@/router/modules/comment'
+import categoryRouter from '@/router/modules/category'
+import linkRouter from '@/router/modules/link'
 // 导入通知路由
-// import noticeRouter from './modules/notifications'
-// // 导入文章路由
-// import articleRouter from './modules/post'
+import noticeRouter from './modules/notifications'
 // 固定的路由
 export const constantRoutes = [
   // 下面都是登录的路由
@@ -143,40 +141,12 @@ export const asyncRoutes = [
   },
   /** 当你的路由太长了,可以采用模块化的方法 **/
   // 示例路由
-  {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/list',
-    name: 'Example',
-    meta: {
-      title: '综合实例',
-      icon: 'el-icon-s-help'
-    },
-    children: [
-      {
-        path: 'create',
-        component: () => import('@/views/example/create'),
-        name: 'CreateArticle',
-        meta: { title: '创建文章', icon: 'edit' }
-      },
-      {
-        path: 'edit/:id(\\d+)',
-        component: () => import('@/views/example/edit'),
-        name: 'EditArticle',
-        meta: { title: '编辑文章', noCache: true, activeMenu: '/example/list' },
-        hidden: true
-      },
-      {
-        path: 'list',
-        component: () => import('@/views/example/list'),
-        name: 'ArticleList',
-        meta: { title: '文章列表', icon: 'list' }
-      }
-    ]
-  },
   userRouter, // 用户管理
-  // noticeRouter, // 通知路由
-  // articleRouter, // 文章路由
+  postRouter, // 文章管理
+  commentRouter, // 评论管理
+  categoryRouter, // 分类管理
+  linkRouter, // 链接管理
+  noticeRouter, // 通知路由
   // 系统监控
   {
     path: '/monitor',
@@ -210,22 +180,35 @@ export const asyncRoutes = [
       }
     ]
   },
-  // 表格的路由
+  componentsRouter,
+  // 后台系统工具
   {
-    path: '/tab',
+    path: '/tool',
     component: Layout,
+    redirect: 'noRedirect',
+    alwaysShow: true,
+    name: 'tool',
+    meta: {
+      roles: ['admin'],
+      title: '系统工具',
+      icon: 'el-icon-s-tools'
+    },
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/tab/index'),
-        name: 'Tab',
-        meta: { title: 'Tab', icon: 'tab' }
+        path: 'swagger',
+        component: () => import('@/views/tool/swagger'),
+        name: 'tool-swagger',
+        meta: { roles: ['admin'], title: '系统接口', icon: 'documentation', noCache: true }
+      },
+      {
+        path: 'management',
+        component: () => import('@/views/tool/backend_manage'),
+        name: 'tool-manage',
+        meta: { roles: ['admin'], title: '后台管理', icon: 'el-icon-s-operation', noCache: true }
       }
+
     ]
   },
-  componentsRouter,
-  chartsRouter,
-  tableRouter,
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

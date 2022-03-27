@@ -119,17 +119,13 @@ const actions = {
 
   // 动态地修改权限
   async changeRoles({ commit, dispatch }, role) {
-    // const token = role + '-token'
-    //
-    // commit('SET_TOKEN', token)
-    // setToken(token)
-
     const { roles } = await dispatch('getInfo')
-
+    // 重置路由
     resetRouter()
-
+    console.log('roles:=', roles)
     // 根据角色生成可访问路由图
     const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
+    console.log('accessRoutes:====', accessRoutes)
     // 动态添加可访问路由
     router.addRoutes(accessRoutes)
 
