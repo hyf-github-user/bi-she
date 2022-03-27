@@ -7,7 +7,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 # 用户处理所需要的表单
 from flask_wtf.file import FileRequired, FileAllowed
-from wtforms import TextAreaField, SubmitField, StringField, SelectField, PasswordField, BooleanField, FileField, \
+from wtforms import SubmitField, StringField, SelectField, PasswordField, BooleanField, FileField, \
     HiddenField
 from wtforms.validators import DataRequired, Length, Optional, URL, ValidationError, Regexp, EqualTo, Email
 
@@ -24,11 +24,11 @@ class PostForm(MyBaseForm):
     文章表单
     """
     _status = [('1', 'published'), ('2', 'draft')]
-    _auth = [('1', '一般'), ('2', '重要'), ('2', '非常重要')]
+    _importance = [('1', '一般'), ('2', '重要'), ('2', '非常重要')]
     title = StringField('主题', validators=[DataRequired(), Length(1, 60)])
     category = SelectField('分类', coerce=int, default=1)
     status = SelectField('状态', choices=_status, default=1)
-    auth = SelectField('重要性', choices=_auth, default=1)
+    importance = SelectField('重要性', choices=_importance, default=1)
     body = CKEditorField('内容', validators=[DataRequired()])
     submit = SubmitField('发布')
 
@@ -36,9 +36,6 @@ class PostForm(MyBaseForm):
         super(PostForm, self).__init__(*args, **kwargs)
         self.category.choices = [(category.id, category.name)
                                  for category in Category.query.order_by(Category.name).all()]
-
-
-
 
 
 class CategoryForm(MyBaseForm):

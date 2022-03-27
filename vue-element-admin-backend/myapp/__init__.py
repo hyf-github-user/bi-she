@@ -122,7 +122,7 @@ def register_commands(app):
             click.echo('创建超级管理员账户中......')
             admin = User(
                 username=username,
-                auth=4,
+                auth=3,
                 name=name,
                 email=app.config['ADMIN_EMAIL'],
                 confirmed=True,

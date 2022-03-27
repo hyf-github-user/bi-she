@@ -342,7 +342,7 @@ class Post(db.Model):
     # 文章是否能被评论
     can_comment = db.Column(db.Boolean, default=True)  # 是否能评论
     # 文章重要性
-    auth = db.Column(db.String(255), default='一般')
+    importance = db.Column(db.SmallInteger, default=1, comment="重要性")
     # 文章的状态
     status = db.Column(db.String(255), default='published')
     # 标记被举报的次数

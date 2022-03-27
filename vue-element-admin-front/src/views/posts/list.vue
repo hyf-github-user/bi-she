@@ -35,7 +35,7 @@
 
       <el-table-column min-width="300px" label="Title">
         <template slot-scope="{row}">
-          <router-link :to="'/example/edit/'+row.id" class="link-type">
+          <router-link :to="'/post/edit/'+row.id" class="link-type">
             <span>{{ row.title }}</span>
           </router-link>
         </template>
@@ -43,11 +43,14 @@
 
       <el-table-column align="center" label="Actions" width="120">
         <template slot-scope="scope">
-          <router-link :to="'/example/edit/'+scope.row.id">
+          <router-link :to="'/post/edit/'+scope.row.id">
             <el-button type="primary" size="small" icon="el-icon-edit">
-              Edit
+              编辑
             </el-button>
           </router-link>
+          <el-button type="primary" size="small" icon="el-icon-edit">
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -57,7 +60,7 @@
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+import { getPosts } from '@/api/post'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -90,7 +93,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
+      getPosts(this.listQuery).then(response => {
         this.list = response.data.items
         this.total = response.data.total
         this.listLoading = false

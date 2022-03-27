@@ -92,8 +92,11 @@ def new_post():
         # 获取文章表单数据
         title = form.title.data
         body = form.body.data
+        importance = form.importance.data
+        status = form.status.data
         category = Category.query.get(form.category.data)
-        post = Post(title=title, body=body, category=category, author=current_user._get_current_object())
+        post = Post(title=title, body=body, category=category, status=status, importance=importance,
+                    author=current_user._get_current_object())
         # 开始提交到数据库
         db.session.add(post)
         db.session.commit()
