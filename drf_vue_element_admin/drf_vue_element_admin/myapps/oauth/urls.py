@@ -1,7 +1,9 @@
 from django.urls import path
+from rest_framework import routers
 from rest_framework_jwt.views import refresh_jwt_token
 
 from drf_vue_element_admin.myapps.oauth.views import oauth
+from drf_vue_element_admin.myapps.oauth.views.oauth import UserRegViewSet
 
 urlpatterns = [
     # 用户登录视图
@@ -13,3 +15,8 @@ urlpatterns = [
     # 获取用户信息的视图
     path('info/', oauth.UserInfoView.as_view()),
 ]
+
+router = routers.DefaultRouter()
+# 注册用户视图
+router.register(r'register', UserRegViewSet, basename='user_register')
+urlpatterns += router.urls

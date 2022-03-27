@@ -3,7 +3,7 @@
 # 文件名  :oauth.py
 # 时间    :2022/3/14 14:18
 import json
-
+from django.contrib.auth import get_user_model
 from django_redis import get_redis_connection
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -11,6 +11,11 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 from rest_framework_jwt.views import ObtainJSONWebToken
+from rest_framework import mixins, viewsets, views
+
+from drf_vue_element_admin.myapps.oauth.serializers import UserRegSerializer
+
+User = get_user_model()
 
 
 class UserLoginView(ObtainJSONWebToken):
@@ -80,3 +85,15 @@ class LogoutAPIView(APIView):
         content = {}
         # 后续将增加redis token黑名单功能
         return Response(data=content)
+
+
+class UserRegViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """
+    注册视图
+    """
+    serializer_class = UserRegSerializer
+    queryset = User.objects.all()
+    # 权限的选择
+    authentication_classes = ()
+    # 使用什么进行认证
+    permission_classes = ()

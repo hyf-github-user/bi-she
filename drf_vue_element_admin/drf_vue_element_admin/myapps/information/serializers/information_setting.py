@@ -63,7 +63,7 @@ class ChangeInformationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        fields = ['name', 'mobile', 'email']
+        fields = ['username', 'mobile', 'email']
 
     @staticmethod
     def validate_mobile(mobile):

@@ -22,8 +22,19 @@ class UserSerializer(serializers.ModelSerializer):
     """
     前台用户的序列化器
     """
-    # 多对一
-    role = RoleSerializer()
+
+    # 返回role的ID
+    # role = serializers.PrimaryKeyRelatedField()
+    roles_list = serializers.SerializerMethodField()
+
+    # 返回关联属性的多个字段
+    # role = RoleSerializer()
+    # 调用role的str方法,多对一
+    role = serializers.StringRelatedField()
+
+    def get_roles_list(self, obj):
+        # 获取用户角色列表
+        return [{'id': obj.role.id, 'name': obj.role.name, 'description': obj.role.description}]
 
     class Meta:
         model = User  # 指定的模型类
@@ -42,7 +53,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     """
-    前台用户的序列化器
+    前台文章的序列化器
     """
     # 多对一
     author = UserSerializer()
@@ -58,9 +69,9 @@ class CommentSerializer(serializers.ModelSerializer):
     """
     前台用户的序列化器
     """
-    # 多对一
-    author = UserSerializer()
-    post = PostSerializer()
+    # 返回关联属性的post的str方法,read_only表示只参与序列化不参与反序列化
+    post = serializers.StringRelatedField(read_only=True)
+    author = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Comment  # 指定的模型类
