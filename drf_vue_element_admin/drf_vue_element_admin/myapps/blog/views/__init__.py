@@ -56,9 +56,6 @@ class LinkViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    # 提供根据评论作者username进行查找
-    filter_backends = (SearchFilter,)
-    search_fields = ('author.username',)
 
 
 class CategoryViewSet(ModelViewSet):
@@ -74,7 +71,7 @@ class NotificationViewSet(ModelViewSet):
     serializer_class = NotificationSerializer
     # 提供根据通知接收者的username进行查找
     filter_backends = (SearchFilter,)
-    search_fields = ('receiver.username',)
+    search_fields = ('is_read',)
 
 
 class BlogDataView(APIView):

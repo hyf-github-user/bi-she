@@ -39,8 +39,8 @@ class Comment(models.Model):
     reviewed = models.IntegerField(blank=True, default=0)
     replied = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True)
 
-    def __str__(self):
-        return self.author.username + "的评论"
+    # def __str__(self):
+    #     return self.author.username + "的评论"
 
     class Meta:
         db_table = 'comment'
@@ -90,6 +90,7 @@ class Notification(models.Model):
 
 class Permission(models.Model):
     name = models.CharField(unique=True, max_length=30, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
     timestamp = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
@@ -123,6 +124,8 @@ class Role(models.Model):
     name = models.CharField(unique=True, max_length=30)
     description = models.CharField(max_length=255, blank=True, null=True)
     timestamp = models.DateTimeField(blank=True, null=True)
+    permissions = models.ManyToManyField('Permission', through='RolesPermissions',
+                                         blank=True, verbose_name='权限')
 
     def __str__(self):
         return self.name

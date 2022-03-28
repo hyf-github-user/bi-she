@@ -10,7 +10,6 @@ class OnlineUsersSerializer(serializers.ModelSerializer):
     """
     id = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
     browser = serializers.SerializerMethodField()
     os = serializers.SerializerMethodField()
     last_time = serializers.SerializerMethodField()
@@ -18,16 +17,13 @@ class OnlineUsersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OnlineUsers
-        fields = ['id', 'username', 'name', 'ip', 'browser', 'os', 'last_time', 'create_time']
+        fields = ['id', 'username', 'ip', 'browser', 'os', 'last_time', 'create_time']
 
     def get_id(self, obj):
         return obj.user.id
 
     def get_username(self, obj):
         return obj.user.username
-
-    def get_name(self, obj):
-        return obj.user.name
 
     def get_browser(self, obj):
         conn = get_redis_connection('online_user')
