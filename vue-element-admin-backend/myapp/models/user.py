@@ -324,6 +324,7 @@ class Permission(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30), unique=True)  # 存储权限功能说明
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
+    description = db.Column(db.String(255))  # 身份描述
     roles = db.relationship(
         'Role', secondary=roles_permissions, back_populates='permissions')  # 多对多的模型联系
 
