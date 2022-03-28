@@ -9,7 +9,7 @@
               clearable
               style="width:300px"
               prefix-icon="el-icon-search"
-              placeholder="输入用户名(username)搜索"
+              placeholder="输入角色名称(name)搜索"
             />
           </el-form-item>
           <el-form-item>
@@ -23,7 +23,7 @@
           style="margin-bottom:20px"
           icon="el-icon-plus"
           size="medium"
-        >新增(需到前台进行注册)
+        >新增(暂不支持)
         </el-button>
         <el-button
           v-permission="['admin']"
@@ -40,7 +40,7 @@
       <el-col>
         <el-card class="box-card">
           <div slot="header" class="clearfix">
-            <span>评论列表</span>
+            <span>角色列表</span>
           </div>
           <el-table
             ref="multipleTable"
@@ -54,7 +54,7 @@
               type="selection"
             />
             <el-table-column
-              label="发表日期"
+              label="创建时间"
               prop="timestamp"
               sortable
             >
@@ -64,7 +64,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="评论ID"
+              label="角色ID"
               prop="id"
             >
               <template slot-scope="scope">
@@ -72,48 +72,21 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="作者名"
-              prop="author"
+              label="角色名称"
+              prop="name"
             >
               <template slot-scope="scope">
-                <el-popover trigger="hover" placement="top">
-                  <p>姓名: {{ scope.row.author.name }}</p>
-                  <p>邮箱: {{ scope.row.author.email }}</p>
-                  <p>RSA私钥: {{ scope.row.author.rsa_password }}</p>
-                  <div slot="reference" class="name-wrapper">
-                    <el-tag size="medium">{{ scope.row.author.username }}</el-tag>
-                  </div>
-                </el-popover>
+                <span style="margin-left: 10px">{{ scope.row.name }}</span>
               </template>
             </el-table-column>
             <el-table-column
-              label="评论内容"
-              prop="body"
+              label="角色描述"
+              prop="description"
             >
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.body }}</span>
+                <span style="margin-left: 10px">{{ scope.row.description }}</span>
               </template>
             </el-table-column>
-            <el-table-column
-              label="审核"
-              prop="reviewed"
-              :formatter="formatter"
-            />
-            <el-table-column
-              label="举报次数"
-              prop="flag"
-            />
-            <!--            <el-table-column-->
-            <!--              label="回复评论"-->
-            <!--              prop="replied"-->
-            <!--            >-->
-            <!--              <template v-show="scope.row.replied" slot-scope="scope">-->
-            <!--                <el-popover trigger="hover" placement="top">-->
-            <!--                  <p>回复的人: {{ scope.row.replied.author.username }}</p>-->
-            <!--                  <p>回复的内容: {{ scope.row.replied.body }}</p>-->
-            <!--                </el-popover>-->
-            <!--              </template>-->
-            <!--            </el-table-column>-->
 
             <el-table-column
               fixed="right"
@@ -201,14 +174,14 @@ export default {
     },
     // table选择框功能的change事件
     handleSelectionChange() {
-      // 获取要删除的多个用户ID
+      // 获取要删除的多个角色ID
       const deleteIds = []
       this.$refs.multipleTable.selection.forEach(data => deleteIds.push(data.id))
       this.multipleSelection = deleteIds
     },
     // 删除User
     deleteRole(row) {
-      this.$confirm('此操作将从用户单中移除该用户, 是否继续？', '提示', {
+      this.$confirm('此操作将从角色列表中移除该角色, 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -225,7 +198,7 @@ export default {
     },
     // 批量删除IP
     deleteRoles() {
-      this.$confirm('此操作将从用户名单单中移除选中用户' + ', 是否继续？', '提示', {
+      this.$confirm('此操作将从角色列表中移除选中角色' + ', 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -256,7 +229,7 @@ export default {
     },
     // 获得编辑的子窗口
     updateComment(row) {
-      // 调用当前更新用户的窗口,并获取当前用户的ID
+      // 调用当前更新角色的窗口,并获取当前角色的ID
       this.curId = row.id
       this.cuDialogVisible = true
     },

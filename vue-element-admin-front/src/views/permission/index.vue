@@ -9,7 +9,7 @@
               clearable
               style="width:300px"
               prefix-icon="el-icon-search"
-              placeholder="输入用户名(username)搜索"
+              placeholder="输入权限名称(name)搜索"
             />
           </el-form-item>
           <el-form-item>
@@ -23,7 +23,7 @@
           style="margin-bottom:20px"
           icon="el-icon-plus"
           size="medium"
-        >新增(需到前台进行注册)
+        >新增(暂不支持)
         </el-button>
         <el-button
           v-permission="['admin']"
@@ -31,7 +31,7 @@
           icon="el-icon-delete"
           :disabled="!multipleSelection.length"
           size="medium"
-          @click="deleteNotifications(form)"
+          @click="deletePermissions(form)"
         >删除
         </el-button>
       </el-col>
@@ -40,11 +40,10 @@
       <el-col>
         <el-card class="box-card">
           <div slot="header" class="clearfix">
-            <span>通知清单</span>
+            <span>权限列表</span>
           </div>
           <el-table
             ref="multipleTable"
-            v-loading="listLoading"
             :data="tableData"
             style="width: 100%"
             highlight-current-row
@@ -55,7 +54,7 @@
               type="selection"
             />
             <el-table-column
-              label="发布日期"
+              label="创建时间"
               prop="timestamp"
               sortable
             >
@@ -65,7 +64,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="通知ID"
+              label="权限ID"
               prop="id"
             >
               <template slot-scope="scope">
@@ -73,26 +72,19 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="通知对象"
-              prop="receiver"
+              label="权限名称"
+              prop="name"
             >
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.receiver.username }}</span>
+                <span style="margin-left: 10px">{{ scope.row.name }}</span>
               </template>
             </el-table-column>
             <el-table-column
-              label="通知已读"
-              prop="is_read"
-              :formatter="formatter"
-            />
-            <el-table-column
-              label="通知内容"
-              prop="message"
+              label="权限描述"
+              prop="description"
             >
-              <template slot-scope="{row}">
-                <router-link :to="'/notices/edit/'+row.id" class="link-type">
-                  <span>{{ row.message }}</span>
-                </router-link>
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.description }}</span>
               </template>
             </el-table-column>
 
@@ -103,21 +95,20 @@
               width="220"
             >
               <template slot-scope="{row}">
-                <router-link :to="'/notices/edit/'+row.id">
-                  <el-button
-                    v-permission="['admin','editor']"
-                    type="primary"
-                    icon="el-icon-edit"
-                    size="mini"
-                  >编辑
-                  </el-button>
-                </router-link>
+                <el-button
+                  v-permission="['admin','editor']"
+                  type="primary"
+                  icon="el-icon-edit"
+                  size="mini"
+                  @click="updateComment(row)"
+                >编辑
+                </el-button>
                 <el-button
                   v-permission="['admin']"
                   type="danger"
                   icon="el-icon-delete"
                   size="mini"
-                  @click="deleteNotification(row)"
+                  @click="deletePermission(row)"
                 >删除
                 </el-button>
               </template>
@@ -136,23 +127,16 @@
         </el-card>
       </el-col>
     </el-row>
+    <!--    调用子组件进行编辑与增加操作-->
+    <cuForm :dialog-visible="cuDialogVisible" :cur-id="curId" @close="close" @search="search" />
   </div>
 </template>
-
 <script>
-import { getNotifications, deleteNotifications, deleteNotification } from '@/api/notice'
+import cuForm from './components/cuForm'
+import { deletePermission, deletePermissions, getPermissions } from '@/api/permission'
 export default {
-  name: 'ArticleList',
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
+  name: 'Roles',
+  components: { cuForm },
   data() {
     return {
       form: {
@@ -163,7 +147,6 @@ export default {
       tableData: [],
       total: 0,
       multipleSelection: [],
-      listLoading: true,
       // cuForm数据
       cuDialogVisible: false,
       curId: null
@@ -175,15 +158,13 @@ export default {
   },
   methods: {
     formatter(row) {
-      return row.is_read === 1 ? '已读' : '未读'
+      return row.reviewed === 1 ? '通过' : '不通过'
     },
     // 获取角色列表/搜索功能
     search() {
-      this.listLoading = true
-      getNotifications(this.form).then(res => {
+      getPermissions(this.form).then(res => {
         this.tableData = res.data.results
         this.total = res.data.count
-        this.listLoading = false
       })
     },
     // 重置
@@ -193,19 +174,19 @@ export default {
     },
     // table选择框功能的change事件
     handleSelectionChange() {
-      // 获取要删除的多个用户ID
+      // 获取要删除的多个权限ID
       const deleteIds = []
       this.$refs.multipleTable.selection.forEach(data => deleteIds.push(data.id))
       this.multipleSelection = deleteIds
     },
     // 删除User
-    deleteNotification(row) {
-      this.$confirm('此操作将从文章列表中删除该文章, 是否继续？', '提示', {
+    deletePermission(row) {
+      this.$confirm('此操作将从权限列表中移除该权限, 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteNotification(row.id).then(res => {
+        deletePermission(row.id).then(res => {
           this.$message({
             message: '删除成功',
             type: 'success'
@@ -216,13 +197,13 @@ export default {
       })
     },
     // 批量删除IP
-    deleteNotifications() {
-      this.$confirm('此操作将从用户名单单中移除选中用户' + ', 是否继续？', '提示', {
+    deletePermissions() {
+      this.$confirm('此操作将从权限列表中移除选中权限' + ', 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteNotifications(this.multipleSelection).then(res => {
+        deletePermissions(this.multipleSelection).then(res => {
           this.$message({
             message: '删除成功',
             type: 'success'
@@ -247,8 +228,8 @@ export default {
       this.cuDialogVisible = true
     },
     // 获得编辑的子窗口
-    updateUser(row) {
-      // 调用当前更新用户的窗口,并获取当前用户的ID
+    updateComment(row) {
+      // 调用当前更新权限的窗口,并获取当前权限的ID
       this.curId = row.id
       this.cuDialogVisible = true
     },
@@ -260,15 +241,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.edit-input {
-  padding-right: 100px;
-}
-
-.cancel-btn {
-  position: absolute;
-  right: 15px;
-  top: 10px;
-}
-</style>

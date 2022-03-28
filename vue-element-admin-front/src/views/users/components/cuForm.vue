@@ -28,12 +28,16 @@
         <el-input v-model="ruleForm.rsa_password" readonly />
       </el-form-item>
 
-      <el-form-item label="身份信息" prop="role">
-        <el-radio-group v-model="ruleForm.role">
-          <el-radio :label="1">锁定用户</el-radio>
-          <el-radio :label="2">普通用户</el-radio>
-          <el-radio :label="3">管理员</el-radio>
-        </el-radio-group>
+      <el-form-item label="角色" prop="roles">
+
+        <el-select v-model="ruleForm.role" placeholder="选择角色">
+          <el-option
+            v-for="item in rolesData"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="激活状态" prop="active">
@@ -80,6 +84,7 @@
 </template>
 <script>
 import { getById, addUser, updateUser } from '@/api/user'
+import { getRoles } from '@/api/roles'
 export default {
   name: 'CuForm',
   props: {
@@ -102,7 +107,6 @@ export default {
         name: '',
         rsa_password: '',
         email: '',
-        role: '',
         active: '',
         confirmed: '',
         locked: '',
@@ -110,8 +114,11 @@ export default {
         receive_collect_notification: '',
         receive_comment_notification: '',
         receive_follow_notification: '',
-        public_collections: ''
+        public_collections: '',
+        roles_list: '',
+        role: ''
       },
+      rolesData: [],
       rules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -128,6 +135,7 @@ export default {
             this.ruleForm = res.data
           })
         }
+        this.getRoles()
       }
     }
   },
@@ -166,6 +174,12 @@ export default {
           console.log('error submit!!')
           return false
         }
+      })
+    },
+    getRoles() {
+      // 获取角色列表
+      getRoles().then(res => {
+        this.rolesData = res.data.results
       })
     },
     resetForm(formName) {

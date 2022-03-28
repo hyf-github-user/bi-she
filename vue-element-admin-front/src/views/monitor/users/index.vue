@@ -25,10 +25,6 @@
             label="用户名"
           />
           <el-table-column
-            prop="name"
-            label="姓名"
-          />
-          <el-table-column
             prop="ip"
             label="登录IP"
             width="130"

@@ -1,34 +1,22 @@
 import Layout from '@/layout'
 
-const noticeRouter = {
+const linkRouter = {
   path: '/notices',
   component: Layout,
-  redirect: '/notices/list',
-  name: 'notices',
+  name: '通知管理',
+  alwaysShow: true, // 当子路由有一个不显示时会导致这个父路由不显示,可以设置alwayShow属性进行总是显示
   meta: {
     title: '通知管理',
-    icon: 'el-icon-s-help'
+    icon: 'link',
+    roles: ['admin', 'editor']
   },
   children: [
     {
-      path: 'create',
-      component: () => import('@/views/notices/create'),
-      name: 'CreateArticle',
-      meta: { title: '创建通知', icon: 'edit' }
-    },
-    {
-      path: 'edit/:id(\\d+)',
-      component: () => import('@/views/notices/edit'),
-      name: 'EditArticle',
-      meta: { title: '编辑通知', noCache: true, activeMenu: '/notices/list' },
-      hidden: true
-    },
-    {
-      path: 'list',
-      component: () => import('@/views/notices/list'),
-      name: 'ArticleList',
-      meta: { title: '通知列表', icon: 'list' }
+      path: 'ManageNotification',
+      component: () => import('@/views/notices'), // 父路由
+      name: '管理通知',
+      meta: { title: '管理通知', icon: 'list' }
     }
   ]
 }
-export default noticeRouter
+export default linkRouter

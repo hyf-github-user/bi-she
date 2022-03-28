@@ -92,7 +92,7 @@
             />
             <el-table-column
               label="角色信息"
-              prop="role"
+              prop="roles_list.name"
             />
             <el-table-column
               label="个人网站"

@@ -1,11 +1,11 @@
 <template>
   <el-dialog :visible.sync="dialogVisible" :title="curId ? '编辑分类' : '新增分类'" width="700px" :before-close="close">
     <el-form ref="ruleForm" label-position="left  " :model="ruleForm" status-icon :rules="rules" label-width="100px" class="demo-ruleForm">
-      <el-form-item label="创建日期">
+      <el-form-item v-show="curId" label="创建日期">
         <el-input v-model="ruleForm.timestamp" readonly />
       </el-form-item>
 
-      <el-form-item label="分类ID">
+      <el-form-item v-show="curId" label="分类ID">
         <el-input v-model="ruleForm.id" readonly />
       </el-form-item>
 

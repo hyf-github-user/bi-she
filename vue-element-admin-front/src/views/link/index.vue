@@ -23,7 +23,8 @@
           style="margin-bottom:20px"
           icon="el-icon-plus"
           size="medium"
-        >新增(需到前台进行注册)
+          @click="createLink"
+        >新增
         </el-button>
         <el-button
           v-permission="['admin']"
@@ -173,14 +174,14 @@ export default {
     },
     // table选择框功能的change事件
     handleSelectionChange() {
-      // 获取要删除的多个用户ID
+      // 获取要删除的多个链接ID
       const deleteIds = []
       this.$refs.multipleTable.selection.forEach(data => deleteIds.push(data.id))
       this.multipleSelection = deleteIds
     },
     // 删除User
     deleteLink(row) {
-      this.$confirm('此操作将从用户单中移除该用户, 是否继续？', '提示', {
+      this.$confirm('此操作将从链接列表中移除该链接, 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -197,7 +198,7 @@ export default {
     },
     // 批量删除IP
     deleteLinks() {
-      this.$confirm('此操作将从用户名单单中移除选中用户' + ', 是否继续？', '提示', {
+      this.$confirm('此操作将从链接列表中中移除选中链接' + ', 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -222,13 +223,12 @@ export default {
       this.form.page = val
       this.search()
     },
-    // 需要到前台进行注册
-    createUser() {
+    createLink() {
       this.cuDialogVisible = true
     },
     // 获得编辑的子窗口
     updateComment(row) {
-      // 调用当前更新用户的窗口,并获取当前用户的ID
+      // 调用当前更新链接的窗口,并获取当前链接的ID
       this.curId = row.id
       this.cuDialogVisible = true
     },

@@ -1,22 +1,29 @@
 <template>
-  <el-dialog :visible.sync="dialogVisible" :title="curId ? '编辑角色' : '新增角色'" width="700px" :before-close="close">
+  <el-dialog :visible.sync="dialogVisible" :title="curId ? '编辑通知' : '新增通知'" width="700px" :before-close="close">
     <el-form ref="ruleForm" label-position="left  " :model="ruleForm" status-icon :rules="rules" label-width="100px" class="demo-ruleForm">
-      <el-form-item label="创建时间">
+      <el-form-item v-show="curId" label="创建时间">
         <el-input v-model="ruleForm.timestamp" readonly />
       </el-form-item>
 
-      <el-form-item label="角色ID">
+      <el-form-item v-show="curId" label="通知ID">
         <el-input v-model="ruleForm.id" readonly />
       </el-form-item>
 
-      <el-form-item label="角色名称" prop="name">
-        <el-input v-model="ruleForm.name" />
+      <el-form-item label="通知内容" prop="message">
+        <el-input v-model="ruleForm.message" />
       </el-form-item>
 
-      <el-form-item label="角色描述" prop="description">
-        <el-input v-model="ruleForm.description" />
-      </el-form-item>
+      <el-form-item label="通知人" prop="roles">
 
+        <el-select v-model="ruleForm.receiver" placeholder="选择角色">
+          <el-option
+            v-for="item in rolesData"
+            :key="item.id"
+            :label="item.username"
+            :value="item.id"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
         <el-button @click="resetForm('ruleForm')">重置</el-button>
@@ -25,7 +32,8 @@
   </el-dialog>
 </template>
 <script>
-import { getById, addRole, updateRole } from '@/api/roles'
+import { getById, addNotification, updateNotification } from '@/api/notice'
+import { getUsers } from '@/api/user'
 export default {
   name: 'CuForm',
   props: {
@@ -43,13 +51,14 @@ export default {
     return {
       ruleForm: {
         id: '',
-        timestamp: '',
+        register_time: '',
         name: '',
-        description: ''
+        url: ''
       },
+      rolesData: [],
       rules: {
-        name: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 1, max: 5, message: '长度在 1 到 5 个字符', trigger: 'blur' }
         ]
       }
@@ -63,6 +72,7 @@ export default {
             this.ruleForm = res.data
           })
         }
+        this.getUsers()
       }
     }
   },
@@ -80,7 +90,10 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.curId) {
-            updateRole(this.curId, this.ruleForm).then(res => {
+            if (!this.ruleForm.department) {
+              this.ruleForm.department = null
+            }
+            updateNotification(this.curId, this.ruleForm).then(res => {
               this.$message({
                 message: '修改成功',
                 type: 'success'
@@ -88,7 +101,7 @@ export default {
               this.search()
             })
           } else {
-            addRole(this.ruleForm).then(res => {
+            addNotification(this.ruleForm).then(res => {
               this.$message({
                 message: '新增成功',
                 type: 'success'
@@ -100,6 +113,13 @@ export default {
           console.log('error submit!!')
           return false
         }
+      })
+    },
+    // 获取用户
+    getUsers() {
+      // 获取角色列表
+      getUsers().then(res => {
+        this.rolesData = res.data.results
       })
     },
     resetForm(formName) {

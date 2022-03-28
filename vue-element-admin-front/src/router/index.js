@@ -6,9 +6,6 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 
-/* 侧边栏的路由 */
-// 组件侧边栏
-import componentsRouter from './modules/components'
 // 用户管理侧边栏
 import userRouter from './modules/users'
 import postRouter from '@/router/modules/post'
@@ -17,6 +14,8 @@ import categoryRouter from '@/router/modules/category'
 import linkRouter from '@/router/modules/link'
 // 导入通知路由
 import noticeRouter from './modules/notifications'
+import roleRouter from '@/router/modules/role'
+import permissionRouter from '@/router/modules/permission'
 // 固定的路由
 export const constantRoutes = [
   // 下面都是登录的路由
@@ -97,51 +96,12 @@ export const constantRoutes = [
 
 // 根据用户的身份多态加载的路由
 export const asyncRoutes = [
-  // 权限的路由
-  {
-    path: '/permission',
-    component: Layout,
-    redirect: '/permission/page',
-    alwaysShow: true, // will always show the root menu
-    name: 'Permission',
-    meta: {
-      title: '权限测试页',
-      icon: 'lock',
-      roles: ['editor', 'admin'] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'page',
-        component: () => import('@/views/permission/page'),
-        name: 'PagePermission',
-        meta: {
-          title: '页面权限',
-          roles: ['admin', 'editor'] // or you can only set roles in sub nav
-        }
-      },
-      {
-        path: 'directive',
-        component: () => import('@/views/permission/directive'),
-        name: 'DirectivePermission',
-        meta: {
-          title: '指令权限'
-          // if do not set roles, means: this page does not require permission
-        }
-      },
-      {
-        path: 'role',
-        component: () => import('@/views/permission/role'),
-        name: 'RolePermission',
-        meta: {
-          title: '角色权限',
-          roles: ['admin']
-        }
-      }
-    ]
-  },
   /** 当你的路由太长了,可以采用模块化的方法 **/
-  // 示例路由
+  // 博客管理页面
   userRouter, // 用户管理
+  roleRouter, // 角色管理
+  // 权限管理
+  permissionRouter,
   postRouter, // 文章管理
   commentRouter, // 评论管理
   categoryRouter, // 分类管理
@@ -156,7 +116,7 @@ export const asyncRoutes = [
     name: 'monitor',
     meta: {
       title: '系统监控',
-      icon: 'el-icon-data-analysis',
+      icon: 'el-icon-monitor',
       roles: ['admin']
     },
     children: [
@@ -180,7 +140,6 @@ export const asyncRoutes = [
       }
     ]
   },
-  componentsRouter,
   // 后台系统工具
   {
     path: '/tool',

@@ -9,7 +9,7 @@
               clearable
               style="width:300px"
               prefix-icon="el-icon-search"
-              placeholder="输入用户名(username)搜索"
+              placeholder="输入文章标题(title)搜索"
             />
           </el-form-item>
           <el-form-item>
@@ -23,7 +23,7 @@
           style="margin-bottom:20px"
           icon="el-icon-plus"
           size="medium"
-        >新增(需到前台进行注册)
+        >新增(需到前台)
         </el-button>
         <el-button
           v-permission="['admin']"
@@ -225,7 +225,7 @@ export default {
     },
     // table选择框功能的change事件
     handleSelectionChange() {
-      // 获取要删除的多个用户ID
+      // 获取要删除的多个文章ID
       const deleteIds = []
       this.$refs.multipleTable.selection.forEach(data => deleteIds.push(data.id))
       this.multipleSelection = deleteIds
@@ -249,7 +249,7 @@ export default {
     },
     // 批量删除IP
     deletePosts() {
-      this.$confirm('此操作将从用户名单单中移除选中用户' + ', 是否继续？', '提示', {
+      this.$confirm('此操作将从文章列表中移除选中文章' + ', 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -280,7 +280,7 @@ export default {
     },
     // 获得编辑的子窗口
     updateUser(row) {
-      // 调用当前更新用户的窗口,并获取当前用户的ID
+      // 调用当前更新文章的窗口,并获取当前文章的ID
       this.curId = row.id
       this.cuDialogVisible = true
     },

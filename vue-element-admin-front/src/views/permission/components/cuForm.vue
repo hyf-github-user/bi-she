@@ -1,19 +1,19 @@
 <template>
-  <el-dialog :visible.sync="dialogVisible" :title="curId ? '编辑角色' : '新增角色'" width="700px" :before-close="close">
+  <el-dialog :visible.sync="dialogVisible" :title="curId ? '编辑权限' : '新增权限'" width="700px" :before-close="close">
     <el-form ref="ruleForm" label-position="left  " :model="ruleForm" status-icon :rules="rules" label-width="100px" class="demo-ruleForm">
       <el-form-item label="创建时间">
         <el-input v-model="ruleForm.timestamp" readonly />
       </el-form-item>
 
-      <el-form-item label="角色ID">
+      <el-form-item label="权限ID">
         <el-input v-model="ruleForm.id" readonly />
       </el-form-item>
 
-      <el-form-item label="角色名称" prop="name">
+      <el-form-item label="权限名称" prop="name">
         <el-input v-model="ruleForm.name" />
       </el-form-item>
 
-      <el-form-item label="角色描述" prop="description">
+      <el-form-item label="权限描述" prop="description">
         <el-input v-model="ruleForm.description" />
       </el-form-item>
 
@@ -25,7 +25,7 @@
   </el-dialog>
 </template>
 <script>
-import { getById, addRole, updateRole } from '@/api/roles'
+import { getById, addPermission, updatePermission } from '@/api/permission'
 export default {
   name: 'CuForm',
   props: {
@@ -49,8 +49,8 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
-          { min: 1, max: 5, message: '长度在 1 到 5 个字符', trigger: 'blur' }
+          { required: true, message: '请输入权限名称', trigger: 'blur' },
+          { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
         ]
       }
     }
@@ -80,7 +80,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.curId) {
-            updateRole(this.curId, this.ruleForm).then(res => {
+            updatePermission(this.curId, this.ruleForm).then(res => {
               this.$message({
                 message: '修改成功',
                 type: 'success'
@@ -88,7 +88,7 @@ export default {
               this.search()
             })
           } else {
-            addRole(this.ruleForm).then(res => {
+            addPermission(this.ruleForm).then(res => {
               this.$message({
                 message: '新增成功',
                 type: 'success'

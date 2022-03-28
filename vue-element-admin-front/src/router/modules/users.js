@@ -4,6 +4,7 @@ const userRouter = {
   path: '/users',
   component: Layout,
   name: '用户管理',
+  redirect: '/users/ManageUser',
   alwaysShow: true, // 当子路由有一个不显示时会导致这个父路由不显示,可以设置alwayShow属性进行总是显示
   meta: {
     title: '用户管理',

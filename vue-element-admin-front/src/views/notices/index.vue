@@ -9,7 +9,7 @@
               clearable
               style="width:300px"
               prefix-icon="el-icon-search"
-              placeholder="输入分类名(name)搜索"
+              placeholder="输入是否已读(0:未读,1:已读)搜索"
             />
           </el-form-item>
           <el-form-item>
@@ -23,7 +23,7 @@
           style="margin-bottom:20px"
           icon="el-icon-plus"
           size="medium"
-          @click="createCategory"
+          @click="createLink"
         >新增
         </el-button>
         <el-button
@@ -32,7 +32,7 @@
           icon="el-icon-delete"
           :disabled="!multipleSelection.length"
           size="medium"
-          @click="deleteCategories(form)"
+          @click="deleteNotifications(form)"
         >删除
         </el-button>
       </el-col>
@@ -41,7 +41,7 @@
       <el-col>
         <el-card class="box-card">
           <div slot="header" class="clearfix">
-            <span>评论列表</span>
+            <span>通知列表</span>
           </div>
           <el-table
             ref="multipleTable"
@@ -55,7 +55,10 @@
               type="selection"
             />
             <el-table-column
-              label="创建日期"
+              type="selection"
+            />
+            <el-table-column
+              label="发布日期"
               prop="timestamp"
               sortable
             >
@@ -65,7 +68,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="分类ID"
+              label="通知ID"
               prop="id"
             >
               <template slot-scope="scope">
@@ -73,11 +76,24 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="分类名称"
-              prop="body"
+              label="通知对象"
+              prop="receiver"
             >
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                <span style="margin-left: 10px">{{ scope.row.receiver }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="是否已读"
+              prop="is_read"
+              :formatter="formatter"
+            />
+            <el-table-column
+              label="通知内容"
+              prop="message"
+            >
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.message }}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -100,7 +116,7 @@
                   type="danger"
                   icon="el-icon-delete"
                   size="mini"
-                  @click="deleteCategory(row)"
+                  @click="deleteNotification(row)"
                 >删除
                 </el-button>
               </template>
@@ -125,7 +141,7 @@
 </template>
 <script>
 import cuForm from './components/cuForm'
-import { deleteCategory, deleteCategories, getCategories } from '@/api/category'
+import { deleteNotification, deleteNotifications, getNotifications } from '@/api/notice'
 export default {
   name: 'Roles',
   components: { cuForm },
@@ -149,9 +165,12 @@ export default {
     this.search()
   },
   methods: {
-    // 获取分类列表/搜索功能
+    formatter(row) {
+      return row.is_read === 1 ? '已读' : '未读'
+    },
+    // 获取角色列表/搜索功能
     search() {
-      getCategories(this.form).then(res => {
+      getNotifications(this.form).then(res => {
         this.tableData = res.data.results
         this.total = res.data.count
       })
@@ -163,19 +182,19 @@ export default {
     },
     // table选择框功能的change事件
     handleSelectionChange() {
-      // 获取要删除的多个分类ID
+      // 获取要删除的多个通知ID
       const deleteIds = []
       this.$refs.multipleTable.selection.forEach(data => deleteIds.push(data.id))
       this.multipleSelection = deleteIds
     },
-    // 删除分类
-    deleteCategory(row) {
-      this.$confirm('此操作将从分类列表中删除该分类, 是否继续？', '提示', {
+    // 删除User
+    deleteNotification(row) {
+      this.$confirm('此操作将从通知列表中移除该通知, 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteCategory(row.id).then(res => {
+        deleteNotification(row.id).then(res => {
           this.$message({
             message: '删除成功',
             type: 'success'
@@ -185,14 +204,14 @@ export default {
         })
       })
     },
-    // 批量删除分类
-    deleteCategories() {
-      this.$confirm('此操作将从分类名单单中移除选中分类' + ', 是否继续？', '提示', {
+    // 批量删除IP
+    deleteNotifications() {
+      this.$confirm('此操作将从通知列表中中移除选中通知' + ', 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteCategories(this.multipleSelection).then(res => {
+        deleteNotifications(this.multipleSelection).then(res => {
           this.$message({
             message: '删除成功',
             type: 'success'
@@ -212,12 +231,12 @@ export default {
       this.form.page = val
       this.search()
     },
-    createCategory() {
+    createLink() {
       this.cuDialogVisible = true
     },
     // 获得编辑的子窗口
     updateComment(row) {
-      // 调用当前更新分类的窗口,并获取当前分类的ID
+      // 调用当前更新通知的窗口,并获取当前通知的ID
       this.curId = row.id
       this.cuDialogVisible = true
     },

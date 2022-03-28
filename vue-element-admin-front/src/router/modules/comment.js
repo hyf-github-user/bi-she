@@ -8,14 +8,14 @@ const commentRouter = {
   meta: {
     title: '评论管理',
     icon: 'message',
-    roles: ['admin']
+    roles: ['admin', 'editor']
   },
   children: [
     {
       path: 'ManageComment',
       component: () => import('@/views/comments'), // 父路由
       name: '管理评论',
-      meta: { title: '管理评论', roles: ['admin'], icon: 'list' }
+      meta: { title: '管理评论', icon: 'list' }
     }
   ]
 }
