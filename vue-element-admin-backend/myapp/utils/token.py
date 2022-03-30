@@ -4,10 +4,8 @@ from collections import namedtuple
 from flask import request, current_app, g
 from flask_httpauth import HTTPTokenAuth
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
-
 from exts import db
 from myapp.utils.network import Result
-from myapp.utils.scope import is_in_scope
 from settings import Operations
 
 auth = HTTPTokenAuth(scheme='JWT')

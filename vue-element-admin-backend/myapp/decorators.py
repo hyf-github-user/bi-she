@@ -4,7 +4,6 @@
 from functools import wraps
 from flask import flash, url_for, redirect, abort, Markup, request, current_app
 from flask_login import current_user
-from myapp.utils.network import Result
 
 
 def confirm_required(func):

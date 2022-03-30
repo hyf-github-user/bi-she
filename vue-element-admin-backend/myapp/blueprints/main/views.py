@@ -94,6 +94,7 @@ def show_post(post_id):
 
 
 @main_bp.route('/report/post/<int:post_id>', methods=['POST'])
+@login_required
 def report_post(post_id):
     """
     举报文章
@@ -108,6 +109,7 @@ def report_post(post_id):
 
 
 @main_bp.route('/category/<int:category_id>')
+@login_required
 def show_category(category_id):
     """
     展示分类详情

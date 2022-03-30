@@ -4,11 +4,6 @@ import click
 from flask import Flask, render_template
 from flask_login import current_user
 from flask_wtf.csrf import CSRFError
-
-from myapp.api.article import api_article
-from myapp.api.comment import api_comment
-from myapp.api.login import login_bp
-from myapp.api.user import api_user
 from myapp.blueprints.ajax.views import ajax_bp
 from myapp.blueprints.auth.views import auth_bp
 from myapp.blueprints.main.views import main_bp
@@ -64,11 +59,6 @@ def register_extensions(app):
 
 # 注册蓝图
 def register_blueprints(app):
-    # 注册api接口的路由
-    app.register_blueprint(api_comment, url_prefix='/api')
-    app.register_blueprint(api_user, url_prefix='/api')
-    app.register_blueprint(api_article, url_prefix='/api')
-    app.register_blueprint(login_bp, url_prefix='/api')
     # 前台蓝图注册
     app.register_blueprint(main_bp)
     app.register_blueprint(user_bp, url_prefix='/user')

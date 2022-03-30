@@ -1,10 +1,8 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
 from io import BytesIO
-
 from flask import Blueprint, flash, redirect, url_for, render_template, make_response, current_app
 from flask_login import current_user, login_required, login_user, logout_user, login_fresh, confirm_login
-
 from exts import db
 from myapp.blueprints.auth.forms import LoginForm, RegisterForm, ForgetPasswordForm, ResetPasswordForm
 from myapp.models.user import User
@@ -127,7 +125,7 @@ def re_authenticate():
         return redirect(url_for('main.index'))
 
     form = LoginForm()
-    if form.validate_on_submit() and current_user.validate_password(form.password.data):
+    if form.validate_on_submit() and current_user.check_password(form.password.data):
         # 重新登录
         confirm_login()
         return redirect_back()
