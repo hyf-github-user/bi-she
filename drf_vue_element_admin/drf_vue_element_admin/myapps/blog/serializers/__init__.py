@@ -170,7 +170,13 @@ class NotificationSerializer(serializers.ModelSerializer):
     前台通知的序列化器
     """
     # 多对一
-    receiver = serializers.StringRelatedField(read_only=True)
+
+    receiver_list = serializers.SerializerMethodField(read_only=True)
+
+    #
+    def get_receiver_list(self, obj):
+        # 获取通知者
+        return {'id': obj.receiver.id, "username": obj.receiver.username}
 
     class Meta:
         model = Notification  # 指定的模型类

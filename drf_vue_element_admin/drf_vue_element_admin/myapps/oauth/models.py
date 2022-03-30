@@ -56,15 +56,6 @@ class Users(AbstractUser):
         }
         return user_info
 
-    # def set_password(self, raw_password):
-    #     """
-    #     重写设置密码的功能
-    #     :param raw_password:
-    #     :return:
-    #     """
-    #     print("你输入的密码是: ", raw_password)
-    #     self.set_password(raw_password)
-
 
 class Permissions(BaseModel):
     """
