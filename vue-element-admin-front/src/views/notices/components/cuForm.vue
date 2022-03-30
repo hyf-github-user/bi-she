@@ -15,9 +15,9 @@
 
       <el-form-item label="通知人" prop="roles">
 
-        <el-select v-model="ruleForm.receiver" placeholder="选择角色">
+        <el-select v-model="ruleForm.receiver" placeholder="选择通知人">
           <el-option
-            v-for="item in rolesData"
+            v-for="item in UsersData"
             :key="item.id"
             :label="item.username"
             :value="item.id"
@@ -55,7 +55,7 @@ export default {
         name: '',
         url: ''
       },
-      rolesData: [],
+      UsersData: [],
       rules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -119,7 +119,7 @@ export default {
     getUsers() {
       // 获取角色列表
       getUsers().then(res => {
-        this.rolesData = res.data.results
+        this.UsersData = res.data.results
       })
     },
     resetForm(formName) {

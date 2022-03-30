@@ -77,10 +77,10 @@
             </el-table-column>
             <el-table-column
               label="通知对象"
-              prop="receiver"
+              prop="receiver_list"
             >
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.receiver }}</span>
+                <span style="margin-left: 10px">{{ scope.row.receiver_list.username }}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -125,8 +125,7 @@
           <!--分页组件-->
           <el-pagination
             :current-page="1"
-            :page-sizes="[2, 3, 4, 5]"
-            :page-size="2"
+            :page-sizes="[ 3, 6, 9]"
             :total="total"
             layout="total, sizes, prev, pager, next, jumper"
             @size-change="handleSizeChange"
@@ -149,7 +148,7 @@ export default {
     return {
       form: {
         page: 1,
-        size: 2,
+        size: 3,
         search: ''
       },
       tableData: [],

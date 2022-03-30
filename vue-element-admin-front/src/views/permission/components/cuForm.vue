@@ -2,10 +2,10 @@
   <el-dialog :visible.sync="dialogVisible" :title="curId ? '编辑权限' : '新增权限'" width="700px" :before-close="close">
     <el-form ref="ruleForm" label-position="left  " :model="ruleForm" status-icon :rules="rules" label-width="100px" class="demo-ruleForm">
       <el-form-item label="创建时间">
-        <el-input v-model="ruleForm.timestamp" readonly />
+        <el-input v-show="curId" v-model="ruleForm.timestamp" readonly />
       </el-form-item>
 
-      <el-form-item label="权限ID">
+      <el-form-item v-show="curId" label="权限ID">
         <el-input v-model="ruleForm.id" readonly />
       </el-form-item>
 

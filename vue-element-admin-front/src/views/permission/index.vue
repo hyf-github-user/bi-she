@@ -23,7 +23,8 @@
           style="margin-bottom:20px"
           icon="el-icon-plus"
           size="medium"
-        >新增(暂不支持)
+          @click="createPermission"
+        >新增
         </el-button>
         <el-button
           v-permission="['admin']"
@@ -223,8 +224,8 @@ export default {
       this.form.page = val
       this.search()
     },
-    // 需要到前台进行注册
-    createUser() {
+    // 创建权限
+    createPermission() {
       this.cuDialogVisible = true
     },
     // 获得编辑的子窗口
