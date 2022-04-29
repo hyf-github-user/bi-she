@@ -37,12 +37,6 @@ class UserLoginView(ObtainJSONWebToken):
             conn.incr('visits')
             return response
         else:
-            if response.data.get('non_field_errors'):
-                # 日后将增加用户多次登录错误,账户锁定功能(待完善)
-                if isinstance(response.data.get('non_field_errors'), list) and len(
-                        response.data.get('non_field_errors')) > 0:
-                    if response.data.get('non_field_errors')[0].strip() == '无法使用提供的认证信息登录。':
-                        return Response(data={'detail': '用户名或密码错误'}, status=status.HTTP_400_BAD_REQUEST)
             raise ValidationError(response.data)
 
 
@@ -93,7 +87,5 @@ class UserRegViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     serializer_class = UserRegSerializer
     queryset = User.objects.all()
-    # 权限的选择
     authentication_classes = ()
-    # 使用什么进行认证
     permission_classes = ()

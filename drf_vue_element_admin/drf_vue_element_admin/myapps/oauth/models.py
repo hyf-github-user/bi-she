@@ -17,11 +17,6 @@ class Users(AbstractUser):
     """
     继承django的系统user
     """
-    # 身份
-    LEVEL = (
-        ('1', '超级管理员'),
-        ('2', '协管员'),
-    )
     mobile = models.CharField(max_length=11, unique=True, null=True, blank=True, default=None, verbose_name='手机号码')
     image = models.ImageField(upload_to='avatar/%Y/%m', default='avatar/default.png', blank=True, verbose_name='头像')
     # 用户与角色是多对多关系

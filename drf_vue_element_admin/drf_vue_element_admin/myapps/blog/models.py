@@ -151,7 +151,6 @@ class RolesPermissions(models.Model):
 class User(models.Model):
     username = models.CharField(max_length=120)
     password_hash = models.CharField(max_length=120, blank=True, null=True)
-    auth = models.SmallIntegerField(blank=True, null=True)
     name = models.CharField(max_length=20)
     email = models.CharField(unique=True, max_length=254)
     website = models.CharField(max_length=255, blank=True, null=True)
@@ -164,7 +163,6 @@ class User(models.Model):
     rsa_password = models.TextField(blank=True, null=True)
     active = models.IntegerField(blank=True, null=True)
     confirmed = models.IntegerField(blank=True, null=True)
-    locked = models.IntegerField(blank=True, null=True)
     role = models.ForeignKey(Role, models.DO_NOTHING, blank=True, null=True)
     receive_comment_notification = models.IntegerField(blank=True, null=True)
     receive_follow_notification = models.IntegerField(blank=True, null=True)

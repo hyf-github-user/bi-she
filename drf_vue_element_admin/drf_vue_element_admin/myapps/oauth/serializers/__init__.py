@@ -29,14 +29,6 @@ class UserRegSerializer(serializers.ModelSerializer):
         fields = ['username', 'mobile', 'password', 'roles', 'image']
 
 
-class PermissionsSerializer(serializers.ModelSerializer):
-    pass
-
-
-class RolesSerializer(serializers.ModelSerializer):
-    pass
-
-
 class UserSerializer(serializers.ModelSerializer):
     roles_list = serializers.SerializerMethodField()
     is_superuser = serializers.BooleanField(read_only=True)
