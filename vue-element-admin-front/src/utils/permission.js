@@ -15,7 +15,7 @@ export default function checkPermission(value) {
     })
     return hasPermission
   } else {
-    console.error(`need roles! Like v-permission="['admin','editor']"`)
+    console.error(`权限不足,请使用v-permission="['admin','editor']"进行更新路由权限`)
     return false
   }
 }

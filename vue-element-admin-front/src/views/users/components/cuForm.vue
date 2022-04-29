@@ -50,11 +50,6 @@
         <el-radio v-model="ruleForm.confirmed" :label="0">未确认</el-radio>
       </el-form-item>
 
-      <el-form-item label="锁定状态" prop="locked">
-        <el-radio v-model="ruleForm.locked" :label="1">已锁定</el-radio>
-        <el-radio v-model="ruleForm.locked" :label="0" :disabled="ruleForm.role==1">未锁定</el-radio>
-      </el-form-item>
-
       <el-form-item label="收藏通知" prop="receive_collect_notification">
         <el-radio v-model="ruleForm.receive_collect_notification" :label="1">接收</el-radio>
         <el-radio v-model="ruleForm.receive_collect_notification" :label="0">未接收</el-radio>

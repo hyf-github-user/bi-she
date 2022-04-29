@@ -87,10 +87,6 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="级别"
-              prop="auth"
-            />
-            <el-table-column
               label="角色信息"
               prop="roles_list.name"
             />
@@ -107,11 +103,6 @@
               label="确认状态"
               prop="confirmed"
               :formatter="formatter2"
-            />
-            <el-table-column
-              label="锁定状态"
-              prop="locked"
-              :formatter="formatter3"
             />
             <el-table-column
               label="收藏通知"
@@ -210,10 +201,6 @@ export default {
     // 确认格式化
     formatter2(row) {
       return row.confirmed ? '已确认' : '未确认'
-    },
-    // 锁定格式化
-    formatter3(row) {
-      return row.locked ? '已锁定' : '未锁定'
     },
     // 格式化收藏通知
     formatter5(row) {

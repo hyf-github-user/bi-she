@@ -55,7 +55,7 @@ service.interceptors.response.use(
     } catch (e) {
       if (error.toString().indexOf('timeout')) {
         Message({
-          message: '请求超时!',
+          message: '后端接口服务错误!',
           type: 'error',
           duration: 3 * 1000
         })
@@ -65,8 +65,7 @@ service.interceptors.response.use(
     if (code === 401) {
       MessageBox.confirm(
         '登录状态过期了哦，您可以继续留在该页面，或者重新登录',
-        '系统提示',
-        {
+        '系统提示', {
           confirmButtonText: '重新登录',
           cancelButtonText: '取消',
           type: 'warning'
