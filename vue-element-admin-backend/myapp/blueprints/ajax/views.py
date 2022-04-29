@@ -5,6 +5,7 @@
 from flask import Blueprint, jsonify, render_template
 from flask_login import current_user
 
+from myapp.decorators import permission_required
 from myapp.models.user import Post, User, Notification
 from myapp.utils.notifications import push_collect_notification, push_follow_notification
 
@@ -59,6 +60,7 @@ def notifications_count():
 
 
 @ajax_bp.route('/collect/<int:post_id>', methods=['POST'])
+@permission_required('FOLLOW')
 def collect(post_id):
     """
     用户收藏文章

@@ -1,76 +1,12 @@
 # 作者：我只是代码的搬运工
 # coding:utf-8
 from collections import namedtuple
-from flask import request, current_app, g
-from flask_httpauth import HTTPTokenAuth
+from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 from exts import db
-from myapp.utils.network import Result
 from settings import Operations
 
-auth = HTTPTokenAuth(scheme='JWT')
 User = namedtuple('User', ['uid', 'scope'])  # 创建一个User对象
-
-
-# token验证
-@auth.verify_token
-def verify_token(token):
-    g.token_error = False
-    g.token_timeout = False
-    g.token_permission = False
-    print("验证的token:===", token)
-    user_info, status = verify_auth_token(token)
-    if user_info and status:
-        print("jwt验证成功!")
-        g.user = user_info
-        return True
-    else:
-        print("jwt验证失败!")
-        return False
-
-
-@auth.error_handler
-def unauthorized():
-    """
-    auth认证失败的处理
-    """
-    if g.token_error:
-        return Result.error(message="Token错误!")
-    elif g.token_timeout:
-        return Result.error(message="Token已过期!")
-    elif g.token_permission:
-        return Result.error(message="权限不足!")
-
-
-# 验证token
-def verify_auth_token(token):
-    s = Serializer(current_app.config['JWT_SECRET'])
-    if not token:
-        g.token_error = True
-        print("没有token")
-        return Result.error(message="未传入token!"), False
-    try:
-        data = s.loads(token)  # 进行token验证
-
-    except SignatureExpired:  # 过期了
-        g.token_timeout = True
-        print("过期了")
-        return Result.error(message="token已过期!"), False
-    except BadSignature:
-        g.token_error = True
-        print("token验证失败")
-        return Result.error(message="token错误!"), False
-
-    uid = data['uid']
-    scope = data['scope']
-    # # 进行权限的功能的验证
-    # endpoint = request.endpoint.split('.')[1]
-    # allow = is_in_scope(scope, endpoint)  # 身份验证,判断是否视图函数是否合适
-    # if not allow:
-    #     print("权限不够!")
-    #     g.token_permission = True
-    #     return Result.error(code=404, message="无此权限!"), False
-    return User(uid, scope), True  # 返回一个对象
 
 
 def generate_token(user, operation, expire_in=None, **kwargs):

@@ -9,7 +9,7 @@ from flask_login import current_user, login_required, logout_user, fresh_login_r
 from exts import db, qiniu_store, avatars
 from myapp.blueprints.user.forms import PostForm, CategoryForm, LinkForm, EditProfileForm, ChangePasswordForm, \
     ChangeEmailForm, NotificationSettingForm, PrivacySettingForm, DeleteAccountForm, UploadAvatarForm, CropAvatarForm
-from myapp.decorators import confirm_required, permission_required
+from myapp.decorators import confirm_required, permission_required, check_locked
 from myapp.models.user import Post, Category, User, Link, Collect
 from myapp.utils import allowed_file, redirect_back
 from myapp.utils.emails import send_change_email_email
@@ -22,6 +22,7 @@ user_bp = Blueprint("user", __name__)
 
 @user_bp.route('/<username>')
 @login_required
+@check_locked
 def index(username):
     """
     个人主页
@@ -30,9 +31,6 @@ def index(username):
     """
     # 根据用户ID查询用户
     user = User.query.filter_by(username=username).first_or_404()  # 查询用户
-    # 判断用户是否被锁定
-    if user.locked:
-        flash("当前用户已锁定!", 'danger')
     # 判断用户是否被激活
     if user == current_user and not user.active:
         # 未被激活,退出登录
@@ -48,6 +46,7 @@ def index(username):
 
 @user_bp.route('/post/upload', methods=['POST'])
 @login_required
+@check_locked
 def upload():
     """
     上传文件,并进行保存
@@ -81,6 +80,7 @@ def image(filename):
 @user_bp.route('/post/new', methods=['GET', 'POST'])
 @login_required  # 确保管理员已登录
 @confirm_required  # 验证确认状态
+@check_locked
 def new_post():
     """
     创建文章并发布
@@ -108,6 +108,7 @@ def new_post():
 
 @user_bp.route('/post/manage/<username>')
 @login_required
+@check_locked
 def manage_post(username):
     """
     管理当前用户发表的文章
@@ -117,7 +118,7 @@ def manage_post(username):
     # 根据用户ID查询用户
     user = User.query.filter_by(username=username).first_or_404()  # 查询用户
     # 判断用户是否被锁定
-    if user.locked:
+    if user.role.name == "locked":
         flash("当前用户已锁定!", 'danger')
     # 判断用户是否被激活
     if user == current_user and not user.active:
@@ -134,6 +135,7 @@ def manage_post(username):
 
 @user_bp.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
 @login_required
+@check_locked
 def edit_post(post_id):
     """
     更新文章
@@ -158,6 +160,7 @@ def edit_post(post_id):
 
 @user_bp.route('/post/<int:post_id>/delete', methods=['POST'])
 @login_required
+@check_locked
 def delete_post(post_id):
     """
     删除文章
@@ -174,6 +177,7 @@ def delete_post(post_id):
 
 @user_bp.route('/category/new', methods=['GET', 'POST'])
 @login_required
+@check_locked
 def new_category():
     """
     创建新的分类
@@ -191,58 +195,9 @@ def new_category():
     return render_template('user/new_category.html', form=form)
 
 
-# 分类的管理接口
-# @user_bp.route('/category/manage/<username>')
-# @login_required
-# def manage_category(username):
-#     """
-#     管理分类
-#     :return:
-#     """
-#     # 根据用户ID查询用户
-#     user = User.query.filter_by(username=username).first_or_404()  # 查询用户
-#     # 判断用户是否被锁定
-#     if user.locked:
-#         flash("当前用户已锁定!", 'danger')
-#     # 判断用户是否被激活
-#     if user == current_user and not user.active:
-#         # 未被激活,退出登录
-#         logout_user()
-#     # 获取当前的文章的页数
-#     page = request.args.get('page', 1, type=int)  # 获取当前页数
-#     per_page = current_app.config['BLUELOG_POST_PER_PAGE']  # 文章分页数
-#     # 获取分页对象(获取当前用户的文章)
-#     pagination = Post.query.with_parent(user).order_by(Post.timestamp.desc()).paginate(page, per_page)
-#     posts = pagination.items
-#     return render_template('user/manage_category.html')
-#
-#
-# @user_bp.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
-# @login_required
-# def edit_category(category_id):
-#     form = CategoryForm()
-#     category = Category.query.get_or_404(category_id)
-#     if form.validate_on_submit():
-#         category.name = form.name.data
-#         db.session.commit()
-#         flash("分类已更新!", 'info')
-#         return redirect(url_for('user.manage_category'))
-#
-#     return render_template('user/edit_category.html', form=form)
-#
-#
-# @user_bp.route('/category/<int:category_id>/delete')
-# @login_required
-# def delete_category(category_id):
-#     category = Category.query.get_or_404(category_id)
-#     db.session.delete(category)
-#     db.session.commit()
-#     flash("分类已删除!", 'info')
-#     return redirect(url_for('user.manage_category',))
-
-
 @user_bp.route('/link/new', methods=['GET', 'POST'])
 @login_required
+@check_locked
 def new_link():
     form = LinkForm()
     if form.validate_on_submit():
@@ -257,59 +212,11 @@ def new_link():
     return render_template('user/new_link.html', form=form)
 
 
-# 友情链接的管理接口
-# @user_bp.route('/link/manage')
-# @login_required
-# def manage_link():
-#     """
-#     管理链接
-#     :return:
-#     """
-#     return render_template('user/manage_link.html')
-#
-#
-# @user_bp.route('/link/<int:link_id>/edit', methods=['GET', 'POST'])
-# @login_required
-# def edit_link(link_id):
-#     """
-#     编辑链接
-#     :param link_id:
-#     :return:
-#     """
-#     link = Link.query.get_or_404(link_id)
-#     form = LinkForm()
-#     if form.validate_on_submit():
-#         link.name = form.name.data
-#         link.url = form.url.data
-#         db.session.commit()
-#         flash("链接更新成功!", 'success')
-#         return redirect(url_for('user.manage_link'))
-#
-#     form.name.data = link.name
-#     form.url.data = link.url
-#
-#     return render_template('user/edit_link.html', form=form)
-#
-#
-# @user_bp.route('link/<int:link_id>/delete', methods=['POST'])
-# @login_required
-# def delete_link(link_id):
-#     """
-#     删除链接
-#     :param link_id:
-#     :return:
-#     """
-#     link = Link.query.get_or_404(link_id)
-#     db.session.delete(link)
-#     db.session.commit()
-#     flash("链接已删除!", 'info')
-#     return redirect(url_for('user.manage_link'))
-
-
 @user_bp.route('/follow/<username>', methods=['POST'])
 @login_required
 @confirm_required
 @permission_required('FOLLOW')
+@check_locked
 def follow(username):
     """
     关注用户视图
@@ -334,6 +241,7 @@ def follow(username):
 
 @user_bp.route('unfollow/<username>')
 @login_required
+@check_locked
 def unfollow(username):
     """
      用户取消关注用户
@@ -411,6 +319,7 @@ def show_collections(username):
 
 @user_bp.route('/settings/profile', methods=['GET', 'POST'])
 @login_required
+@check_locked
 def edit_profile():
     """
     编辑个人信息
@@ -442,7 +351,7 @@ def change_password():
     # 验证表单的输入
     if form.validate_on_submit():
         # 验证旧密码
-        if current_user.validate_password(form.old_password.data):
+        if current_user.check_password(form.old_password.data):
             # 设置密码
             current_user.set_password(form.password.data)
             db.session.commit()
@@ -473,6 +382,7 @@ def change_email_request():
 
 @user_bp.route('/change-email/<token>')
 @login_required
+@check_locked
 def change_email(token):
     """
     验证token并判断是什么操作然后进行相应的操作
@@ -490,6 +400,7 @@ def change_email(token):
 
 @user_bp.route('/settings/notification-setting', methods=['GET', 'POST'])
 @login_required
+@check_locked
 def notification_setting():
     # 通知设置表单
     form = NotificationSettingForm()
@@ -508,6 +419,7 @@ def notification_setting():
 
 @user_bp.route('/settings/privacy-setting', methods=['GET', 'POST'])
 @login_required
+@check_locked
 def privacy_setting():
     # 隐私设置表单
     form = PrivacySettingForm()
@@ -522,6 +434,7 @@ def privacy_setting():
 
 @user_bp.route('/settings/delete-account', methods=['GET', 'POST'])
 @login_required
+@check_locked
 def delete_account():
     # 注销用户的表单
     form = DeleteAccountForm()
@@ -536,6 +449,7 @@ def delete_account():
 @user_bp.route('/settings/change-avatar', methods=['GET', 'POST'])
 @login_required
 @confirm_required
+@check_locked
 def change_avatar():
     """
     修改头像
@@ -551,6 +465,7 @@ def change_avatar():
 @user_bp.route('/settings/avatar/upload', methods=['POST'])
 @login_required
 @confirm_required
+@check_locked
 def upload_avatar():
     """
     保存上传后的图片
@@ -571,6 +486,7 @@ def upload_avatar():
 @user_bp.route('/settings/avatar/crop', methods=['POST'])
 @login_required
 @confirm_required
+@check_locked
 def crop_avatar():
     """
     处理裁剪图片后的结果并保存图片

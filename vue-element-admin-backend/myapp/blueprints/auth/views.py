@@ -29,12 +29,14 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data.lower()).first()
         if user and user.check_password(form.password.data):
-            if login_user(user, form.remember_me.data):  # 记住我登录选项
+            if login_user(user, form.remember_me.data) and not user.role.name == "locked":  # 记住我登录选项
                 flash('登录成功!', 'info')
                 return redirect_back()  # 回到首页
             else:
                 flash('你的账号已被封禁!', 'warning')
-                return redirect(url_for('main.index'))
+                # 账号被禁无法登录!
+                logout_user()
+                return redirect_back()
         flash('邮箱或密码错误!', 'warning')
     return render_template('auth/login.html', form=form)
 
@@ -57,11 +59,11 @@ def register():
         if email == current_app.config['ADMIN_EMAIL']:
             user = User(
                 username=username,
-                auth=4,
                 name=name,
                 email=current_app.config['ADMIN_EMAIL'],
                 confirmed=True,
-                active=True
+                active=True,
+                role_id=3,
             )
         # 设置rsa与hash密码
         user.set_password(password=password)

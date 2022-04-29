@@ -11,7 +11,7 @@ from myapp.blueprints.user.views import user_bp
 from exts import bootstrap, db, cors, mail, avatars, login_manager, csrf, qiniu_store, moment, ckeditor, \
     whooshee
 from myapp.models.user import Role, User, Category, Comment, Link, Follow, Collect
-from myapp.utils import Result
+from myapp.utils.network import Result
 
 from settings import DevelopmentConfig
 
@@ -102,7 +102,8 @@ def register_commands(app):
         db.create_all()  # 根据模型生成相应的表
         click.echo('初始化权限与角色的数据库...')
         Role.init_role()
-        admin = User.query.filter_by(auth=3).first()  # 首先查询是否存在超级管理员
+
+        admin = User.query.filter_by(role_id=3).first()  # 首先查询是否存在超级管理员
         if admin is not None:
             click.echo('超级管理员账户已存在,正在更新管理员信息....')
             admin.username = username
@@ -112,7 +113,7 @@ def register_commands(app):
             click.echo('创建超级管理员账户中......')
             admin = User(
                 username=username,
-                auth=3,
+                role_id=3,
                 name=name,
                 email=app.config['ADMIN_EMAIL'],
                 confirmed=True,
@@ -138,7 +139,7 @@ def register_commands(app):
         test_password = "12345678"
         click.echo("开始创建测试员......")
         test_user = User.query.filter_by(
-            username=test_username).first()  # 首先查询是否存在测试用户
+            username=test_username, role_id=2).first()  # 首先查询是否存在测试用户
         if test_user is not None:
             click.echo('测试账户已存在,正在更新测试员信息....')
             test_user.username = test_username
@@ -148,7 +149,7 @@ def register_commands(app):
             click.echo('创建测试员账户中......')
             test_user = User(
                 username=test_username,
-                auth=2,
+                role_id=2,
                 name=test_name,
                 email=test_email,
                 confirmed=True,

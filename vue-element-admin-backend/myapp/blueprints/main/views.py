@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, send_from_directory, current_app, 
 from flask_login import current_user, login_required
 from exts import db
 from myapp.blueprints.main.forms import CommentForm
-from myapp.decorators import permission_required, confirm_required
+from myapp.decorators import permission_required, confirm_required, check_locked
 from myapp.models.user import Post, Category, Comment, User, Collect, Notification
 from myapp.utils import redirect_back
 from myapp.utils.notifications import push_comment_notification, push_collect_notification
@@ -95,6 +95,7 @@ def show_post(post_id):
 
 @main_bp.route('/report/post/<int:post_id>', methods=['POST'])
 @login_required
+@check_locked
 def report_post(post_id):
     """
     举报文章
@@ -110,6 +111,7 @@ def report_post(post_id):
 
 @main_bp.route('/category/<int:category_id>')
 @login_required
+@check_locked
 def show_category(category_id):
     """
     展示分类详情
@@ -131,6 +133,7 @@ def show_category(category_id):
 @main_bp.route('/post/<int:post_id>/comment/new', methods=['POST'])
 @login_required
 @permission_required('COMMENT')
+@check_locked
 def new_comment(post_id):
     """
     创建文章评论
@@ -165,6 +168,7 @@ def new_comment(post_id):
 @main_bp.route('/reply/comment/<int:comment_id>')
 @login_required
 @permission_required('COMMENT')
+@check_locked
 def reply_comment(comment_id):
     """
     回复评论
@@ -181,6 +185,7 @@ def reply_comment(comment_id):
 @main_bp.route('/set_comment/<int:post_id>', methods=['POST'])
 @login_required
 @permission_required('COMMENT')
+@check_locked
 def set_comment(post_id):
     """
     设置评论功能
@@ -204,6 +209,7 @@ def set_comment(post_id):
 @main_bp.route('/delete/comment/<int:comment_id>', methods=['POST'])
 @login_required
 @permission_required('COMMENT')
+@check_locked
 def delete_comment(comment_id):
     """
     删除评论
@@ -222,6 +228,7 @@ def delete_comment(comment_id):
 
 @main_bp.route('/report/comment/<int:comment_id>')
 @login_required
+@check_locked
 def report_comment(comment_id):
     """
     举报评论
@@ -239,6 +246,7 @@ def report_comment(comment_id):
 @login_required
 @confirm_required
 @permission_required('COLLECT')  # 判断是否有收藏的权限
+@check_locked
 def collect(post_id):
     """
     用户收藏文章
@@ -264,6 +272,7 @@ def collect(post_id):
 @login_required
 @confirm_required
 @permission_required('COLLECT')  # 判断是否有收藏的权限
+@check_locked
 def uncollect(post_id):
     """
     取消收藏文章
@@ -285,6 +294,7 @@ def uncollect(post_id):
 @main_bp.route('/post/<int:post_id>/collectors')
 @login_required
 @confirm_required
+@check_locked
 def show_collectors(post_id):
     """
     显示文章的收藏者
@@ -304,6 +314,7 @@ def show_collectors(post_id):
 
 @main_bp.route('/notifications')
 @login_required
+@check_locked
 def show_notifications():
     """
     展示用户的通知
@@ -326,6 +337,7 @@ def show_notifications():
 
 @main_bp.route('/notification/read/<int:notification_id>', methods=['POST'])
 @login_required
+@check_locked
 def read_notification(notification_id):
     """
     确认单个通知
@@ -344,6 +356,7 @@ def read_notification(notification_id):
 
 @main_bp.route('/notifications/read/all', methods=['POST'])
 @login_required
+@check_locked
 def read_all_notification():
     """
     确认所有通知

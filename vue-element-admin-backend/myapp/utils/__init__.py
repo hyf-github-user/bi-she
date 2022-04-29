@@ -6,7 +6,6 @@ from urllib.parse import urlparse, urljoin
 from flask import request, redirect, url_for, current_app
 
 from myapp.utils.rsa_message import RSAUtil
-from myapp.utils.network import Result
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 import random
 
@@ -139,6 +138,7 @@ def mkdir_path(path):
     """
     if not os.path.exists(path):
         os.makedirs(path)
+
 
 def allowed_file(filename):
     return '.' in filename and \

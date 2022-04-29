@@ -7,7 +7,6 @@ from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import check_password_hash, generate_password_hash
 from exts import db, whooshee
-from myapp.utils.network import Result
 
 
 # 用户与用户关联模型(自我关联模型)
@@ -35,7 +34,6 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(120), nullable=False)  # 登录名称
     password_hash = db.Column(db.String(120))  # 哈希密码
-    auth = db.Column(db.SmallInteger, default=2)  # 级别(分为1,2,3 三个等级)
     name = db.Column(db.String(20), nullable=False)  # 真实姓名
     email = db.Column(db.String(254), nullable=False,
                       unique=True, index=True)  # 用户邮箱
@@ -53,11 +51,10 @@ class User(db.Model, UserMixin):
     # 用户状态
     active = db.Column(db.Boolean, default=True)  # 是否激活用户
     confirmed = db.Column(db.Boolean, default=False)  # 确认注册
-    locked = db.Column(db.Boolean, default=False)  # 锁定用户
 
     # 身份字段
     # 用户与身份的关联(一对多)
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'), default=2)
     role = db.relationship('Role', back_populates='users')
 
     # 是否接收通知消息
@@ -97,42 +94,6 @@ class User(db.Model, UserMixin):
         # 用户关注自己
         self.follow(self)
 
-    # 更新用户信息
-    def update(self, username, name, email, active, locked, confirmed, role_id):
-        self.username = username
-        self.name = name
-        self.email = email
-        self.active = active
-        self.confirmed = confirmed
-        self.role_id = role_id
-        # role_id与locked的关系
-        if self.role_id == 1:
-            self.locked = 1
-        else:
-            self.locked = locked
-        if self.locked == 1:
-            self.role_id = 1
-            self.auth = 1
-        else:
-            # 保证auth与role_id一样
-            self.auth = self.role_id
-
-    # 转换为json数据
-    def to_json(self):
-        return {
-            'id': self.id,
-            'username': self.username,
-            'name': self.name,
-            'auth': self.auth,
-            'email': self.email,
-            'active': self.active,
-            'confirmed': self.confirmed,
-            'locked': self.locked,
-            'register_time': self.register_time,
-            'rsa_password_hash': self.rsa_password,
-            'role_id': self.role_id,
-        }
-
     # 初始化角色信息,设置role
     def set_role(self):
         if self.role is None:
@@ -163,10 +124,6 @@ class User(db.Model, UserMixin):
             return False
         return check_password_hash(self.password_hash, password)
 
-    # 验证rsa密码
-    def check_rsa(self, password):
-        pass
-
     # 自动生成头像
     def generate_avatar(self):
         avatar = Identicon()
@@ -175,35 +132,6 @@ class User(db.Model, UserMixin):
         self.avatar_m = filenames[1]
         self.avatar_l = filenames[2]
         db.session.commit()
-
-    # 验证密码
-    @staticmethod
-    def verify(username, password):
-        user = User.query.filter_by(username=username).first()
-        if not user:  # 无用户
-            # 返回认证失败的错误
-            return Result.error(message="无此用户!"), False
-        if not user.check_password(password):  # 密码错误
-            return Result.error(message="用户名或密码错误!"), False
-        # 用户类别判断
-        scope = 'admin' if user.auth == 3 else \
-            'user' if user.auth == 2 \
-                else 'locked'
-        return {'uid': user.id, 'scope': scope}, True
-
-    # 产生token
-    @staticmethod
-    def create_token(uid, scope):
-        s = Serializer(current_app.config['JWT_SECRET'], expires_in=current_app.config['TOKEN_EXPIRATION'])
-        t = s.dumps({
-            'uid': uid,
-            'scope': scope
-        })
-        # 进行ASCII编码
-        token = {
-            'token': t.decode('ascii')
-        }
-        return token
 
     # 一个方法变成属性调用
     @property
